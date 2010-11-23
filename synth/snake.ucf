@@ -1,0 +1,40 @@
+### Spartan-3 Clock - 50MHz oscillator
+NET ext_clk_50 LOC=T9;  
+
+### Spartan-3 VGA Port:
+NET red_out LOC=R12;  # Red
+NET green_out LOC=T12;  # Green
+NET blue_out LOC=R11;  # Blue
+NET hs_out LOC=R9;  # Horizontal sync
+NET vs_out LOC=T10;  # Vertical sync
+### Spartan-3 LED SEGMENTS x 4
+#NET an[0] LOC=d14;  # LED SEG 1 anode
+#NET an[1] LOC=g14;  # LED SEG 2 anode
+#NET an[2] LOC=f14;  # LED SEG 3 anode
+#NET an[3] LOC=e13;  # LED SEG 4 anode
+#NET seven_seg[0] LOC=e14;  # Segment A
+#NET seven_seg[1] LOC=g13;  # Segment B
+#NET sseven_seg[2] LOC=h15;  # Segment C
+#NET seven_seg[3] LOC=p15;  # Segment D
+#NET seven_seg[4] LOC=r16;  # Segment E
+#NET seven_seg[5] LOC=f13;  # Segment F
+#NET seven_seg[6] LOC=n16;  # Segment G
+#NET seven_seg[7] LOC=p16;  # Decimal Point
+
+### Spartan-3 Button for reset
+NET ext_reset LOC=l14;  # Reset Button
+
+### Spartan-3 LED for 'clocks locked'
+NET clks_locked LOC=K12;  #LED 8 to indicate 'clocks locked'
+
+### Spartan-3 PS2 Port
+# NET ps2d LOC=m15;  #PS2 Data
+# NET ps2c LOC=m16;  #PS2 Clock
+#Created by Constraints Editor (xc3s200-ft256-4) - 2010/11/16
+NET "ext_clk_50" TNM_NET = ext_clk_50;
+TIMESPEC TS_ext_clk_50 = PERIOD "ext_clk_50" 20 ns HIGH 50%;
+
+### DCM STUFF
+
+
+
