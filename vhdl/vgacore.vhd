@@ -1,28 +1,20 @@
 --------------------------------------------------------------------------------
+-- Module Name:    VGA - behavioral
+--
+-- Author: Aaron Storey
+-- 
+-- Description: This module checks the Video Ram for the state of each 'cell'
+--              the monitor is generating and rerieves the pixel data from a character ROM
+-- 
+-- 
+-- Dependencies: VRAM, SHFTREG and CHROM modules.
+-- 
+-- 
+-- Reference Material:
+-- VGATEST vhdl authored by :
 -- Company:  Department of Computer Science, University of Texas at San Antonio
 -- Engineer:  Chia-Tien Dan Lo (danlo@cs.utsa.edu)
---
--- Create Date:    11:01:23 08/20/06
--- Design Name:    
--- Module Name:    vgacore - behavioral
--- Project Name:   
--- Target Device:   Xilinx Spartan 3 xc3s200 on Didilent Spartan-3 Starter Kit Board
--- Tool versions: ISE 8.1.03i 
--- Description: This VGA test will draw a single color page and change color
---                                       every one second. VGA resolution is 640x480 @25 MHZ 8 colors
--- Dependencies:
 -- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
--- Pin Assignment:
--- MET clk50_in loc = T9
--- NET red_out LOC=R12; 
--- NET green_out LOC=T12;
--- NET blue_out LOC=R11;
--- NET hs_out LOC=R9; 
--- NET vs_out LOC=T10; 
 --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
@@ -39,7 +31,7 @@ entity vga_core is
        hs_out      : out std_logic;
        vs_out      : out std_logic;
 		 ram_address_b : out unsigned(12 downto 0);
-		 ram_data_b : in unsigned(5 downto 0);
+		 ram_data_b : in unsigned(7 downto 0);
 		 rom_address : out unsigned(8 downto 0);
 		 rom_data : in unsigned(7 downto 0);
 		 strobe: out std_logic;
@@ -168,7 +160,7 @@ begin
 		  ram_address_b <= to_unsigned((to_integer(cell)), ram_address_b'length);
 		elsif pixelcount_w = "100" then
 			strobe <= '0';
-			rom_address <= to_unsigned(to_integer(ram_data_b) * 8 + to_integer(row_count), rom_address'length);
+			rom_address <= to_unsigned(to_integer(ram_data_b(5 downto 0)) * 8 + to_integer(row_count), rom_address'length);
 		elsif pixelcount_w = "101" then
 			strobe <= '0';
 			row_data <= rom_data;

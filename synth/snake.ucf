@@ -1,3 +1,7 @@
+###
+### SPARTAN 3 STARTER BOARD SETUP
+###
+###
 ### Spartan-3 Clock - 50MHz oscillator
 NET ext_clk_50 LOC=T9;  
 

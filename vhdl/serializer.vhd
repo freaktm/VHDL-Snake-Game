@@ -1,3 +1,20 @@
+--------------------------------------------------------------------------------
+-- Module Name:    VRAM - behavioral
+--
+-- Author: Anthony Blake
+-- 
+-- Description: 8 to 1 Serializer
+--              
+-- 
+-- 
+-- Dependencies: 
+-- 
+-- 
+-- Assisted by:
+--
+-- Anthonix the great.
+-- 
+----------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

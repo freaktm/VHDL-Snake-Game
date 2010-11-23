@@ -1,8 +1,20 @@
+--------------------------------------------------------------------------------
+-- Module Name:    CHROM - behavioral
 --
+-- Author: Aaron Storey
 -- 
---    This Entity contains an array of data elements representing the fonts and characters 
-
---n00b
+-- Description: This module generates the character ROM to store the 
+--              pixel data for displaying the various characters
+-- 
+-- 
+-- Dependencies: 
+-- 
+-- 
+-- Assisted by:
+--
+-- Anthonix the great.
+-- 
+----------------------------------------------------------------------------
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -20,17 +32,17 @@ architecture behavioral of fontrom is
 type mem_array is array (0 to 511) of unsigned(7 downto 0);
 constant characters: mem_array := (
 
-  --blank square
+  --blank character (0)
 	"00000000",
 	"00000000",
-	"00011000",
-	"00111111",
-	"00111111",
-	"00011000",
+	"00000000",
+	"00000000",
+	"00000000",
+	"00000000",	
 	"00000000",
 	"00000000",
 	
-  --border square
+  --filled character (1)
 	"11111111",
 	"11111111",
 	"11111111",
@@ -40,7 +52,7 @@ constant characters: mem_array := (
 	"11111111",
 	"11111111",
 
-	-- horizontal line
+	-- horizontal line (2)
 	"00000000",
 	"00000000",
 	"00000000",
@@ -50,7 +62,7 @@ constant characters: mem_array := (
 	"00000000",
 	"00000000",
 	
-	-- vertical line
+	-- vertical line (3)
 	"00011000",
 	"00011000",
 	"00011000",
@@ -61,7 +73,7 @@ constant characters: mem_array := (
 	"00011000",
 	
 	
-	-- top right turn
+	-- top right turn (4)
 	"00011000",
 	"00011000",
 	"00011000",
@@ -71,7 +83,7 @@ constant characters: mem_array := (
 	"00000000",
 	"00000000",
 	
-	-- top left turn
+	-- top left turn (5)
 	"00011000",
 	"00011000",
 	"00011000",
@@ -81,7 +93,7 @@ constant characters: mem_array := (
 	"00000000",
 	"00000000",
 	
-	-- bottom right turn
+	-- bottom right turn (6)
 	"00000000",
 	"00000000",
 	"00000000",
@@ -91,7 +103,7 @@ constant characters: mem_array := (
 	"00011000",
 	"00011000",
 	
-	-- bottom left turn
+	-- bottom left turn (7)
 	"00000000",
 	"00000000",
 	"00000000",
@@ -101,7 +113,7 @@ constant characters: mem_array := (
 	"00011000",
 	"00011000",
 	
-	-- top tail
+	-- unused (8)
 	"00011000",
 	"00011000",
 	"00011000",
@@ -111,7 +123,7 @@ constant characters: mem_array := (
 	"00000000",
 	"00000000",
 	
-	-- bottom tail
+	-- unused (9)
 	"00000000",
 	"00000000",
 	"00000000",
@@ -121,7 +133,7 @@ constant characters: mem_array := (
 	"00011000",
 	"00011000",
 	
-	-- left tail
+	-- unused (10)
 	"00000000",
 	"00000000",
 	"00000000",
@@ -131,7 +143,7 @@ constant characters: mem_array := (
 	"00000000",
 	"00000000",
 	
-	-- right tail
+	-- unused (11)
 	"00000000",
 	"00000000",
 	"00000000",
@@ -182,7 +194,7 @@ constant characters: mem_array := (
 	"00000000",
 	"00000000",
 	
-	-- smash into vertical line
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -192,7 +204,7 @@ constant characters: mem_array := (
 	"10000000",
 	"00000000",
 	
-	-- smash into horizontal line
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -202,7 +214,7 @@ constant characters: mem_array := (
 	"10000000",
 	"00000000",
 	
-	-- smash into topr corner
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -212,7 +224,7 @@ constant characters: mem_array := (
 	"10000000",
 	"00000000",
 	
-	-- smash into topl corner
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -222,7 +234,7 @@ constant characters: mem_array := (
 	"10000000",
 	"00000000",
 		
-	-- smash into bottomr corner
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -232,7 +244,7 @@ constant characters: mem_array := (
 	"10000000",
 	"00000000",
 	
-	-- smash into bottoml corner
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -242,7 +254,7 @@ constant characters: mem_array := (
 	"10000000",
 	"00000000",
 	
-	-- smash into vert tail
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",
@@ -254,7 +266,7 @@ constant characters: mem_array := (
 	
 
 	
-	-- smash into horz tail
+	-- unused
 	"00000000",
 	"11110000",
 	"00010000",

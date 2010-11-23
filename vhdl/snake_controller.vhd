@@ -1,28 +1,19 @@
 --------------------------------------------------------------------------------
--- Company:  Department of Computer Science, University of Texas at San Antonio
--- Engineer:  Chia-Tien Dan Lo (danlo@cs.utsa.edu)
+-- Module Name:    MAINBOARD - behavioral
 --
--- Create Date:    11:01:23 08/20/06
--- Design Name:    
--- Module Name:    vgacore - behavioral
--- Project Name:   
--- Target Device:   Xilinx Spartan 3 xc3s200 on Didilent Spartan-3 Starter Kit Board
--- Tool versions: ISE 8.1.03i 
--- Description: This VGA test will draw a single color page and change color
---                                       every one second. VGA resolution is 640x480 @25 MHZ 8 colors
--- Dependencies:
+-- Author: Aaron Storey
 -- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
+-- Description: This module connects all the components together as a system
+--              
 -- 
--- Pin Assignment:
--- MET clk50_in loc = T9
--- NET red_out LOC=R12; 
--- NET green_out LOC=T12;
--- NET blue_out LOC=R11;
--- NET hs_out LOC=R9; 
--- NET vs_out LOC=T10; 
+-- 
+-- Dependencies: VRAM, DCM, LOGIC, VGA, CHROM1 & SHFTREG
+-- 
+-- 
+-- Assisted by:
+--
+-- Anthonix the great.
+-- 
 --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
@@ -191,7 +182,7 @@ begin
         data_output_b  => data_o_b);
 
   -- Character generator memory instantiation
-  CHROM1 : fontrom port map (
+  CHROM : fontrom port map (
 	 clk25 => clk25,
 	 address => number_address,
     data    => number_data

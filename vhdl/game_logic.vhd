@@ -1,22 +1,20 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+--------------------------------------------------------------------------------
+-- Module Name:    LOGIC - behavioral
+--
+-- Author: Aaron Storey
 -- 
--- Create Date:    12:58:58 11/18/2010 
--- Design Name: 
--- Module Name:    game_logic - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Description: This module controls the game logic for the snake physics etc.
+--              
+-- 
+-- 
+-- Dependencies: VRAM
+-- 
+-- 
+-- Assisted by:
 --
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
+-- Anthonix the great.
+-- 
+-----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
