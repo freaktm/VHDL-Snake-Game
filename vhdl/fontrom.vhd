@@ -2,6 +2,8 @@
 -- 
 --    This Entity contains an array of data elements representing the fonts and characters 
 
+--n00b
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
