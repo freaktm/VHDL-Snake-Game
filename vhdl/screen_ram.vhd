@@ -44,39 +44,39 @@ architecture syn of screen_ram is
     for i in 0 to 79 loop
 		for j in 0 to 59 loop
 			if (i=0 or i=79 or j=0 or j=59 or j=55) then
-				temp_ram(j*80+i) := "0000000000001000"; -- BORDERS
+				temp_ram(j*80+i) := to_unsigned(8, 16); -- BORDERS
 		   elsif (i=2 and j=57) then
-				temp_ram(j*80+i) := "0000000110100000"; -- S
+				temp_ram(j*80+i) := to_unsigned(52*8, 16); -- S
 			   elsif (i=3 and j=57) then
-				temp_ram(j*80+i) := "0000000100100000"; -- C
+				temp_ram(j*80+i) := to_unsigned(36*8, 16); -- C
 				elsif (i=4 and j=57) then
-				temp_ram(j*80+i) := "0000000110000000"; -- O
+				temp_ram(j*80+i) := to_unsigned(48*8, 16); -- O
 				elsif (i=5 and j=57) then
-				temp_ram(j*80+i) := "0000000110011000"; -- R
+				temp_ram(j*80+i) := to_unsigned(51*8, 16); -- R
 				elsif (i=6 and j=57) then
-				temp_ram(j*80+i) := "0000000100110000"; -- E	
+				temp_ram(j*80+i) := to_unsigned(38*8, 16); -- E	
 				elsif ((i=8 and j=57) or (i=9 and j=57) or (i=10 and j=57) or (i=11 and j=57)) then
-				temp_ram(j*80+i) := "0000000011000000"; -- 0		
+				temp_ram(j*80+i) := to_unsigned(24*8, 16); -- 0		
 			   elsif (i=66 and j=57) then
-				temp_ram(j*80+i) := "0000000110111000"; -- V
+				temp_ram(j*80+i) := to_unsigned(55*8, 16); -- V
 				elsif (i=67 and j=57) then
-				temp_ram(j*80+i) := to_unsigned(48*8, 16); -- H
+				temp_ram(j*80+i) := to_unsigned(41*8, 16); -- H
 				elsif (i=68 and j=57) then
-				temp_ram(j*80+i) := "0000000100101000"; -- D
+				temp_ram(j*80+i) := to_unsigned(37*8, 16); -- D
 				elsif (i=69 and j=57) then
-				temp_ram(j*80+i) := "0000000101101000"; -- L				
+				temp_ram(j*80+i) := to_unsigned(45*8, 16); -- L				
 	   		elsif (i=71 and j=57) then
-				temp_ram(j*80+i) := "0000000110100000"; -- S
+				temp_ram(j*80+i) := to_unsigned(52*8, 16); -- S
 			   elsif (i=72 and j=57) then
-				temp_ram(j*80+i) := "0000000101111000"; -- N
+				temp_ram(j*80+i) := to_unsigned(47*8, 16); -- N
 				elsif (i=73 and j=57) then
-				temp_ram(j*80+i) := "0000000100010000"; -- A
+				temp_ram(j*80+i) := to_unsigned(34*8, 16); -- A
 				elsif (i=74 and j=57) then
-				temp_ram(j*80+i) := "0000000101100000"; -- K
+				temp_ram(j*80+i) := to_unsigned(44*8, 16); -- K
 				elsif (i=75 and j=57) then
-				temp_ram(j*80+i) := "0000000100110000"; -- E	
+				temp_ram(j*80+i) := to_unsigned(38*8, 16); -- E	
 				else
-				temp_ram(j*80+i) := "0000000000000000";
+				temp_ram(j*80+i) := (others => '0');
 		   end if;
 		end loop;
     end loop;
