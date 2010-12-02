@@ -83,13 +83,13 @@ begin
           breakReceived <= '1';
         end if;
 
-        if scancode = keyboardA then
+        if scancode = keyboardW then
           Direction <= "00";
         elsif scancode = keyboardD then
           Direction <= "01";
         elsif scancode = keyboardS then
           Direction <= "10";
-        elsif scancode = keyboardW then
+        elsif scancode = keyboardA then
           Direction <= "11";
         end if;
       end if;
