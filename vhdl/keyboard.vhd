@@ -41,10 +41,10 @@ architecture Behavioral of KeyboardController is
   signal scancode      : std_logic_vector(7 downto 0);
   signal breakReceived : std_logic              := '0';
 
-  constant keyboardA : std_logic_vector(7 downto 0) := "00011100";
-  constant keyboardY : std_logic_vector(7 downto 0) := "00011010";
-  constant keyboardK : std_logic_vector(7 downto 0) := "01000010";
-  constant keyboardM : std_logic_vector(7 downto 0) := "00111010";
+  constant keyboardA : std_logic_vector(7 downto 0) := X"1C";
+  constant keyboardD : std_logic_vector(7 downto 0) := X"23";
+  constant keyboardS : std_logic_vector(7 downto 0) := X"1B";
+  constant keyboardW : std_logic_vector(7 downto 0) := X"1D";
 
 begin
 
@@ -72,9 +72,9 @@ begin
       -- breakcode breaks the current scancode
       if breakReceived = '1' then
         breakReceived <= '0';
---                              if scancode = keyboardA or scancode = keyboardY then
+--                              if scancode = keyboardA or scancode = keyboardD then
 --                                      LeftPaddleDirection <= 0;
---                              elsif scancode = keyboardK or scancode = keyboardM then
+--                              elsif scancode = keyboardS or scancode = keyboardW then
 --                                      RightPaddleDirection <= 0;
 --                              end if;
       elsif breakReceived = '0' then
@@ -85,11 +85,11 @@ begin
 
         if scancode = keyboardA then
           Direction <= "00";
-        elsif scancode = keyboardY then
+        elsif scancode = keyboardD then
           Direction <= "01";
-        elsif scancode = keyboardK then
+        elsif scancode = keyboardS then
           Direction <= "10";
-        elsif scancode = keyboardM then
+        elsif scancode = keyboardW then
           Direction <= "11";
         end if;
       end if;
