@@ -102,7 +102,7 @@ colour <= color;
  p_movesnake : process (clk25, ext_reset, Direction)
  begin
          if ext_reset = '1' then               -- asynchronous reset (active low)
-        --add resets for Direction
+        Direction <= (others => '0');
     elsif clk25'event and clk25 = '1' then    -- rising clock edge
 		
 			if (Direction = "00") then
