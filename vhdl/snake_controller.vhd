@@ -30,20 +30,21 @@ entity MAINBOARD is
        green_out   : out std_logic;
        blue_out    : out std_logic;
        hs_out      : out std_logic;
-       vs_out      : out std_logic
+       vs_out      : out std_logic;
+		 ps2d : in std_logic;
+		 ps2c : in std_logic
 		 );
 end MAINBOARD;
 
 architecture behavioral of MAINBOARD is
 
---component PS2 is
---    Port ( Clock : in STD_LOGIC;
---			  KeyboardClock : in STD_LOGIC;
---           KeyboardData : in STD_LOGIC;
---           LeftPaddleDirection : out integer;
---           RightPaddleDirection : out integer
---);
---end component;
+component KeyboardController is
+    Port ( Clock : in STD_LOGIC;
+	        KeyboardClock : in  STD_LOGIC;
+           KeyboardData : in  STD_LOGIC;
+           Direction : out std_logic_vector(1 downto 0)
+	);
+end component;
 
   component clock_sync is port (
 			 CLKIN_IN        : in    std_logic; 
@@ -56,13 +57,15 @@ architecture behavioral of MAINBOARD is
   
   component game_logic is
   port( 
-		 clk50 : in std_logic;
+		 clk25 : in std_logic;
        ext_reset   : in  std_logic;
        WEA_int     : out std_logic;
        EN_int      : out std_logic;
        address_a_int : out std_logic_vector(12 downto 0);
 	    input_a_int   : out unsigned(15 downto 0);
-       output_a_int   : in unsigned(15 downto 0)
+       output_a_int   : in unsigned(15 downto 0);
+		 colour : out unsigned(1 downto 0);
+		 Direction : in std_logic_vector(1 downto 0)
 				
 		 );
 end component;
@@ -82,7 +85,8 @@ component vga_core is
 		 rom_data : in unsigned(7 downto 0);
 		 strobe: out std_logic;
 		 row_data : out unsigned(7 downto 0);
-		 pixel : in std_logic  
+		 pixel : in std_logic;
+		 colour_in : in unsigned(1 downto 0)
 		 );
 end component;
 
@@ -130,6 +134,9 @@ end component;
   signal strobe_sig : std_logic;
   signal dout_int : std_logic;
   signal din_int : unsigned(7 downto 0);
+  signal colour_int : unsigned(1 downto 0);
+  signal Direction_int : std_logic_vector(1 downto 0);
+ -- signal kb_data : std_logic;
  
 
 
@@ -138,8 +145,13 @@ begin
   
   -- PS2  Keyboard Controller instantiation
 
---kbController : KeyboardController port map ( clk, kb_clk, kb_data, leftPaddleDirection, rightPaddleDirection );
---
+
+ PS2 : KeyboardController port map (
+			  Clock => clk25,
+	        KeyboardClock => ps2c,
+           KeyboardData => ps2d,
+           Direction => Direction_int
+	);
 
 
   -- Clock Manager instantiation 
@@ -155,13 +167,16 @@ begin
 --  GAME LOGIC instantiation
   LOGIC: game_logic
     port map (
-        clk50         => clk50,
+        clk25         => clk25,
         ext_reset     => ext_reset,
         WEA_int       => WEA,
         EN_int        => EN,
         address_a_int => address_a,
         input_a_int   => data_i_a,
-        output_a_int  => data_o_a
+        output_a_int  => data_o_a,
+		  colour => colour_int,
+		  Direction => Direction_int
+		
 		  );
 
 
@@ -181,7 +196,8 @@ begin
 		 rom_data => number_data,
 		 strobe => strobe_sig,
 		 row_data => din_int,
-		 pixel => dout_int
+		 pixel => dout_int,
+		 colour_in => colour_int
     );
 	 
  -- VRAM instantiation
