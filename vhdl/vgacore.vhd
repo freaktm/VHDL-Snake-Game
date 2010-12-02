@@ -36,7 +36,8 @@ rom_address : out unsigned(8 downto 0);
 rom_data : in unsigned(7 downto 0);
 strobe: out std_logic;
 row_data : out unsigned(7 downto 0);
-pixel : in std_logic
+pixel : in std_logic;
+colour_in : in unsigned(1 downto 0)
 );
 end vga_core;
 
@@ -61,12 +62,15 @@ signal hs_out_int, vs_out_int : std_logic;
 
 begin
 
-  cellupdate : process (clk25)
+  cellupdate : process (clk25, x, y)
    begin
 
 x_temp <= "000" & x(9 downto 3);
 y_temp <= "000" & y(9 downto 3);
 cell <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
+if (to_integer(hcounter) < 144) and (to_integer(vcounter) < 39) then
+ cell <= (others => '0');
+end if;
 
 
 end process;
@@ -93,9 +97,23 @@ end process;
         and (to_integer(vcounter) >= 39 ) -- 39
         and (to_integer(vcounter) < 519 ) -- 519
       then
+		if (colour_in = "00") then
 red_out <= '0';
 green_out <= '0';
 blue_out <= pixel;
+     elsif (colour_in = "01") then
+	  red_out <= pixel;
+green_out <= '0';
+blue_out <= '0';
+     elsif (colour_in = "10") then
+	  red_out <= '0';
+green_out <= pixel;
+blue_out <= '0';
+     elsif (colour_in = "11") then
+	  red_out <= pixel;
+green_out <= pixel;
+blue_out <= '0';
+ end if;
       else
           red_out <= '0';
           green_out <= '0';
@@ -154,6 +172,20 @@ row_count <= (others => '0');
 p_strobe: process(clk25, pixelcount_w, rom_data, ram_data_b)
 begin
 if clk25'event and clk25='1' then
+
+if (to_integer(hcounter) = 140) and (to_integer(vcounter) < 39) then
+ strobe <= '0';
+ ram_address_b <= to_unsigned((to_integer(cell)), ram_address_b'length);
+ elsif (to_integer(hcounter) = 141) and (to_integer(vcounter) < 39) then
+	strobe <= '0';
+	rom_address <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
+  elsif (to_integer(hcounter) = 142) and (to_integer(vcounter) < 39) then
+	strobe <= '0';
+	row_data <= rom_data;
+	 elsif (to_integer(hcounter) = 143) and (to_integer(vcounter) < 39) then
+		strobe <= '1';
+		end if;
+
 if pixelcount_w = "111" then
 strobe <= '1';
 elsif pixelcount_w < "100" then

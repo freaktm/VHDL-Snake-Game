@@ -36,6 +36,15 @@ end MAINBOARD;
 
 architecture behavioral of MAINBOARD is
 
+--component PS2 is
+--    Port ( Clock : in STD_LOGIC;
+--			  KeyboardClock : in STD_LOGIC;
+--           KeyboardData : in STD_LOGIC;
+--           LeftPaddleDirection : out integer;
+--           RightPaddleDirection : out integer
+--);
+--end component;
+
   component clock_sync is port (
 			 CLKIN_IN        : in    std_logic; 
           RST_IN          : in    std_logic; 
@@ -52,8 +61,8 @@ architecture behavioral of MAINBOARD is
        WEA_int     : out std_logic;
        EN_int      : out std_logic;
        address_a_int : out std_logic_vector(12 downto 0);
-	    input_a_int   : out std_logic_vector(5 downto 0);
-       output_a_int   : in std_logic_vector(5 downto 0)
+	    input_a_int   : out unsigned(15 downto 0);
+       output_a_int   : in unsigned(15 downto 0)
 				
 		 );
 end component;
@@ -68,7 +77,7 @@ component vga_core is
        hs_out      : out std_logic;
        vs_out      : out std_logic;
 		 ram_address_b : out unsigned(12 downto 0);
-		 ram_data_b : in unsigned(5 downto 0);
+		 ram_data_b : in unsigned(15 downto 0);
 		 rom_address : out unsigned(8 downto 0);
 		 rom_data : in unsigned(7 downto 0);
 		 strobe: out std_logic;
@@ -83,9 +92,9 @@ component screen_ram is
           enable_a   : in std_logic;
           addr_a : in std_logic_vector(12 downto 0);
 			 addr_b : in unsigned(12 downto 0);
-          data_input_a   : in std_logic_vector(5 downto 0);
-          data_output_a   : out std_logic_vector(5 downto 0);
-			 data_output_b   : out unsigned(5 downto 0)
+          data_input_a   : in unsigned(15 downto 0);
+          data_output_a   : out unsigned(15 downto 0);
+			 data_output_b   : out unsigned(15 downto 0)
 			 );
 end component;
 
@@ -113,9 +122,9 @@ end component;
   signal EN : std_logic;
   signal         address_a : std_logic_vector(12 downto 0);
 	signal		 address_b : unsigned(12 downto 0);
-        signal  data_i_a  : std_logic_vector(5 downto 0);
-         signal data_o_a : std_logic_vector(5 downto 0);
-			 signal data_o_b : unsigned(5 downto 0);
+        signal  data_i_a  : unsigned(15 downto 0);
+         signal data_o_a : unsigned(15 downto 0);
+			 signal data_o_b : unsigned(15 downto 0);
 			   signal number_data    : unsigned( 7 downto 0);
   signal number_address : unsigned( 8 downto 0);
   signal strobe_sig : std_logic;
@@ -126,6 +135,12 @@ end component;
 
 
 begin
+  
+  -- PS2  Keyboard Controller instantiation
+
+--kbController : KeyboardController port map ( clk, kb_clk, kb_data, leftPaddleDirection, rightPaddleDirection );
+--
+
 
   -- Clock Manager instantiation 
   DCM : clock_sync port map (
