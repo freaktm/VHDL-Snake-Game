@@ -72,11 +72,7 @@ begin
       -- breakcode breaks the current scancode
       if breakReceived = '1' then
         breakReceived <= '0';
---                              if scancode = keyboardA or scancode = keyboardD then
---                                      LeftPaddleDirection <= 0;
---                              elsif scancode = keyboardS or scancode = keyboardW then
---                                      RightPaddleDirection <= 0;
---                              end if;
+
       elsif breakReceived = '0' then
         -- scancode processing
         if scancode = "11110000" then   -- mark break for next scancode
