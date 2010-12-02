@@ -75,6 +75,10 @@ architecture syn of screen_ram is
           temp_ram(j*80+i) := to_unsigned(44*8, 16);  -- K
         elsif (i = 75 and j = 57) then
           temp_ram(j*80+i) := to_unsigned(38*8, 16);  -- E       
+		        elsif (i = 40 and j = 30) then
+          temp_ram(j*80+i) := to_unsigned(3*8, 16);  -- Snake Head  
+		        elsif (i = 40 and j = 31) then
+          temp_ram(j*80+i) := to_unsigned(3*8, 16);  -- Snake Tail 			 
         else
           temp_ram(j*80+i) := (others => '0');
         end if;
