@@ -25,16 +25,16 @@ entity screen_ram is
           enable_a   : in std_logic;
           addr_a : in std_logic_vector(12 downto 0);
 			 addr_b : in std_logic_vector(12 downto 0);
-          data_input_a   : in std_logic_vector(7 downto 0);
-          data_output_a   : out std_logic_vector(7 downto 0);
-			 data_output_b   : out std_logic_vector(7 downto 0)
+          data_input_a   : in unsigned(15 downto 0);
+          data_output_a   : out unsigned(15 downto 0);
+			 data_output_b   : out unsigned(15 downto 0)
 			 );
 end screen_ram;
 
 
 architecture syn of screen_ram is
 
-  type video_ram is array(0 to 4799) of std_logic_vector(7 downto 0);
+  type video_ram is array(0 to 8191) of unsigned(15 downto 0);
   
   impure function generate_static_display 
   return video_ram is
@@ -44,39 +44,39 @@ architecture syn of screen_ram is
     for i in 0 to 79 loop
 		for j in 0 to 59 loop
 			if (i=0 or i=79 or j=0 or j=59 or j=55) then
-				temp_ram(j*80+i) := "00000001";
+				temp_ram(j*80+i) := "0000000000001000"; -- BORDERS
 		   elsif (i=2 and j=57) then
-				temp_ram(j*80+i) := "00110100"; -- 52nd character Letter S
+				temp_ram(j*80+i) := "0000000110100000"; -- S
 			   elsif (i=3 and j=57) then
-				temp_ram(j*80+i) := "00100100"; -- 36th character Letter C
+				temp_ram(j*80+i) := "0000000100100000"; -- C
 				elsif (i=4 and j=57) then
-				temp_ram(j*80+i) := "00110000"; -- 48th character Letter O
+				temp_ram(j*80+i) := "0000000110000000"; -- O
 				elsif (i=5 and j=57) then
-				temp_ram(j*80+i) := "00110011"; -- 51st character Letter R
+				temp_ram(j*80+i) := "0000000110011000"; -- R
 				elsif (i=6 and j=57) then
-				temp_ram(j*80+i) := "00100110"; -- 38th character Letter E	
+				temp_ram(j*80+i) := "0000000100110000"; -- E	
 				elsif ((i=8 and j=57) or (i=9 and j=57) or (i=10 and j=57) or (i=11 and j=57)) then
-				temp_ram(j*80+i) := "00100001"; -- 33rd character Number 0		
-			   elsif (i=45 and j=57) then
-				temp_ram(j*80+i) := "00110111"; -- 55th character Letter V
-				elsif (i=46 and j=57) then
-				temp_ram(j*80+i) := "00101001"; -- 41st character Letter H
-				elsif (i=47 and j=57) then
-				temp_ram(j*80+i) := "00100101"; -- 37th character Letter D
-				elsif (i=48 and j=57) then
-				temp_ram(j*80+i) := "00101100"; -- 44th character Letter L				
-	   		elsif (i=50 and j=57) then
-				temp_ram(j*80+i) := "00110100"; -- 52nd character Letter S
-			   elsif (i=51 and j=57) then
-				temp_ram(j*80+i) := "00100100"; -- th character Letter N
-				elsif (i=52 and j=57) then
-				temp_ram(j*80+i) := "00110000"; -- th character Letter A
-				elsif (i=53 and j=57) then
-				temp_ram(j*80+i) := "00110011"; -- st character Letter K
-				elsif (i=54 and j=57) then
-				temp_ram(j*80+i) := "00100110"; -- 38th character Letter E	
+				temp_ram(j*80+i) := "0000000011000000"; -- 0		
+			   elsif (i=66 and j=57) then
+				temp_ram(j*80+i) := "0000000110111000"; -- V
+				elsif (i=67 and j=57) then
+				temp_ram(j*80+i) := to_unsigned(48*8, 16); -- H
+				elsif (i=68 and j=57) then
+				temp_ram(j*80+i) := "0000000100101000"; -- D
+				elsif (i=69 and j=57) then
+				temp_ram(j*80+i) := "0000000101101000"; -- L				
+	   		elsif (i=71 and j=57) then
+				temp_ram(j*80+i) := "0000000110100000"; -- S
+			   elsif (i=72 and j=57) then
+				temp_ram(j*80+i) := "0000000101111000"; -- N
+				elsif (i=73 and j=57) then
+				temp_ram(j*80+i) := "0000000100010000"; -- A
+				elsif (i=74 and j=57) then
+				temp_ram(j*80+i) := "0000000101100000"; -- K
+				elsif (i=75 and j=57) then
+				temp_ram(j*80+i) := "0000000100110000"; -- E	
 				else
-				temp_ram(j*80+i) := "00000000";
+				temp_ram(j*80+i) := "0000000000000000";
 		   end if;
 		end loop;
     end loop;
@@ -85,6 +85,10 @@ architecture syn of screen_ram is
   end function;
   
   signal vidram: video_ram := generate_static_display; 
+  
+  
+
+  
 begin
 
 
