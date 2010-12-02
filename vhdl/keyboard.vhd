@@ -36,7 +36,7 @@ end KeyboardController;
 
 architecture Behavioral of KeyboardController is
 
-  signal bitCount      : integer range 0 to 100 := 0;
+  signal bitCount      : integer range 0 to 10 := 0;
   signal scancodeReady : std_logic              := '0';
   signal scancode      : std_logic_vector(7 downto 0);
   signal breakReceived : std_logic              := '0';
