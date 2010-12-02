@@ -3,9 +3,9 @@
 ###
 ###
 ### Spartan-3 Clock - 50MHz oscillator
-NET ext_clk_50 LOC=T9;  
+NET ext_clk_50 LOC=T9; 
 
-### Spartan-3 VGA Port:
+### Spartan-3 VGA Port
 NET red_out LOC=R12;  # Red
 NET green_out LOC=T12;  # Green
 NET blue_out LOC=R11;  # Blue
@@ -32,8 +32,8 @@ NET ext_reset LOC=l14;  # Reset Button
 NET clks_locked LOC=K12;  #LED 8 to indicate 'clocks locked'
 
 ### Spartan-3 PS2 Port
-# NET ps2d LOC=m15;  #PS2 Data
-# NET ps2c LOC=m16;  #PS2 Clock
+NET ps2d LOC=m15;  #PS2 Data
+NET ps2c LOC=m16;  #PS2 Clock
 #Created by Constraints Editor (xc3s200-ft256-4) - 2010/11/16
 NET "ext_clk_50" TNM_NET = ext_clk_50;
 TIMESPEC TS_ext_clk_50 = PERIOD "ext_clk_50" 20 ns HIGH 50%;
