@@ -37,7 +37,7 @@ entity vga_core is
     strobe        : out std_logic;
     row_data      : out unsigned(7 downto 0);
     pixel         : in  std_logic;
-    colour_in     : in  unsigned(1 downto 0)
+    colour_in     : in  unsigned(1 downto 0);
     );
 end vga_core;
 
