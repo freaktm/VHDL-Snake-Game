@@ -90,21 +90,6 @@ colour <= color;
     end if;
   end process p_cell;
 
--- p_timer : process (clk25, ext_reset)
--- variable cnt: integer;
--- begin
---        if ext_reset = '1' then               -- asynchronous reset (active low)
---        add resets for timer and score
---    elsif clk25'event and clk25 = '1' then    -- rising clock edge
---cnt := cnt + 1;
---if cnt = 25000000 then
---color <= color + 1;
---timer <= timer + 1;
---cnt := 0;
---end if;
---end if;
--- end process p_timer;
- 
  p_movesnake : process (clk25, ext_reset, Direction)
  variable cnt: integer;
  variable skl: integer;
