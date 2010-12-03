@@ -141,6 +141,8 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(7*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					current_direction <= "100";
+					else 
+					current_direction <= current_direction;
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
@@ -154,6 +156,8 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					current_direction <= "100";
+					else 
+					current_direction <= current_direction;
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
@@ -167,6 +171,8 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
+					else 
+					current_direction <= current_direction;
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
@@ -180,6 +186,8 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
+					else 
+					current_direction <= current_direction;
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
