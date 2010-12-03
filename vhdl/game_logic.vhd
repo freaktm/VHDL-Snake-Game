@@ -85,6 +85,7 @@ WEA_int <= write_enable;
 		speed <= "11111";  -- slowest speed
 		skill <= (others => '0'); -- lowest skill
 		body_character <= to_unsigned(3*8, 13); -- vertical
+		next_direction <= "001";
     elsif clk25'event and clk25 = '1' then    -- rising clock edge
 	 
 			if (write_enable = '1') then
@@ -98,29 +99,33 @@ WEA_int <= write_enable;
 				end if;
 			--	 end of direction update
 				
-				-- update speed counter every 0.5 seconds, when speed reaches 0, the snake moves.
+				-- move snake head every 0.5 seconds.
 			cnt := cnt + 1;
-		if cnt = 12500000 then
-			speed <= speed - 1;
+		if cnt = 7500000 then
+			speed <= speed - 1; -- update speed counter every 0.5 seconds, when speed reaches 0, the snake grows.
 			skill <= skill + 1;
 			cnt := 0;
 			if (next_direction = current_direction) then
 				if (current_direction = "001") then  -- moving vertical 
+					body_character <= to_unsigned(3*8, 13); -- vertical character
 					head_cell <= next_head_cell;
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					WE_head <= '1';
 					write_data_head <= current_direction & body_character;
 					elsif (current_direction = "010") then -- moving right
+					body_character <= to_unsigned(2*8, 13); -- horizontal character
 					head_cell <= next_head_cell;
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					WE_head <= '1';
 					write_data_head <= current_direction & body_character;
 					elsif (current_direction = "011") then -- moving down
-					head_cell <= next_head_cell;
+					body_character <= to_unsigned(3*8, 13); -- vertical character
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
+					head_cell <= next_head_cell;
 					WE_head <= '1';
 					write_data_head <= current_direction & body_character;
 					elsif (current_direction = "100") then -- moving right
+					body_character <= to_unsigned(2*8, 13); -- horizontal character
 					head_cell <= next_head_cell;
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					WE_head <= '1';
@@ -130,24 +135,47 @@ WEA_int <= write_enable;
 				if (current_direction = "001") then
 				   if (next_direction = "010") then
 					body_character <= to_unsigned(6*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					elsif (next_direction = "100") then
 					body_character <= to_unsigned(7*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					end if;
 					head_cell <= next_head_cell;
-					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					WE_head <= '1';
 					write_data_head <= Direction & body_character;
-
 				elsif (current_direction = "011") then
 					if (next_direction = "010") then
 					body_character <= to_unsigned(4*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					elsif (next_direction = "100") then
 					body_character <= to_unsigned(5*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					end if;
 					head_cell <= next_head_cell;
-					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					WE_head <= '1';
 					write_data_head <= Direction & body_character;	
+				elsif (current_direction = "010") then
+					if (next_direction = "001") then
+					body_character <= to_unsigned(4*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
+					elsif (next_direction = "011") then
+					body_character <= to_unsigned(5*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
+					end if;
+					head_cell <= next_head_cell;
+					WE_head <= '1';
+					write_data_head <= Direction & body_character;	
+				elsif (current_direction = "100") then
+					if (next_direction = "001") then
+					body_character <= to_unsigned(4*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
+					elsif (next_direction = "011") then
+					body_character <= to_unsigned(5*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
+					end if;
+					head_cell <= next_head_cell;
+					WE_head <= '1';
+					write_data_head <= Direction & body_character;						
 				end if;
 			
 			end if;
