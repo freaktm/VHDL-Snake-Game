@@ -105,7 +105,7 @@ WEA_int <= write_enable;
 			speed <= speed - 1; -- update speed counter every 0.5 seconds, when speed reaches 0, the snake grows.
 			skill <= skill + 1;
 			cnt := 0;
-			if (next_direction = current_direction) then
+			if (next_direction = current_direction) then  -- IF NO CHANGE IN DIRECTION
 				if (current_direction = "001") then  -- moving vertical 
 					body_character <= to_unsigned(3*8, 13); -- vertical character
 					head_cell <= next_head_cell;
@@ -132,7 +132,7 @@ WEA_int <= write_enable;
 					write_data_head <= current_direction & body_character;					
 				end if;
 			else	
-				if (current_direction = "001") then
+				if (current_direction = "001") then  -- IF moving UP before change
 				   if (next_direction = "010") then
 					body_character <= to_unsigned(6*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
@@ -141,13 +141,14 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(7*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					current_direction <= "100";
-					else 
-					current_direction <= current_direction;
+					else
+					body_character <= to_unsigned(3*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
 					write_data_head <= Direction & body_character;
-				elsif (current_direction = "011") then
+				elsif (current_direction = "011") then  -- IF moving DOWN befoe change
 					if (next_direction = "010") then
 					body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
@@ -156,13 +157,14 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					current_direction <= "100";
-					else 
-					current_direction <= current_direction;
+					else
+					body_character <= to_unsigned(3*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
 					write_data_head <= Direction & body_character;	
-				elsif (current_direction = "010") then
+				elsif (current_direction = "010") then -- IF moving RIGHT before change
 					if (next_direction = "001") then
 					body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
@@ -171,13 +173,14 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
-					else 
-					current_direction <= current_direction;
+					else
+					body_character <= to_unsigned(2*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
 					write_data_head <= Direction & body_character;	
-				elsif (current_direction = "100") then
+				elsif (current_direction = "100") then  -- IF moving LEFT before change
 					if (next_direction = "001") then
 					body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
@@ -186,8 +189,9 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
-					else 
-					current_direction <= current_direction;
+					else
+					body_character <= to_unsigned(2*8, body_character'length);
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
