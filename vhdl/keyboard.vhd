@@ -30,7 +30,7 @@ use IEEE.numeric_std.all;
 entity KeyboardController is
   port (KeyboardClock : in  std_logic;
         KeyboardData  : in  std_logic;
-        Direction     : out std_logic_vector(2 downto 0)
+        Direction     : out unsigned(2 downto 0)
         );
 end KeyboardController;
 
