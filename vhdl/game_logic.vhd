@@ -38,7 +38,7 @@ entity game_logic is
 	    input_a_int   : out unsigned(15 downto 0):= "0000000000000000";
        output_a_int   : in unsigned(15 downto 0) := "0000000000000000";
 		 colour : out unsigned(1 downto 0);
-		 Direction : in std_logic_vector(2 downto 0)
+		 Direction : in unsigned(2 downto 0)
 		 );
 end game_logic;
 
@@ -49,18 +49,18 @@ signal head_cell : unsigned(12 downto 0) := to_unsigned(2440, 13); -- cell 2440
 signal tail_cell : unsigned(12 downto 0) := to_unsigned(2520, 13); -- cell 2520 (cell below head cell)
 signal next_head_cell : unsigned(12 downto 0) := to_unsigned(2360, 13);  -- cell 2360
 signal next_tail_cell : unsigned(12 downto 0) := to_unsigned(2440, 13);  -- cell 2360
-signal birth_time : unsigned(4 downto 0) := to_unsigned(5, 5); -- 5 seconds
-signal seconds : unsigned(19 downto 0);
-signal head_direction : unsigned(1 downto 0) := "00"; -- moving up
-signal tail_direction : unsigned(1 downto 0) := "00"; -- moving up
 signal speed : unsigned(4 downto 0) := "11111"; -- slowest speed
 signal score : unsigned(13 downto 0);
-signal timer : unsigned(13 downto 0);
 signal color : unsigned (1 downto 0);
-signal current_direction : std_logic_vector(2 downto 0);
+signal current_direction : unsigned(2 downto 0);
 signal skill : unsigned(4 downto 0) := "00000"; -- skill 0
 signal WE_head : std_logic;
 signal WE_tail : std_logic;
+signal next_direction : unsigned(2 downto 0);
+signal body_character : unsigned(12 downto 0) := to_unsigned(3*8, 13);
+signal write_data_head : unsigned(15 downto 0); 
+signal write_data_tail : unsigned(15 downto 0);
+signal write_enable : std_logic;
                                       
 begin
 
@@ -69,47 +69,34 @@ begin
 
 EN_int <= '1';
 colour <= color;
+WEA_int <= write_enable;
 
  
 
- p_cell : process (clk25, ext_reset)
-  begin  -- process p_cell
-    if ext_reset = '1' then               -- asynchronous reset (active low)
-      head_cell <= to_unsigned(2440, head_cell'length);
-		tail_cell <= to_unsigned(2440, tail_cell'length);
-		birth_time <= to_unsigned(5, birth_time'length);
-		seconds <= to_unsigned(0, seconds'length);
-		head_direction <= to_unsigned(0, head_direction'length); -- moving up
-		tail_direction <= to_unsigned(0, tail_direction'length); -- moving up
-		speed <= "11111";  -- slowest speed
-		skill <= (others => '0'); -- lowest skill
-    elsif clk25'event and clk25 = '1' then    -- rising clock edge
-                                      
-		
 
-    end if;
-  end process p_cell;
 
  p_movesnake : process (clk25, ext_reset, Direction)
  variable cnt: integer;
- variable skl: integer;
- begin
+  begin
          if ext_reset = '1' then               -- asynchronous reset (active low)
         current_direction <= "001";
+	   head_cell <= to_unsigned(2440, head_cell'length);
+		tail_cell <= to_unsigned(2440, tail_cell'length);
+		speed <= "11111";  -- slowest speed
+		skill <= (others => '0'); -- lowest skill
+		body_character <= to_unsigned(3*8, 13); -- vertical
     elsif clk25'event and clk25 = '1' then    -- rising clock edge
-		-- update direction based on keyboard input
+	 
+			if (write_enable = '1') then
+				write_enable <= '0';
+			end if;
+		-- update next direction based on any keyboard input
 			if (Direction = "000") then
-			 current_direction <= current_direction;
-			elsif (Direction = "001") then
-			 current_direction <= "001";
-			elsif (Direction = "010") then
-			 current_direction <= "010";
-			elsif (Direction = "011") then
-			 current_direction <= "011";
-			elsif (Direction = "100") then
-			 current_direction <= "100";
+			 next_direction <= next_direction;
+			else
+			 next_direction <= Direction;
 				end if;
-				-- end of direction update
+			--	 end of direction update
 				
 				-- update speed counter every 0.5 seconds, when speed reaches 0, the snake moves.
 			cnt := cnt + 1;
@@ -117,11 +104,66 @@ colour <= color;
 			speed <= speed - 1;
 			skill <= skill + 1;
 			cnt := 0;
+			if (next_direction = current_direction) then
+				if (current_direction = "001") then  -- moving vertical 
+					head_cell <= next_head_cell;
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
+					WE_head <= '1';
+					write_data_head <= current_direction & body_character;
+					elsif (current_direction = "010") then -- moving right
+					head_cell <= next_head_cell;
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
+					WE_head <= '1';
+					write_data_head <= current_direction & body_character;
+					elsif (current_direction = "011") then -- moving down
+					head_cell <= next_head_cell;
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
+					WE_head <= '1';
+					write_data_head <= current_direction & body_character;
+					elsif (current_direction = "100") then -- moving right
+					head_cell <= next_head_cell;
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
+					WE_head <= '1';
+					write_data_head <= current_direction & body_character;					
+				end if;
+			else	
+				if (current_direction = "001") then
+				   if (next_direction = "010") then
+					body_character <= to_unsigned(6*8, body_character'length);
+					elsif (next_direction = "100") then
+					body_character <= to_unsigned(7*8, body_character'length);
+					end if;
+					head_cell <= next_head_cell;
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
+					WE_head <= '1';
+					write_data_head <= Direction & body_character;
+
+				elsif (current_direction = "011") then
+					if (next_direction = "010") then
+					body_character <= to_unsigned(4*8, body_character'length);
+					elsif (next_direction = "100") then
+					body_character <= to_unsigned(5*8, body_character'length);
+					end if;
+					head_cell <= next_head_cell;
+					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
+					WE_head <= '1';
+					write_data_head <= Direction & body_character;	
+				end if;
+			
+			end if;
+			
 		end if;
 
-		if (speed = 0) then
+		  if (speed = 0) then
 			speed <= "11111" - skill;
 			
+			end if;
+			
+			if (WE_head = '1') then
+				WE_head <= '0';
+				input_a_int <= write_data_head;
+				address_a_int <= head_cell;
+				write_enable <= '1';
 			end if;
 			
 		end if;
