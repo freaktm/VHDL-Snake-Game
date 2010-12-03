@@ -41,7 +41,7 @@ architecture behavioral of MAINBOARD is
   component KeyboardController is
     port (KeyboardClock : in  std_logic;
            KeyboardData : in  std_logic;
-           Direction    : out std_logic_vector(2 downto 0)
+           Direction    : out unsigned(2 downto 0)
            );
   end component;
 
@@ -64,7 +64,7 @@ architecture behavioral of MAINBOARD is
       input_a_int   : out unsigned(15 downto 0);
       output_a_int  : in  unsigned(15 downto 0);
       colour        : out unsigned(1 downto 0);
-      Direction     : in  std_logic_vector(2 downto 0)
+      Direction     : in  unsigned(2 downto 0)
 
       );
   end component;
@@ -120,7 +120,6 @@ architecture behavioral of MAINBOARD is
 
   signal clk25          : std_logic;
   signal clk50          : std_logic;
-  signal reset_n        : std_logic;
   signal WEA            : std_logic;
   signal EN             : std_logic;
   signal address_a      : std_logic_vector(12 downto 0);
@@ -134,7 +133,7 @@ architecture behavioral of MAINBOARD is
   signal dout_int       : std_logic;
   signal din_int        : unsigned(7 downto 0);
   signal colour_int     : unsigned(1 downto 0);
-  signal Direction_int  : std_logic_vector(2 downto 0);
+  signal Direction_int  : unsigned(2 downto 0);
   -- signal kb_data : std_logic;
   
 
