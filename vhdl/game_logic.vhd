@@ -136,9 +136,11 @@ WEA_int <= write_enable;
 				   if (next_direction = "010") then
 					body_character <= to_unsigned(6*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
+					current_direction <= "010";
 					elsif (next_direction = "100") then
 					body_character <= to_unsigned(7*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
+					current_direction <= "100";
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
@@ -147,9 +149,11 @@ WEA_int <= write_enable;
 					if (next_direction = "010") then
 					body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
+					current_direction <= "010";
 					elsif (next_direction = "100") then
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
+					current_direction <= "100";
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
@@ -158,9 +162,11 @@ WEA_int <= write_enable;
 					if (next_direction = "001") then
 					body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
+					current_direction <= "001";
 					elsif (next_direction = "011") then
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
+					current_direction <= "011";
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
@@ -169,9 +175,11 @@ WEA_int <= write_enable;
 					if (next_direction = "001") then
 					body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
+					current_direction <= "001";
 					elsif (next_direction = "011") then
 					body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
+					current_direction <= "011";
 					end if;
 					head_cell <= next_head_cell;
 					WE_head <= '1';
