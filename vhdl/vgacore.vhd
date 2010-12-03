@@ -62,18 +62,6 @@ architecture behavioral of vga_core is
 
 begin
 
-  cellupdate : process (clk25, x, y)
-  begin
-
-    x_temp <= "000" & x(9 downto 3);
-    y_temp <= "000" & y(9 downto 3);
-    cell   <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
-    if (to_integer(hcounter) < 144) and (to_integer(vcounter) < 39) then
-      cell <= (others => '0');
-    end if;
-
-
-  end process;
 
   p2 : process (clk25)
 
@@ -88,12 +76,21 @@ begin
       -- and set its color to any value between 1 to 7. The following example simply sets
       -- the whole display area to a single-color wash, which is changed every one
       -- second.
+		
+		
+			x <= to_unsigned((to_integer(hcounter) - 144), x'length);
+			y <= to_unsigned((to_integer(vcounter) - 39), y'length);
+			x_temp <= "000" & x(9 downto 3);
+			y_temp <= "000" & y(9 downto 3);
 
-      x <= to_unsigned((to_integer(hcounter) - 144), x'length);
-      y <= to_unsigned((to_integer(vcounter) - 39), y'length);
+			if (to_integer(hcounter) < 144) and (to_integer(vcounter) < 39) then
+				cell <= (others => '0');
+				else
+					cell   <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
+			end if;
 
       if (to_integer(hcounter) >= 144)    -- 144
-        and (to_integer(hcounter) < 784)  -- 784
+        and (to_integer(hcounter) < 808)  -- 784
         and (to_integer(vcounter) >= 39)  -- 39
         and (to_integer(vcounter) < 519)  -- 519
       then
@@ -128,7 +125,7 @@ begin
       -- Sync pulse time (total cycles) Ts = 800 cycles
 
       if (to_integer(hcounter) > 0)
-        and (to_integer(hcounter) < 93)  -- 96+1
+        and (to_integer(hcounter) < 117)  -- 96+1
       then
         hs_out_int <= '0';
       else
@@ -169,20 +166,19 @@ begin
 
   end process;
 
-  p_strobe : process(clk25, pixelcount_w, rom_data, ram_data_b)
+  p_strobe : process(clk25)
   begin
     if clk25'event and clk25 = '1' then
-
-      if (to_integer(hcounter) = 140) and (to_integer(vcounter) < 39) then
+      if (to_integer(hcounter) = 130) and (to_integer(vcounter) = 39) then
         strobe        <= '0';
         ram_address_b <= to_unsigned((to_integer(cell)), ram_address_b'length);
-      elsif (to_integer(hcounter) = 141) and (to_integer(vcounter) < 39) then
+      elsif (to_integer(hcounter) = 131) and (to_integer(vcounter) = 39) then
         strobe      <= '0';
         rom_address <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
-      elsif (to_integer(hcounter) = 142) and (to_integer(vcounter) < 39) then
+      elsif (to_integer(hcounter) = 132) and (to_integer(vcounter) = 39) then
         strobe   <= '0';
         row_data <= rom_data;
-      elsif (to_integer(hcounter) = 143) and (to_integer(vcounter) < 39) then
+      elsif (to_integer(hcounter) = 133) and (to_integer(vcounter) = 39) then
         strobe <= '1';
       end if;
 
