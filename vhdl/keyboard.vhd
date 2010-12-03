@@ -30,7 +30,7 @@ use IEEE.numeric_std.all;
 entity KeyboardController is
   port (KeyboardClock : in  std_logic;
         KeyboardData  : in  std_logic;
-        Direction     : out std_logic_vector(1 downto 0)
+        Direction     : out std_logic_vector(2 downto 0)
         );
 end KeyboardController;
 
@@ -80,13 +80,15 @@ begin
         end if;
 
         if scancode = keyboardW then
-          Direction <= "00";
+          Direction <= "001";
         elsif scancode = keyboardD then
-          Direction <= "01";
+          Direction <= "010";
         elsif scancode = keyboardS then
-          Direction <= "10";
+          Direction <= "011";
         elsif scancode = keyboardA then
-          Direction <= "11";
+          Direction <= "100";
+			else 
+			 Direction <= "000";
         end if;
       end if;
     end if;
