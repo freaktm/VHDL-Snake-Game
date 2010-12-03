@@ -47,6 +47,7 @@ architecture Behavioral of game_logic is
 
 signal head_cell : unsigned(12 downto 0) := to_unsigned(2440, 13); -- cell 2440
 signal tail_cell : unsigned(12 downto 0) := to_unsigned(2520, 13); -- cell 2520 (cell below head cell)
+signal corner_cell : unsigned(12 downto 0);
 signal next_head_cell : unsigned(12 downto 0) := to_unsigned(2360, 13);  -- cell 2360
 signal next_tail_cell : unsigned(12 downto 0) := to_unsigned(2440, 13);  -- cell 2360
 signal speed : unsigned(4 downto 0) := "11111"; -- slowest speed
@@ -56,10 +57,13 @@ signal current_direction : unsigned(2 downto 0);
 signal skill : unsigned(4 downto 0) := "00000"; -- skill 0
 signal WE_head : std_logic;
 signal WE_tail : std_logic;
+signal WE_corner : std_logic;
 signal next_direction : unsigned(2 downto 0);
 signal body_character : unsigned(12 downto 0) := to_unsigned(3*8, 13);
+signal old_body_character : unsigned(12 downto 0);
 signal write_data_head : unsigned(15 downto 0); 
 signal write_data_tail : unsigned(15 downto 0);
+signal write_data_corner : unsigned(15 downto 0);
 signal write_enable : std_logic;
                                       
 begin
@@ -86,6 +90,9 @@ WEA_int <= write_enable;
 		skill <= (others => '0'); -- lowest skill
 		body_character <= to_unsigned(3*8, 13); -- vertical
 		next_direction <= "001";
+		WE_head <= '1';
+		WE_corner <= '1';
+		WE_tail <= '1';
     elsif clk25'event and clk25 = '1' then    -- rising clock edge
 	 
 			if (write_enable = '1') then
@@ -108,29 +115,19 @@ WEA_int <= write_enable;
 			if (next_direction = current_direction) then  -- IF NO CHANGE IN DIRECTION
 				if (current_direction = "001") then  -- moving vertical 
 					body_character <= to_unsigned(3*8, 13); -- vertical character
-					head_cell <= next_head_cell;
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
-					WE_head <= '1';
-					write_data_head <= current_direction & body_character;
 					elsif (current_direction = "010") then -- moving right
 					body_character <= to_unsigned(2*8, 13); -- horizontal character
-					head_cell <= next_head_cell;
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
-					WE_head <= '1';
-					write_data_head <= current_direction & body_character;
 					elsif (current_direction = "011") then -- moving down
 					body_character <= to_unsigned(3*8, 13); -- vertical character
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
-					head_cell <= next_head_cell;
-					WE_head <= '1';
-					write_data_head <= current_direction & body_character;
 					elsif (current_direction = "100") then -- moving right
 					body_character <= to_unsigned(2*8, 13); -- horizontal character
-					head_cell <= next_head_cell;
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
-					WE_head <= '1';
-					write_data_head <= current_direction & body_character;					
 				end if;
+				WE_head <= '1';
+				write_data_head <= current_direction & body_character;	
 			else	
 				if (current_direction = "001") then  -- IF moving UP before change
 				   if (next_direction = "010") then
@@ -145,9 +142,7 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(3*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					end if;
-					head_cell <= next_head_cell;
-					WE_head <= '1';
-					write_data_head <= Direction & body_character;
+					body_character <= to_unsigned(2*8, body_character'length);
 				elsif (current_direction = "011") then  -- IF moving DOWN befoe change
 					if (next_direction = "010") then
 					body_character <= to_unsigned(4*8, body_character'length);
@@ -161,9 +156,7 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(3*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					end if;
-					head_cell <= next_head_cell;
-					WE_head <= '1';
-					write_data_head <= Direction & body_character;	
+					body_character <= to_unsigned(2*8, body_character'length);
 				elsif (current_direction = "010") then -- IF moving RIGHT before change
 					if (next_direction = "001") then
 					body_character <= to_unsigned(4*8, body_character'length);
@@ -177,27 +170,25 @@ WEA_int <= write_enable;
 					body_character <= to_unsigned(2*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					end if;
-					head_cell <= next_head_cell;
-					WE_head <= '1';
-					write_data_head <= Direction & body_character;	
+					body_character <= to_unsigned(3*8, body_character'length);
 				elsif (current_direction = "100") then  -- IF moving LEFT before change
 					if (next_direction = "001") then
-					body_character <= to_unsigned(4*8, body_character'length);
+					old_body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					current_direction <= "001";
 					elsif (next_direction = "011") then
-					body_character <= to_unsigned(5*8, body_character'length);
+					old_body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
 					else
-					body_character <= to_unsigned(2*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					end if;
-					head_cell <= next_head_cell;
-					WE_head <= '1';
-					write_data_head <= Direction & body_character;						
+					body_character <= to_unsigned(3*8, body_character'length);
 				end if;
-			
+					write_data_corner <= Direction & old_body_character;
+					write_data_head <= Direction & body_character;	
+					WE_head <= '1';
+					WE_corner <= '1';
 			end if;
 			
 		end if;
@@ -210,9 +201,17 @@ WEA_int <= write_enable;
 			if (WE_head = '1') then
 				WE_head <= '0';
 				input_a_int <= write_data_head;
+				head_cell <= next_head_cell;
 				address_a_int <= head_cell;
 				write_enable <= '1';
+				elsif (WE_corner = '1') then
+				WE_corner <= '0';
+				input_a_int <= write_data_corner;
+				address_a_int <= corner_cell;
+				write_enable <= '1';
 			end if;
+			
+
 			
 		end if;
  
