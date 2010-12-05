@@ -79,7 +79,7 @@ WEA_int <= write_enable;
 
 
 
- p_movesnake : process (clk25, ext_reset, Direction)
+ p_movesnake : process (clk25, ext_reset)
  variable cnt: integer;
   begin
          if ext_reset = '1' then               -- asynchronous reset (active low)
@@ -130,56 +130,64 @@ WEA_int <= write_enable;
 				write_data_head <= current_direction & body_character;	
 			else	
 				if (current_direction = "001") then  -- IF moving UP before change
-				   if (next_direction = "010") then
-					body_character <= to_unsigned(6*8, body_character'length);
+				   if (next_direction = "010") then  -- turns RIGHT
+					old_body_character <= to_unsigned(6*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					current_direction <= "010";
-					elsif (next_direction = "100") then
-					body_character <= to_unsigned(7*8, body_character'length);
+					WE_corner <= '1';
+					elsif (next_direction = "100") then  -- turns LEFT
+					old_body_character <= to_unsigned(7*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					current_direction <= "100";
+					WE_corner <= '1';
 					else
 					body_character <= to_unsigned(3*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					end if;
 					body_character <= to_unsigned(2*8, body_character'length);
 				elsif (current_direction = "011") then  -- IF moving DOWN befoe change
-					if (next_direction = "010") then
-					body_character <= to_unsigned(4*8, body_character'length);
+					if (next_direction = "010") then -- turns RIGHT
+					old_body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					current_direction <= "010";
-					elsif (next_direction = "100") then
-					body_character <= to_unsigned(5*8, body_character'length);
+					WE_corner <= '1';
+					elsif (next_direction = "100") then  -- turns  LEFT
+					old_body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					current_direction <= "100";
+					WE_corner <= '1';
 					else
 					body_character <= to_unsigned(3*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					end if;
 					body_character <= to_unsigned(2*8, body_character'length);
 				elsif (current_direction = "010") then -- IF moving RIGHT before change
-					if (next_direction = "001") then
-					body_character <= to_unsigned(4*8, body_character'length);
+					if (next_direction = "001") then  -- turns UP
+					old_body_character <= to_unsigned(5*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					current_direction <= "001";
-					elsif (next_direction = "011") then
-					body_character <= to_unsigned(5*8, body_character'length);
+					WE_corner <= '1';
+					elsif (next_direction = "011") then -- turns  DOWN
+					old_body_character <= to_unsigned(7*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
+					WE_corner <= '1';
 					else
 					body_character <= to_unsigned(2*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 					end if;
 					body_character <= to_unsigned(3*8, body_character'length);
 				elsif (current_direction = "100") then  -- IF moving LEFT before change
-					if (next_direction = "001") then
+					if (next_direction = "001") then -- turns UP
 					old_body_character <= to_unsigned(4*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 					current_direction <= "001";
-					elsif (next_direction = "011") then
-					old_body_character <= to_unsigned(5*8, body_character'length);
+					WE_corner <= '1';
+					elsif (next_direction = "011") then --turns DOWN
+					old_body_character <= to_unsigned(6*8, body_character'length);
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 					current_direction <= "011";
+					WE_corner <= '1';
 					else
 					next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 					end if;
@@ -188,7 +196,6 @@ WEA_int <= write_enable;
 					write_data_corner <= Direction & old_body_character;
 					write_data_head <= Direction & body_character;	
 					WE_head <= '1';
-					WE_corner <= '1';
 			end if;
 			
 		end if;
@@ -200,6 +207,7 @@ WEA_int <= write_enable;
 			
 			if (WE_head = '1') then
 				WE_head <= '0';
+				corner_cell <= head_cell;
 				input_a_int <= write_data_head;
 				head_cell <= next_head_cell;
 				address_a_int <= head_cell;
