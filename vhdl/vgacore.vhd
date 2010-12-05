@@ -48,7 +48,6 @@ architecture behavioral of vga_core is
   signal vcounter     : unsigned(9 downto 0);  --1000001001 is 521
   signal pixelcount_w : unsigned(2 downto 0);  -- 8 pixels wide for each cell.
   signal row_count    : unsigned(2 downto 0)  := "000";  -- 8 pixels deep for each cell.
-  signal next_row     : std_logic_vector(7 downto 0);
   signal cell         : unsigned(12 downto 0) := "0000000000000";
   signal x            : unsigned(9 downto 0);
   signal y            : unsigned(9 downto 0);
