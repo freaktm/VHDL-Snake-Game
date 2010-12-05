@@ -75,6 +75,10 @@ architecture Behavioral of game_logic is
   signal write_data_score4                          : unsigned(15 downto 0);
   signal write_enable                               : std_logic;
   signal write_job                                  : std_logic_vector(2 downto 0) := "000";  -- signal for cell update pipeline
+  signal crash_check                                : std_logic                    := 0;  -- register to activate the  crash checker
+  signal check_progress                             : std_logic_vector(1 downto 0) := "00";  -- crash check pipeline
+  signal crashed                                    : std_logic                    := 0;  -- register to activate the crashed state
+  
   
 begin
 
@@ -112,6 +116,7 @@ begin
       write_data_score2 <= (others => '0');
       write_data_score3 <= (others => '0');
       write_data_score4 <= (others => '0');
+      crash_check       <= '0';
     elsif clk25'event and clk25 = '1' then        -- rising clock edge
 
 
@@ -140,11 +145,19 @@ begin
       end if;
 -- end of direction update
 
+
+--update crash check pipeline
+      if (check_progress = "11") then
+        crash_check <= '0'
+      end if;
+
 -- move snake head every 0.5 seconds.
       cnt := cnt + 1;
       if cnt = 7500000 then
-        speed <= speed - 1;  -- update speed counter every 0.5 seconds, when speed reaches 0, the snake grows.
-        cnt   := 0;
+        speed       <= speed - 1;  -- update speed counter every 0.5 seconds, when speed reaches 0, the snake grows.
+        cnt         := 0;
+        WE_head     <= '1';
+        crash_check <= '1';
         if (next_direction = current_direction) then  -- IF NO CHANGE IN DIRECTION
           if (current_direction = "001") then     -- moving vertical
             body_character <= to_unsigned(3*8, 13);   -- vertical character
@@ -159,7 +172,6 @@ begin
             body_character <= to_unsigned(2*8, 13);   -- horizontal character
             next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
           end if;
-          WE_head         <= '1';
           write_data_head <= current_direction & body_character;
         else
           if (current_direction = "001") then     -- IF moving UP before change
@@ -228,14 +240,12 @@ begin
           end if;
           write_data_corner <= Direction & old_body_character;
           write_data_head   <= Direction & body_character;
-          WE_head           <= '1';
         end if;
         
       end if;
     end if;
     
   end process p_movesnake;
-
 
   -- purpose: updates the ram entries for the video display
   -- type   : sequential
@@ -246,17 +256,40 @@ begin
   p_cellupdate : process (clk25, ext_reset)
   begin  -- process p_cellupdate
     if ext_reset = '1' then             -- asynchronous reset (active lo high)
-     write_job <= (others => '0');
-	  head_cell         <= to_unsigned(2440, head_cell'length);
-     tail_cell         <= to_unsigned(2440, tail_cell'length);
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge 
+      write_job      <= (others => '0');
+      head_cell      <= to_unsigned(2440, head_cell'length);
+      tail_cell      <= to_unsigned(2440, tail_cell'length);
+      check_progress <= (others => '0');
+      crashed        <= '0';
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge
+      
       if (WE_head = '1') then
-        write_job     <= "001";
-        corner_cell   <= head_cell;
-        input_a_int   <= write_data_head;
-        head_cell     <= next_head_cell;
-        address_a_int <= head_cell;
-        write_enable  <= '1';
+        -- Start of check to see if snake hit a border or itself.
+
+        if (crash_check = '1') then
+          if (check_progress = "00") then
+            address_a_int  <= next_head_cell;
+            check_progress <= "01";
+          elsif (check_progress = "01") then
+            if (to_integer(output_a_int) /= 0) then
+              crashed <= '1';
+            else
+              crashed <= '0';
+            end if;
+            check_progress <= "11";
+          else
+            check_progress <= "00";
+          end if;
+
+        else
+          write_job     <= "001";
+          corner_cell   <= head_cell;
+          input_a_int   <= write_data_head;
+          head_cell     <= next_head_cell;
+          address_a_int <= head_cell;
+          write_enable  <= '1';
+        end if;
+
       elsif (WE_corner = '1') then
         write_job     <= "010";
         input_a_int   <= write_data_corner;
@@ -287,10 +320,11 @@ begin
         input_a_int   <= write_data_score4;
         address_a_int <= score4_cell;
         write_enable  <= '1';
-       else
-		   write_enable <= '0';
-         write_job <= (others => '0');
+      else
+        write_enable <= '0';
+        write_job    <= (others => '0');
       end if;
+      
     end if;
   end process p_cellupdate;
 
