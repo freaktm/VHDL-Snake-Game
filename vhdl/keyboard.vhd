@@ -89,7 +89,7 @@ begin
         elsif scancode = keyboardA then
           Direction <= "100";
         elsif scancode = keyboardSPACE then
-          Direction <= "101"
+          Direction <= "101";
         else
           Direction <= "000";
         end if;
