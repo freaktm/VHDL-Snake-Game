@@ -75,10 +75,10 @@ architecture Behavioral of game_logic is
   signal write_data_score4                          : unsigned(15 downto 0);
   signal write_enable                               : std_logic;
   signal write_job                                  : std_logic_vector(2 downto 0) := "000";  -- signal for cell update pipeline
-  signal crash_check                                : std_logic                    := 0;  -- register to activate the  crash checker
+  signal crash_check                                : std_logic                    := '0';  -- register to activate the  crash checker
   signal check_progress                             : std_logic_vector(1 downto 0) := "00";  -- crash check pipeline
-  signal crashed                                    : std_logic                    := 0;  -- register to activate the crashed state
-  signal read_to_restart : std_logic := '0';  -- register to start game
+  signal crashed                                    : std_logic                    := '0';  -- register to activate the crashed state
+  signal ready_to_restart : std_logic := '0';  -- register to start game
   
 begin
 
