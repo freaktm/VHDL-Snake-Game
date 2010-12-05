@@ -78,7 +78,7 @@ architecture Behavioral of game_logic is
   signal crash_check                                : std_logic                    := 0;  -- register to activate the  crash checker
   signal check_progress                             : std_logic_vector(1 downto 0) := "00";  -- crash check pipeline
   signal crashed                                    : std_logic                    := 0;  -- register to activate the crashed state
-  
+  signal read_to_restart : std_logic := '0';  -- register to start game
   
 begin
 
@@ -117,6 +117,7 @@ begin
       write_data_score3 <= (others => '0');
       write_data_score4 <= (others => '0');
       crash_check       <= '0';
+      ready_to_restart <= '0';
     elsif clk25'event and clk25 = '1' then        -- rising clock edge
 
 
@@ -148,7 +149,7 @@ begin
 
 --update crash check pipeline
       if (check_progress = "11") then
-        crash_check <= '0'
+        crash_check <= '0';
       end if;
 
 -- move snake head every 0.5 seconds.
@@ -262,7 +263,13 @@ begin
       check_progress <= (others => '0');
       crashed        <= '0';
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
-      
+
+      if (crashed = '1') and (ready_to_restart /= '1') then
+      -- start of crashed loop
+       
+
+        
+      else      
       if (WE_head = '1') then
         -- Start of check to see if snake hit a border or itself.
 
@@ -324,7 +331,7 @@ begin
         write_enable <= '0';
         write_job    <= (others => '0');
       end if;
-      
+    end if;
     end if;
   end process p_cellupdate;
 
