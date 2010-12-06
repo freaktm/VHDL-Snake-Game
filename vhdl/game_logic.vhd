@@ -83,15 +83,67 @@ architecture Behavioral of game_logic is
   signal game_reset                                 : std_logic                    := '0';  -- register to signal end of reset
   signal move_snake : std_logic := '0';  -- when timer reaches max he snake is moved.
   
-begin
-
   
-
+  --- STATE MACHINE SIGNALS
+  type state_t is (IDLE, HEAD, CORNER, TAIL, SCORE, RESET);
+  signal state : state_t;
+  
+  
+  
+begin
 
   EN_int  <= '1';
   colour  <= color;
   WEA_int <= write_enable;
 
+
+
+-- purpose: controls which state the game logic is in
+-- type   : sequential
+-- inputs : clk25, ext_reset, tick, head_done, corner_done, corner, score, tail_done, crashed, reset_done
+-- outputs: state
+p_state_machine: process (clk25, ext_reset)
+begin  -- process p_state_machine
+  if ext_reset = '1' then               -- asynchronous reset (active high)
+    state <= IDLE;
+  elsif clk25'event and clk25 = '1' then  -- rising clock edge
+    case state is
+      when IDLE  => 
+         if tick ='1' then
+                    state <= HEAD;  
+                    end if;
+      when HEAD =>
+                    if (head_done = '1') and (corner = '1') then
+                      state <= CORNER;
+                    elsif (head_done = '1') and (corner = '0') then
+                      state <= TAIL;
+                    elsif (crashed = '1') then
+                      state <= RESET;
+                    end if;
+      when CORNER =>
+                    if (corner_done = '1') then
+                      state <= TAIL;
+                    end if;
+      when TAIL =>
+                    if (tail_done = '1') and (score = '0') then
+                      state <= IDLE;
+                    elsif (tail_done = '1') and (score = '1') then
+                      state  <= SCORE;
+                    end if;
+      when SCORE =>
+                    if (score_done = '1') then
+                      state <= IDLE;
+                    end if;
+      when RESET =>
+                    if (reset_done = '1') then
+                      state <= IDLE;
+                    end if;                  
+    end case;
+  end if;
+end process p_state_machine;
+
+
+  
 
 -- purpose: updates the user input from keyboard
 -- type   : sequential
@@ -319,108 +371,109 @@ end process p_collision_checker;
     end if;
     
   end process p_movesnake;
+  
+  
+  
 
-  -- purpose: updates the ram entries for the video display
-  -- type   : sequential
-  -- inputs : clk25, ext_reset, WE_head, WE_tail, WE_corner, write_data_head,
-  -- write_data_tail, write_data_corner, head_cell, corner_cell, tail_cell,
-  -- WE_score1, WE_Score2, WE_score3, WE_score4, write_data_score1, write_data_score2, write_data_score3, write_data_score4
-  -- outputs : address_a_int, write_enable, input_a_int, write_job
-  p_cellupdate : process (clk25, ext_reset, game_reset)
-    variable ramcnt_i : integer;
-    variable ramcnt_j : integer;
-  begin  -- process p_cellupdate
-    if (ext_reset = '1') or (game_reset = '1') then  -- asynchronous reset (active high)
-      write_job      <= (others => '0');
-      head_cell      <= to_unsigned(2440, head_cell'length);
-      tail_cell      <= to_unsigned(2440, tail_cell'length);
-      check_progress <= (others => '0');
-      crashed        <= '0';
-      ramcnt_i       := 0;
-      ramcnt_j       := 0;
-      write_enable   <= '0';
-      game_reset     <= '0';
-      head_cell      <= to_unsigned(2440, head_cell'length);
-      tail_cell      <= to_unsigned(2440, tail_cell'length);
-      crashed        <= '0';
-      
-
-      
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge  
-      if (reset_game = '1') then
-        write_enable <= '1';
-        input_a_int  <= (others => '0');
-        ramcnt_i     := ramcnt_i + 1;
-        if (ramcnt_i = 80) then
-          ramcnt_j := ramcnt_j + 1;
-          ramcnt_i := 0;
-          if (ramcnt_j = 55) then
-            game_reset <= '1';
-          end if;
-        end if;
-        if (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
-          address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length);
-          input_a_int   <= (others => '0');
-        else
-          address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length);
-          input_a_int   <= to_unsigned(8, input_a_int'length);
-        end if;
-      end if;
-
-      if (crashed = '1') then
-        -- CRASHED STATE
-
-
-
-      else
-        if (WE_head = '1') then
-
-
-          else
-            write_job     <= "001";
-            input_a_int   <= write_data_head;
-            head_cell     <= next_head_cell;
-            address_a_int <= head_cell;
-            write_enable  <= '1';
-          end if;
-
-        elsif (WE_corner = '1') then
-          write_job     <= "010";
-          input_a_int   <= write_data_corner;
-          address_a_int <= corner_cell;
-          write_enable  <= '1';
-        elsif (WE_tail = '1') then
-          write_job     <= "011";
-          input_a_int   <= write_data_tail;
-          address_a_int <= tail_cell;
-          write_enable  <= '1';
-        elsif (WE_score1 = '1') then
-          write_job     <= "100";
-          input_a_int   <= write_data_score1;
-          address_a_int <= score1_cell;
-          write_enable  <= '1';
-        elsif (WE_score2 = '1') then
-          write_job     <= "101";
-          input_a_int   <= write_data_score2;
-          address_a_int <= score2_cell;
-          write_enable  <= '1';
-        elsif (WE_score3 = '1') then
-          write_job     <= "110";
-          input_a_int   <= write_data_score3;
-          address_a_int <= score3_cell;
-          write_enable  <= '1';
-        elsif (WE_score4 = '1') then
-          write_job     <= "111";
-          input_a_int   <= write_data_score4;
-          address_a_int <= score4_cell;
-          write_enable  <= '1';
-        else
-          write_enable <= '0';
-          write_job    <= (others => '0');
-        end if;
-      end if;
-    end if;
-  end process p_cellupdate;
+--  -- purpose: updates the ram entries for the video display
+--  -- type   : sequential
+--  -- inputs : clk25, ext_reset, WE_head, WE_tail, WE_corner, write_data_head,
+--  -- write_data_tail, write_data_corner, head_cell, corner_cell, tail_cell,
+--  -- WE_score1, WE_Score2, WE_score3, WE_score4, write_data_score1, write_data_score2, write_data_score3, write_data_score4
+--  -- outputs : address_a_int, write_enable, input_a_int, write_job
+--  p_cellupdate : process (clk25, ext_reset, game_reset)
+--    variable ramcnt_i : integer;
+--    variable ramcnt_j : integer;
+--  begin  -- process p_cellupdate
+--    if (ext_reset = '1') or (game_reset = '1') then  -- asynchronous reset (active high)
+--      write_job      <= (others => '0');
+--      head_cell      <= to_unsigned(2440, head_cell'length);
+--      tail_cell      <= to_unsigned(2440, tail_cell'length);
+--      check_progress <= (others => '0');
+--      crashed        <= '0';
+--      ramcnt_i       := 0;
+--      ramcnt_j       := 0;
+--      write_enable   <= '0';
+--      game_reset     <= '0';
+--      head_cell      <= to_unsigned(2440, head_cell'length);
+--      tail_cell      <= to_unsigned(2440, tail_cell'length);
+--      crashed        <= '0';
+--		
+--    elsif clk25'event and clk25 = '1' then  -- rising clock edge  
+--      if (reset_game = '1') then
+--        write_enable <= '1';
+--        input_a_int  <= (others => '0');
+--        ramcnt_i     := ramcnt_i + 1;
+--        if (ramcnt_i = 80) then
+--          ramcnt_j := ramcnt_j + 1;
+--          ramcnt_i := 0;
+--          if (ramcnt_j = 55) then
+--            game_reset <= '1';
+--          end if;
+--        end if;
+--        if (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
+--          address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length);
+--          input_a_int   <= (others => '0');
+--        else
+--          address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length);
+--          input_a_int   <= to_unsigned(8, input_a_int'length);
+--        end if;
+--      end if;
+--
+--      if (crashed = '1') then
+--        -- CRASHED STATE
+--
+--
+--
+--      else
+--        if (WE_head = '1') then
+--
+--
+--          else
+--            write_job     <= "001";
+--            input_a_int   <= write_data_head;
+--            head_cell     <= next_head_cell;
+--            address_a_int <= head_cell;
+--            write_enable  <= '1';
+--          end if;
+--
+--        elsif (WE_corner = '1') then
+--          write_job     <= "010";
+--          input_a_int   <= write_data_corner;
+--          address_a_int <= corner_cell;
+--          write_enable  <= '1';
+--        elsif (WE_tail = '1') then
+--          write_job     <= "011";
+--          input_a_int   <= write_data_tail;
+--          address_a_int <= tail_cell;
+--          write_enable  <= '1';
+--        elsif (WE_score1 = '1') then
+--          write_job     <= "100";
+--          input_a_int   <= write_data_score1;
+--          address_a_int <= score1_cell;
+--          write_enable  <= '1';
+--        elsif (WE_score2 = '1') then
+--          write_job     <= "101";
+--          input_a_int   <= write_data_score2;
+--          address_a_int <= score2_cell;
+--          write_enable  <= '1';
+--        elsif (WE_score3 = '1') then
+--          write_job     <= "110";
+--          input_a_int   <= write_data_score3;
+--          address_a_int <= score3_cell;
+--          write_enable  <= '1';
+--        elsif (WE_score4 = '1') then
+--          write_job     <= "111";
+--          input_a_int   <= write_data_score4;
+--          address_a_int <= score4_cell;
+--          write_enable  <= '1';
+--        else
+--          write_enable <= '0';
+--          write_job    <= (others => '0');
+--        end if;
+--      end if;
+--    end if;
+--  end process p_cellupdate;
 
 
 
