@@ -54,6 +54,7 @@ architecture Behavioral of game_logic is
   signal score4_cell                                : unsigned(12 downto 0);
   signal next_head_cell                             : unsigned(12 downto 0)        := to_unsigned(2360, 13);  -- cell 2360
   signal next_tail_cell                             : unsigned(12 downto 0)        := to_unsigned(2440, 13);  -- cell 2360
+ -- signal clearcell : unsigned(12 downto 0) := to_unsigned(0, 13);
   signal speed                                      : unsigned(4 downto 0)         := "11111";  -- slowest speed
   signal score                                      : unsigned(13 downto 0);
   signal color                                      : unsigned (1 downto 0);
@@ -78,11 +79,12 @@ architecture Behavioral of game_logic is
   signal crash_check                                : std_logic                    := '0';  -- register to activate the  crash checker
   signal check_progress                             : std_logic_vector(1 downto 0) := "00";  -- crash check pipeline
   signal crashed                                    : std_logic                    := '0';  -- register to activate the crashed state
-  signal ready_to_restart : std_logic := '0';  -- register to start game
+  signal reset_game : std_logic := '0';  -- register to restart game
+  signal game_reset : std_logic := '0';  -- register to signal end of reset
   
 begin
 
-
+ 
 
 
   EN_int  <= '1';
@@ -93,14 +95,14 @@ begin
 
 
 
-  p_movesnake : process (clk25, ext_reset)
+  p_movesnake : process (clk25, ext_reset, game_reset)
     variable cnt : integer;
   begin
-    if ext_reset = '1' then             -- asynchronous reset (active low)
+    if (ext_reset = '1') or (game_reset = '1') then             -- asynchronous reset (active low)
       current_direction <= "001";
       speed             <= "11111";     -- slowest speed
       skill             <= (others => '0');       -- lowest skill
-      body_character    <= to_unsigned(3*8, 13);  -- 
+      body_character    <= to_unsigned(2*8, 13);  -- 
       next_direction    <= "001";
       WE_head           <= '0';
       WE_corner         <= '0';
@@ -117,7 +119,10 @@ begin
       write_data_score3 <= (others => '0');
       write_data_score4 <= (others => '0');
       crash_check       <= '0';
-      ready_to_restart <= '0';
+		reset_game <= '0';
+					next_head_cell      <= to_unsigned(2360, head_cell'length);
+		
+				
     elsif clk25'event and clk25 = '1' then        -- rising clock edge
 
 
@@ -139,10 +144,15 @@ begin
           WE_score4 <= '0';
         end if;
       end if;
+		
 
--- update next direction based on any keyboard input
+
+-- update keyboard input
       if (Direction /= "000") then
         next_direction <= Direction;
+		  if (Direction = "101") and (crashed = '1') then
+		   reset_game <= '1';
+			end if;
       end if;
 -- end of direction update
 
@@ -254,18 +264,50 @@ begin
   -- write_data_tail, write_data_corner, head_cell, corner_cell, tail_cell,
   -- WE_score1, WE_Score2, WE_score3, WE_score4, write_data_score1, write_data_score2, write_data_score3, write_data_score4
   -- outputs : address_a_int, write_enable, input_a_int, write_job
-  p_cellupdate : process (clk25, ext_reset)
+  p_cellupdate : process (clk25, ext_reset, game_reset)
+  variable ramcnt_i : integer;
+  variable ramcnt_j : integer;
   begin  -- process p_cellupdate
-    if ext_reset = '1' then             -- asynchronous reset (active lo high)
+    if (ext_reset = '1') or (game_reset = '1') then             -- asynchronous reset (active high)
       write_job      <= (others => '0');
       head_cell      <= to_unsigned(2440, head_cell'length);
       tail_cell      <= to_unsigned(2440, tail_cell'length);
       check_progress <= (others => '0');
       crashed        <= '0';
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge
+				  ramcnt_i := 0;
+		  ramcnt_j := 0;
+		  write_enable <= '0';
+		  game_reset <= '0';
+			head_cell      <= to_unsigned(2440, head_cell'length);
+			tail_cell      <= to_unsigned(2440, tail_cell'length);
+		  crashed <= '0';
+		  
 
-      if (crashed = '1') and (ready_to_restart /= '1') then
-      -- start of crashed loop
+		
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge  
+	 if (reset_game ='1') then
+		write_enable <= '1';
+		input_a_int <= (others => '0');
+		ramcnt_i := ramcnt_i + 1;
+		if (ramcnt_i = 80) then
+		 ramcnt_j := ramcnt_j + 1;
+		 ramcnt_i := 0;		 
+		 if (ramcnt_j = 55) then
+		  game_reset <= '1';
+		  end if;
+
+		  
+		 end if;
+	    if (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
+			  address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length );
+			  input_a_int <= (others => '0');
+		end if;
+	
+
+		end if;
+
+      if (crashed = '1') then
+      -- CRASHED STATE
        
 
         
