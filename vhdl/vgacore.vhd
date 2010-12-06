@@ -149,7 +149,9 @@ begin
       if (to_integer(hcounter) = 800) then
         vcounter  <= vcounter+1;
         hcounter  <= (others => '0');
+		  if (vcounter > 39) then
         row_count <= row_count + 1;
+		  end if;
         if (to_integer(row_count) = 8) then
           row_count <= (others => '0');
         end if;
