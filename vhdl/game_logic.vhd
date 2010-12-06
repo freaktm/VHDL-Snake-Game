@@ -121,6 +121,7 @@ begin
 		next_head_cell      <= to_unsigned(2360, head_cell'length);
 		write_data_head <= current_direction & body_character;
 		WE_head <= '1';
+		corner_cell <= (others => '0');
 		
 				
     elsif clk25'event and clk25 = '1' then        -- rising clock edge
@@ -253,6 +254,7 @@ begin
           end if;
           write_data_corner <= Direction & old_body_character;
           write_data_head   <= Direction & body_character;
+			 corner_cell   <= head_cell;
         end if;
         
       end if;
@@ -296,9 +298,7 @@ begin
 		 ramcnt_i := 0;		 
 		 if (ramcnt_j = 55) then
 		  game_reset <= '1';
-		  end if;
-
-		  
+		  end if; 
 		 end if;
 	    if (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
 			  address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length );
@@ -307,8 +307,6 @@ begin
 			  address_a_int <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_int'length );
 			  input_a_int <= to_unsigned(8, input_a_int'length);
 		end if;
-	
-
 		end if;
 
       if (crashed = '1') then
@@ -337,7 +335,6 @@ begin
 
         else
           write_job     <= "001";
-          corner_cell   <= head_cell;
           input_a_int   <= write_data_head;
           head_cell     <= next_head_cell;
           address_a_int <= head_cell;
