@@ -37,7 +37,8 @@ entity head_logic is
     head_read_data  : in  unsigned(15 downto 0);
     head_done     : out std_logic;
 	 reset_en : out std_logic;
-	 request_read : out std_logic
+	 request_read : out std_logic;
+	 keyboard : in std_logic_vector(2 downto 0)
     );
 end game_logic;
 
@@ -89,7 +90,7 @@ begin
 
 
 
---
+--RESET RAM CODE
 --        write_enable <= '1';
 --        input_a_int  <= (others => '0');
 --        ramcnt_i     := ramcnt_i + 1;
@@ -111,7 +112,34 @@ begin
 --        end if;
 
 
+-- purpose: checks if the snake has crashed into a border or itself
+-- type   : sequential
+-- inputs : clk25, ext_reset, crash_check, next_head_cell, output_a_int, crash_result_ready
+-- outputs: crash_test, crashed
+--      p_collision_checker : process (clk25, ext_reset, game_reset)
+--      begin   process p_collision_checker
+--        if (ext_reset = '0') or (game_reset = '0') then   asynchronous reset (active low)
+--          crash_test <= (others => '0');
+--          crashed    <= '0';
+--        elsif clk25'event and clk25 = '1' then            rising clock edge
 
+
+
+--          if (crash_check = '1') then
+--            if (crash_test = "00") then
+--                  address_a_int  <= next_head_cell;
+--              crash_test <= "01";
+--            elsif (crash_result_ready = '1') then
+--              crash_test <= (others => '0');
+--              if (to_integer(output_a_int) /= 0) then
+--                crashed <= '1';
+--              else
+--                crashed <= '0';
+--              end if;
+--            end if;
+--          end if;
+--        end if;
+--      end process p_collision_checker;
 
   
   -- purpose: checks for crash when in CRASH_CHECK state

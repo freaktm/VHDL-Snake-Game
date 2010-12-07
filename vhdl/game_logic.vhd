@@ -78,16 +78,17 @@ architecture Behavioral of game_logic is
       head_read_data  : in  unsigned(15 downto 0);
       head_done       : out std_logic;
       reset_en        : out std_logic;
-      request_read    : out std_logic
+      request_read    : out std_logic;
+		keyboard : in std_logic_vector(2 downto 0)
       );
   end component;
 
   signal tick            : std_logic;
-  signal reset_en_int    : std_logic;
-  signal head_en_int     : std_logic;
-  signal tail_en_int     : std_logic;
-  signal corner_en_int   : std_logic;
-  signal score_en_int    : std_logic;
+  signal reset_en    : std_logic;
+  signal head_en     : std_logic;
+  signal tail_en     : std_logic;
+  signal corner_en   : std_logic;
+  signal score_en    : std_logic;
   signal reset_done_int  : std_logic;
   signal head_done_int   : std_logic;
   signal tail_done_int   : std_logic;
@@ -142,14 +143,19 @@ begin
       head_write_data => head_write_data_int,
       head_read_data  => ram_output_a,
       head_done       => head_done_int,
-      reset_en        => reset_en_int,
-      request_read    => request_read_int);
+      reset_en        => reset_en,
+      request_read    => request_read_int,
+		keyboard => next_direction);
 		
 		
 		
   EN_int <= '1';
 
 
+-- purpose: controls the timer for the snake
+-- type   : sequential
+-- inputs : clk25, ext_reset
+-- outputs: tick
   p_tick_timer : process (clk25, ext_reset)
     variable cnt : integer;
   begin
@@ -282,13 +288,11 @@ begin
   end process p_reset_en;
 
 
-
-
 -- purpose: updates the user input from keyboard
 -- type   : combinational
 -- inputs : clk25, ext_reset, Direction, crashed
 -- outputs: next_direction, reset_game
-  p_keyboard_input : process --(Direction)
+  p_keyboard_input : process (Direction)
   begin  
 -- update keyboard input      
       if (Direction /= "000") and (Direction /= "101") then
@@ -297,40 +301,12 @@ begin
         next_direction <= "111";
       end if;
 -- end of keyboard update
-    end if;
   end process p_keyboard_input;
 
 
 
 
--- purpose: checks if the snake has crashed into a border or itself
--- type   : sequential
--- inputs : clk25, ext_reset, crash_check, next_head_cell, output_a_int, crash_result_ready
--- outputs: crash_test, crashed
---      p_collision_checker : process (clk25, ext_reset, game_reset)
---      begin   process p_collision_checker
---        if (ext_reset = '0') or (game_reset = '0') then   asynchronous reset (active low)
---          crash_test <= (others => '0');
---          crashed    <= '0';
---        elsif clk25'event and clk25 = '1' then            rising clock edge
 
-
-
---          if (crash_check = '1') then
---            if (crash_test = "00") then
---                  address_a_int  <= next_head_cell;
---              crash_test <= "01";
---            elsif (crash_result_ready = '1') then
---              crash_test <= (others => '0');
---              if (to_integer(output_a_int) /= 0) then
---                crashed <= '1';
---              else
---                crashed <= '0';
---              end if;
---            end if;
---          end if;
---        end if;
---      end process p_collision_checker;
 
 
 
