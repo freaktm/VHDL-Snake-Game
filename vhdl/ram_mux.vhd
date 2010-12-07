@@ -32,12 +32,22 @@ use work.gamelogic_pkg.all;
 
 entity ram_mux is
   port(
-    gamelogic_state : in gamelogic_state_t;
-    WEA          : out std_logic;
-    address_a    : out unsigned(12 downto 0);
-    input_a      : out unsigned(15 downto 0);
-    task_done    : out std_logic;
-    request_read : in  std_logic
+    gamelogic_state   : in  gamelogic_state_t;
+    WEA               : out std_logic;
+    address_a         : out unsigned(12 downto 0);
+    input_a           : out unsigned(15 downto 0);
+    task_done         : out std_logic;
+    request_read      : in  std_logic;
+    head_write_data   : in  unsigned(15 downto 0);
+    head_cell         : in  unsigned(12 downto 0);
+    corner_write_data : in  unsigned(15 downto 0);
+    corner_cell       : in  unsigned(12 downto 0);
+    tail_write_data   : in  unsigned(15 downto 0);
+    tail_cell         : in  unsigned(12 downto 0);
+    score_write_data  : in  unsigned(15 downto 0);
+    score_cell        : in  unsigned(12 downto 0);
+    reset_data        : in  unsigned(15 downto 0);
+    reset_cell        : in  unsigned(12 downto 0)
     );
 end ram_mux;
 
@@ -49,8 +59,8 @@ architecture Behavioral of ram_mux is
   signal write_enable  : std_logic;
   signal address_a_int : unsigned(12 downto 0);
   signal input_a_int   : unsigned(15 downto 0);
- 
-
+  
+  signal state : gamelogic_state_t;
   
 begin
   -- purpose: updates the ram entries for the video display also controls the reading
@@ -68,82 +78,42 @@ begin
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate
-if game_logic_state = RESET then    -- RESET STATE OF RAM                                                      
-        write_enable <= '1';
-        input_a_int  <= (others => '0');
-        ramcnt_i     := ramcnt_i + 1;
-        if (ramcnt_i = 80) then
-          ramcnt_j := ramcnt_j + 1;
-          ramcnt_i := 0;
-          if (ramcnt_j = 55) then
-            reset_done <= '1';
-            ramcnt_i   := 0;
-            ramcnt_j   := 0;
-            write_enable <= '0';
-          end if;
-       elsif (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
-          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
-          input_a   <= (others => '0');
-        else
-          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
-          input_a   <= to_unsigned(8, input_a'length);
-        end if;
-        
-      elsif (head_en = '1') then        -- HEAD STATE OF MUX
-        if (request_read = '1') then
-          write_enable <= '0';
-        else
-          write_enable <= '1';
-        end if;
-        if (waiting = '0') then
-          task_done     <= '0';
-          input_a_int   <= head_write_data;
-          address_a_int <= head_cell;
-          waiting       <= '1';
-        else
-          waiting   <= '0';
-          task_done <= '1';
-        end if;       
-      elsif (corner_en = '1') then      -- CORNER STATE OF MUX
-        if (waiting = '0') then
-          write_enable <= '1';
-          task_done     <= '0';
-          input_a_int   <= corner_write_data;
-          address_a_int <= corner_cell;
-          waiting       <= '1';
-        else
-          write_enable <= '0';
-          waiting   <= '0';
-          task_done <= '1';
-        end if;
-      elsif (tail_en = '1') then        -- TAIL STATE OF MUX
-        if (waiting = '0') then
-          write_enable <= '1';
-          task_done     <= '0';
-          input_a_int   <= corner_write_data;
-          address_a_int <= corner_cell;
-          waiting       <= '1';
-        else
-          write_enable <= '0';
-          waiting   <= '0';
-          task_done <= '1';
-        end if;
-      elsif (score_en = '1') then       -- SCORE STATE OF MUX
-        if (waiting = '0') then
-          write_enable <= '1';
-          task_done     <= '0';
-          input_a_int   <= score_write_data;
-          address_a_int <= score_cell;
-          waiting       <= '1';
-        else
-          write_enable <= '0';
-          waiting   <= '0';
-          task_done <= '1';
-        end if;
-      else
+    if game_logic_state = RESET then  -- RESET STATE OF RAM                                                      
+      input_a_int   <= reset_data;
+      address_a_int <= reset_cell;
+      write_enable  <= '1';
+      
+    elsif (game_logic_state = HEAD) then  -- HEAD STATE OF MUX
+      input_a_int   <= head_write_data;
+      address_a_int <= head_cell;
+      if (request_read = '1') then
         write_enable <= '0';
+      else
+        write_enable <= '1';
       end if;
-  
-    end process p_cellupdate;
+      
+      
+    elsif (game_logic_state = CORNER) then  -- CORNER STATE OF MUX
+      input_a_int   <= corner_write_data;
+      address_a_int <= corner_cell;
+      write_enable  <= '1';
+      
+    elsif (game_logic_state = TAIL) then  -- TAIL STATE OF MUX
 
-    end Behavioral;
+      input_a_int   <= corner_write_data;
+      address_a_int <= corner_cell;
+      write_enable  <= '1';
+      
+    elsif (game_logic_state = SCORE) then  -- SCORE STATE OF MUX
+
+      input_a_int   <= score_write_data;
+      address_a_int <= score_cell;
+      write_enable  <= '1';
+      
+    else
+      write_enable <= '0';              -- MUX IDLE
+    end if;
+    
+  end process p_cellupdate;
+
+end Behavioral;

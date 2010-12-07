@@ -37,7 +37,8 @@ entity head_logic is
     input_a_head   : out unsigned(15 downto 0);
     output_a_head  : in  unsigned(15 downto 0);
     head_done     : out std_logic;
-	 reset_en : out std_logic
+	 reset_en : out std_logic;
+	 request_read : out std_logic
     );
 end game_logic;
 
@@ -45,7 +46,7 @@ architecture Behavioral of head_logic is
 
 
   -- HEAD STATE MACHINE SIGNALS
-  type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
+ -- type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
   signal head_state : head_state_t;
   
 begin
@@ -86,6 +87,33 @@ begin
     end if;
   end process p_head_state_machine;
   
+
+
+
+--
+--        write_enable <= '1';
+--        input_a_int  <= (others => '0');
+--        ramcnt_i     := ramcnt_i + 1;
+--        if (ramcnt_i = 80) then
+--          ramcnt_j := ramcnt_j + 1;
+--          ramcnt_i := 0;
+--          if (ramcnt_j = 55) then
+--            reset_done <= '1';
+--            ramcnt_i   := 0;
+--            ramcnt_j   := 0;
+--            write_enable <= '0';
+--          end if;
+--       elsif (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
+--          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
+--          input_a   <= (others => '0');
+--        else
+--          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
+--          input_a   <= to_unsigned(8, input_a'length);
+--        end if;
+
+
+
+
   
   -- purpose: checks for crash when in CRASH_CHECK state
 -- type   : combinational

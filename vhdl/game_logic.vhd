@@ -34,18 +34,53 @@ entity game_logic is
   port(
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
-    WEA_int       : out std_logic;
-    EN_int        : out std_logic;
-    address_a_int : out unsigned(12 downto 0) := "0000000000000";
-    input_a_int   : out unsigned(15 downto 0) := "0000000000000000";
-    output_a_int  : in  unsigned(15 downto 0) := "0000000000000000";
-    colour        : out unsigned(1 downto 0);
+--    WEA_int       : out std_logic;
+--    EN_int        : out std_logic;
+ --   address_a_int : out unsigned(12 downto 0) := "0000000000000";
+ --   input_a_int   : out unsigned(15 downto 0) := "0000000000000000";
+--    output_a_int  : in  unsigned(15 downto 0) := "0000000000000000";
+--    colour        : out unsigned(1 downto 0);
     Direction     : in  unsigned(2 downto 0)
     );
 end game_logic;
 
 architecture Behavioral of game_logic is
 
+
+component ram_mux is
+  port(
+    gamelogic_state   : in  gamelogic_state_t;
+    WEA               : out std_logic;
+    address_a         : out unsigned(12 downto 0);
+    input_a           : out unsigned(15 downto 0);
+    request_read      : in  std_logic;
+    head_write_data   : in  unsigned(15 downto 0);
+    head_cell         : in  unsigned(12 downto 0);
+    corner_write_data : in  unsigned(15 downto 0);
+    corner_cell       : in  unsigned(12 downto 0);
+    tail_write_data   : in  unsigned(15 downto 0);
+    tail_cell         : in  unsigned(12 downto 0);
+    score_write_data  : in  unsigned(15 downto 0);
+    score_cell        : in  unsigned(12 downto 0);
+    reset_data        : in  unsigned(15 downto 0);
+    reset_cell        : in  unsigned(12 downto 0)
+    );
+end component;
+
+
+component head_logic is
+  port(
+    clk25         : in  std_logic;
+    ext_reset     : in  std_logic;
+    WEA_head       : out std_logic;
+    address_a_head : out unsigned(12 downto 0);
+    input_a_head   : out unsigned(15 downto 0);
+    output_a_head  : in  unsigned(15 downto 0);
+    head_done     : out std_logic;
+	 reset_en : out std_logic;
+	 request_read : out std_logic
+    );
+end component;
 
 signal tick : std_logic;
 signal reset_en : std_logic;
@@ -103,15 +138,48 @@ signal corner_done : std_logic;
 
   --- LOGIC STATE MACHINE SIGNALS
  
-  signal state : gamelogic_state_t;
+  signal logic_state : gamelogic_state_t;
  
   
   
 begin
 
-  EN_int  <= '1';
- -- colour  <= color;
- -- WEA_int <= write_enable;
+
+
+  RAM_CNTRL: ram_mux
+    port map (
+      gamelogic_state   => gamelogic_state,
+      WEA               => WEA,
+      address_a         => address_a,
+      input_a           => input_a,
+      task_done         => task_done,
+      request_read      => request_read,
+      head_write_data   => head_write_data,
+      head_cell         => head_cell,
+      corner_write_data => corner_write_data,
+      corner_cell       => corner_cell,
+      tail_write_data   => tail_write_data,
+      tail_cell         => tail_cell,
+      score_write_data  => score_write_data,
+      score_cell        => score_cell,
+      reset_data        => reset_data,
+      reset_cell        => reset_cell);
+
+
+  HEAD_CNTRL: head_logic
+    port map (
+      clk25          => clk25,
+      ext_reset      => ext_reset,
+      WEA_head       => WEA_head,
+      address_a_head => address_a_head,
+      input_a_head   => input_a_head,
+      output_a_head  => output_a_head,
+      head_done      => head_done,
+      reset_en       => reset_en,
+      request_read   => request_read);
+		
+		EN_int  <= '1';
+
 
 
 
@@ -124,36 +192,36 @@ begin
     if ext_reset = '1' then                 -- asynchronous reset (active high)
       state <= IDLE;
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
-      case state is
+      case logic_state is
         when IDLE =>
           if tick = '1' then
-            state <= HEAD;
+            logic_state <= HEAD;
           end if;
         when HEAD =>
           if (head_done = '1') and (corner_en = '1') then
-            state <= CORNER;
+            logic_state <= CORNER;
           elsif (head_done = '1') and (corner_en = '0') then
-            state <= TAIL;
+            logic_state <= TAIL;
           elsif (crashed = '1') then
-            state <= RESET;
+            logic_state <= RESET;
           end if;
         when CORNER =>
           if (corner_done = '1') then
-            state <= TAIL;
+            logic_state <= TAIL;
           end if;
         when TAIL =>
           if (tail_done = '1') and (score_en = '0') then
-            state <= IDLE;
+            logic_state <= IDLE;
           elsif (tail_done = '1') and (score_en = '1') then
-            state <= SCORE;
+            logic_state <= SCORE;
           end if;
         when SCORE =>
           if (score_done = '1') then
-            state <= IDLE;
+            logic_state <= IDLE;
           end if;
         when RESET =>
           if (reset_done = '1') then
-            state <= IDLE;
+            logic_state <= IDLE;
           end if;
       end case;
     end if;
