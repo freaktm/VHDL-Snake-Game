@@ -103,9 +103,7 @@ signal corner_done : std_logic;
   type   state_t is (IDLE, HEAD, CORNER, TAIL, SCORE, RESET);
   signal state : state_t;
 
-  -- HEAD STATE MACHINE SIGNALS
-  type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
-  signal head_state : head_state_t;
+
   
   
   
@@ -160,58 +158,17 @@ begin
           end if;
       end case;
     end if;
+
   end process p_state_machine;
   
   
   
-  -- purpose: controls the HEAD state
-  -- type   : sequential
-  -- inputs : clk25, ext_reset, head_en, ram_data_a, Direction 
-  -- outputs: reset_en, head_done
-  p_head_state_machine: process (clk25, ext_reset)
-  begin  -- process p_head_state_machine
-    if ext_reset = '1' then             -- asynchronous reset (active high)
-head_state <= IDLE              
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge
-            case state is
-        when IDLE =>
-          if head_en = '1' then
-            head_state <= CRASH_CHECK ;
-          end if;
-        when CRASH_CHECK =>
-          if reset_en = '1' then
-            head_state <= IDLE;
-          elsif (no_crash = '1') and (next_direction = current_direction) then
-            head_state <= HEAD;
-          elsif (no_crash = '1') then
-            head_state <= CORNER;
-          end if;
-        when CORNER =>
-          if head_corner_done ='1' then
-            head_state <= HEAD;
-          end if;
-        when HEAD =>
-          if head_done = '1' then
-            head_state <= IDLE
-          end if;
-
-      end case;
-    end if;
-  end process p_head_state_machine;
 
 
 
 
--- purpose: checks for crash when in CRASH_CHECK state
--- type   : combinational
--- inputs : head_state
--- outputs: no_crash, reset_en
-p_check_crash: process (head_state)
-begin  -- process p_check_crash
-  if head_state = CRASH_CHECK then
-    
-  end if;
-end process p_check_crash;
+
+
 
   
 -- type   : combinational
