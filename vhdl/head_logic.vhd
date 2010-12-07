@@ -142,15 +142,18 @@ begin
 --      end process p_collision_checker;
 
   
-  -- purpose: checks for crash when in CRASH_CHECK state
--- type   : combinational
--- inputs : head_state
--- outputs: no_crash, reset_en
-p_check_crash: process (head_state)
-begin  -- process p_check_crash
-  if head_state = CRASH_CHECK then
-    
-  end if;
-end process p_check_crash;
+--  -- purpose: checks for crash when in CRASH_CHECK state
+---- type   : combinational
+---- inputs : head_state
+---- outputs: no_crash, reset_en
+--p_check_crash: process (head_state)
+--begin  -- process p_check_crash
+--  if head_state = CRASH_CHECK then
+--    
+--  end if;
+--end process p_check_crash;
+--
+
+
 
     end Behavioral;
