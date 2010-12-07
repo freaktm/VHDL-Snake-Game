@@ -32,21 +32,11 @@ use work.gamelogic_pkg.all;
 
 entity ram_mux is
   port(
-    clk25        : in  std_logic;
-    ext_reset    : in  std_logic;
-
     gamelogic_state : in gamelogic_state_t;
-    
---    head_en      : in  std_logic;
---    tail_en      : in  std_logic;
---    corner_en    : in  std_logic;
---    score_en     : in  std_logic;
-
     WEA          : out std_logic;
     address_a    : out unsigned(12 downto 0);
     input_a      : out unsigned(15 downto 0);
     task_done    : out std_logic;
-    reset_en     : in  std_logic;
     request_read : in  std_logic
     );
 end ram_mux;
@@ -59,7 +49,7 @@ architecture Behavioral of ram_mux is
   signal write_enable  : std_logic;
   signal address_a_int : unsigned(12 downto 0);
   signal input_a_int   : unsigned(15 downto 0);
-  signal waiting       : std_logic;
+ 
 
   
 begin
@@ -74,20 +64,11 @@ begin
   address_a <= address_a_int;
   WEA       <= write_enable;
 
-  p_process_request : process ()
+  p_process_request : process (game_logic_state, request_read)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate
-    if (ext_reset = '1') then           -- asynchronous reset (active high)
-      reset_done   <= '0';
-      task_done    <= '0';
-      write_enable <= '0';
-      address_a    <= (others => '0');
-      input_a      <= (others => '0');
-      accessing    <= '0';
-    elsif clk25'event and clk25 = '1' and reset_en = '0' then  -- rising clock edge
-      -- RESET STATE OF RAM                                                      
-      if (reset_en = '1') then
+if game_logic_state = RESET then    -- RESET STATE OF RAM                                                      
         write_enable <= '1';
         input_a_int  <= (others => '0');
         ramcnt_i     := ramcnt_i + 1;
@@ -100,8 +81,7 @@ begin
             ramcnt_j   := 0;
             write_enable <= '0';
           end if;
-        end if;
-        if (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
+       elsif (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
           address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
           input_a   <= (others => '0');
         else
