@@ -54,10 +54,12 @@ architecture Behavioral of game_logic is
       input_a           : out unsigned(15 downto 0);
       request_read      : in  std_logic;
       head_write_data   : in  unsigned(15 downto 0);
+      head_read_data    : out unsigned(15 downto 0);
       head_cell         : in  unsigned(12 downto 0);
       corner_write_data : in  unsigned(15 downto 0);
       corner_cell       : in  unsigned(12 downto 0);
       tail_write_data   : in  unsigned(15 downto 0);
+      tail_read_data    : out unsigned(15 downto 0);
       tail_cell         : in  unsigned(12 downto 0);
       score_write_data  : in  unsigned(15 downto 0);
       score_cell        : in  unsigned(12 downto 0);
@@ -69,18 +71,18 @@ architecture Behavioral of game_logic is
 
   component head_logic is
     port(
-      clk25          : in  std_logic;
-      ext_reset      : in  std_logic;
-      address_a_head : out unsigned(12 downto 0);
-      input_a_head   : out unsigned(15 downto 0);
-      output_a_head  : in  unsigned(15 downto 0);
-      head_done      : out std_logic;
-      reset_en       : out std_logic;
-      request_read   : out std_logic
+      clk25           : in  std_logic;
+      ext_reset       : in  std_logic;
+      address_a_head  : out unsigned(12 downto 0);
+      head_write_data : out unsigned(15 downto 0);
+      head_read_data  : in  unsigned(15 downto 0);
+      head_done       : out std_logic;
+      reset_en        : out std_logic;
+      request_read    : out std_logic
       );
   end component;
 
-  signal tick       : std_logic;
+  signal tick            : std_logic;
   signal reset_en_int    : std_logic;
   signal head_en_int     : std_logic;
   signal tail_en_int     : std_logic;
@@ -92,63 +94,22 @@ architecture Behavioral of game_logic is
   signal score_done_int  : std_logic;
   signal crashed_int     : std_logic;
   signal corner_done_int : std_logic;
-
-
-
---  signal head_cell                                  : unsigned(12 downto 0)        := to_unsigned(2440, 13);  -- cell 2440
---  signal tail_cell                                  : unsigned(12 downto 0)        := to_unsigned(2520, 13);  -- cell 2520 (cell below head cell)
---  signal corner_cell                                : unsigned(12 downto 0);
---  signal score1_cell                                : unsigned(12 downto 0);
---  signal score2_cell                                : unsigned(12 downto 0);
---  signal score3_cell                                : unsigned(12 downto 0);
---  signal score4_cell                                : unsigned(12 downto 0);
---  signal next_head_cell                             : unsigned(12 downto 0)        := to_unsigned(2360, 13);  -- cell 2360
---  signal next_tail_cell                             : unsigned(12 downto 0)        := to_unsigned(2440, 13);  -- cell 2360
---  -- signal clearcell : unsigned(12 downto 0) := to_unsigned(0, 13);
---  signal speed                                      : unsigned(4 downto 0)         := "11111";  -- slowest speed
---  signal score                                      : unsigned(13 downto 0);
---  signal color                                      : unsigned (1 downto 0);
---  signal current_direction                          : unsigned(2 downto 0);
---  signal skill                                      : unsigned(4 downto 0)         := "00000";  -- skill 0
---  signal WE_head                                    : std_logic;
---  signal WE_tail                                    : std_logic;
---  signal WE_corner                                  : std_logic;
---  signal WE_score1, WE_score2, WE_score3, WE_score4 : std_logic                    := '0';  -- registers for the cell updater
---  signal next_direction                             : unsigned(2 downto 0);
---  signal body_character                             : unsigned(12 downto 0)        := to_unsigned(3*8, 13);
---  signal old_body_character                         : unsigned(12 downto 0);
---  signal write_data_head                            : unsigned(15 downto 0);
---  signal write_data_tail                            : unsigned(15 downto 0);
---  signal write_data_corner                          : unsigned(15 downto 0);
---  signal write_data_score1                          : unsigned(15 downto 0);
---  signal write_data_score2                          : unsigned(15 downto 0);
---  signal write_data_score3                          : unsigned(15 downto 0);
---  signal write_data_score4                          : unsigned(15 downto 0);
---  signal write_enable                               : std_logic;
---  signal write_job                                  : std_logic_vector(2 downto 0) := "000";  -- signal for cell update pipeline
---  signal crash_check                                : std_logic                    := '0';  -- register to activate the  crash checker
---  signal crash_test                                 : std_logic_vector(1 downto 0) := "00";  -- crash check pipeline
---  signal crashed                                    : std_logic                    := '0';  -- register to activate the crashed state
---  signal reset_game                                 : std_logic                    := '0';  -- register to restart game
---  signal game_reset                                 : std_logic                    := '0';  -- register to signal end of reset
---  signal move_snake                                 : std_logic                    := '0';  -- when timer reaches max he snake is moved.
---
-
-  --- LOGIC STATE MACHINE SIGNALS
-
   signal logic_state : gamelogic_state_t;
-
   signal request_read_int      : std_logic;
   signal head_write_data_int   : unsigned(15 downto 0);
+  signal head_read_data_int    : unsigned(15 downto 0);
   signal head_cell_int         : unsigned(12 downto 0);
   signal corner_write_data_int : unsigned(15 downto 0);
   signal corner_cell_int       : unsigned(12 downto 0);
   signal tail_write_data_int   : unsigned(15 downto 0);
+  signal tail_read_data_int    : unsigned(15 downto 0);
   signal tail_cell_int         : unsigned(12 downto 0);
   signal score_write_data_int  : unsigned(15 downto 0);
   signal score_cell_int        : unsigned(12 downto 0);
   signal reset_data_int        : unsigned(15 downto 0);
   signal reset_cell_int        : unsigned(12 downto 0);
+  signal address_a_int : unsigned(12 downto 0);
+  signal next_direction : std_logic_vector(2 downto 0);
   
 begin
 
@@ -160,6 +121,7 @@ begin
       WEA               => ram_WEA,
       address_a         => ram_address_a,
       input_a           => ram_input_a,
+      output_a          => ram_output_a,
       request_read      => request_read_int,
       head_write_data   => head_write_data_int,
       head_cell         => head_cell_int,
@@ -172,36 +134,37 @@ begin
       reset_data        => reset_data_int,
       reset_cell        => reset_cell_int);
 
-
   HEAD_CNTRL : head_logic
     port map (
-      clk25          => clk25,
-      ext_reset      => ext_reset,
-      address_a_head => address_a_head_int,
-      input_a_head   => input_a_head_int,
-      output_a_head  => output_a_head_int,
-      head_done      => head_done_int,
-      reset_en       => reset_en_int,
-      request_read   => request_read_int);
-
+      clk25           => clk25,
+      ext_reset       => ext_reset,
+      address_a_head  => head_cell_int,
+      head_write_data => head_write_data_int,
+      head_read_data  => ram_output_a,
+      head_done       => head_done_int,
+      reset_en        => reset_en_int,
+      request_read    => request_read_int);
+		
+		
+		
   EN_int <= '1';
-  
- 
+
+
   p_tick_timer : process (clk25, ext_reset)
     variable cnt : integer;
-begin 
-    if (ext_reset = '1') then   --asynchronous reset (active high)
+  begin
+    if (ext_reset = '1') then           --asynchronous reset (active high)
       tick <= '0';
-    elsif clk25'event and clk25 = '1' then        --    rising clock edge   
+    elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
       if (cnt = 5000000) then
-        tick <= '1'; --  move snake head every time the  timer reaches max.
-        cnt        := 0;
+        tick <= '1';  --  move snake head every time the  timer reaches max.
+        cnt  := 0;
       else
         tick <= '0';
       end if;
-		end if;
-    end process p_tick_timer;
+    end if;
+  end process p_tick_timer;
 
 
 
@@ -322,23 +285,20 @@ begin
 
 
 -- purpose: updates the user input from keyboard
--- type   : sequential
+-- type   : combinational
 -- inputs : clk25, ext_reset, Direction, crashed
 -- outputs: next_direction, reset_game
---  p_keyboard_input : process (clk25, ext_reset)
---  begin   process p_keyboard_input
---    if ext_reset = '0' then                  asynchronous reset (active low)
---      next_direction = (others => '0');
---    elsif clk25'event and clk25 = '1' then   rising clock edge
+  p_keyboard_input : process --(Direction)
+  begin  
 -- update keyboard input      
---      if (Direction /= "000") and (Direction /= "101") then
---        next_direction <= Direction;
---      elsif (Direction = "101") and (crashed = '1') then
---        next_direction <= "111";
---      end if;
+      if (Direction /= "000") and (Direction /= "101") then
+        next_direction <= Direction;
+      elsif (Direction = "101") and (crashed = '1') then
+        next_direction <= "111";
+      end if;
 -- end of keyboard update
---    end if;
---  end process p_keyboard_input;
+    end if;
+  end process p_keyboard_input;
 
 
 

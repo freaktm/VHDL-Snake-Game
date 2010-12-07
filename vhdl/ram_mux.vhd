@@ -36,7 +36,7 @@ entity ram_mux is
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
     input_a           : out unsigned(15 downto 0);
-    task_done         : out std_logic;
+	 output_a	: in unsigned(15 downto 0);
     request_read      : in  std_logic;
     head_write_data   : in  unsigned(15 downto 0);
     head_cell         : in  unsigned(12 downto 0);
@@ -59,18 +59,20 @@ architecture Behavioral of ram_mux is
   signal write_enable  : std_logic;
   signal address_a_int : unsigned(12 downto 0);
   signal input_a_int   : unsigned(15 downto 0);
+  signal output_a_int : unsigned(15 downto 0);
   
   signal state : gamelogic_state_t;
   
 begin
   -- purpose: updates the ram entries for the video display also controls the reading
-  -- type   : sequential
+  -- type   : combinational
   -- inputs : clk25, ext_reset, WE_head, WE_tail, WE_corner, write_data_head,
   -- write_data_tail, write_data_corner, head_cell, corner_cell, tail_cell,
   -- WE_score1, WE_Score2, WE_score3, WE_score4, write_data_score1, write_data_score2, write_data_score3, write_data_score4
   -- outputs : address_a_int, write_enable, input_a_int, write_job
   
   input_a   <= input_a_int;
+  output_a <= output_a_int;
   address_a <= address_a_int;
   WEA       <= write_enable;
 

@@ -33,8 +33,8 @@ entity head_logic is
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
     address_a_head : out unsigned(12 downto 0);
-    input_a_head   : out unsigned(15 downto 0);
-    output_a_head  : in  unsigned(15 downto 0);
+    head_write_data   : out unsigned(15 downto 0);
+    head_read_data  : in  unsigned(15 downto 0);
     head_done     : out std_logic;
 	 reset_en : out std_logic;
 	 request_read : out std_logic
