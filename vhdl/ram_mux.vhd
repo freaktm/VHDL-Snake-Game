@@ -36,7 +36,6 @@ entity ram_mux is
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
     input_a           : out unsigned(15 downto 0);
-	 output_a	: in unsigned(15 downto 0);
     request_read      : in  std_logic;
     head_write_data   : in  unsigned(15 downto 0);
     head_cell         : in  unsigned(12 downto 0);
@@ -72,7 +71,6 @@ begin
   -- outputs : address_a_int, write_enable, input_a_int, write_job
   
   input_a   <= input_a_int;
-  output_a <= output_a_int;
   address_a <= address_a_int;
   WEA       <= write_enable;
 
