@@ -88,7 +88,7 @@ architecture Behavioral of game_logic is
   type state_t is (IDLE, HEAD, CORNER, TAIL, SCORE, RESET);
   signal state : state_t;
   
-  
+    
   
 begin
 
