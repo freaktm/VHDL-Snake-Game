@@ -34,12 +34,11 @@ entity game_logic is
   port(
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
---    WEA_int       : out std_logic;
---    EN_int        : out std_logic;
- --   address_a_int : out unsigned(12 downto 0) := "0000000000000";
- --   input_a_int   : out unsigned(15 downto 0) := "0000000000000000";
---    output_a_int  : in  unsigned(15 downto 0) := "0000000000000000";
---    colour        : out unsigned(1 downto 0);
+    ram_WEA       : out std_logic;
+    ram_EN        : out std_logic;
+    ram_address_a : out unsigned(12 downto 0) := "0000000000000";
+    ram_input_a   : out unsigned(15 downto 0) := "0000000000000000";
+    ram_output_a  : in  unsigned(15 downto 0) := "0000000000000000";
     Direction     : in  unsigned(2 downto 0)
     );
 end game_logic;
@@ -47,53 +46,52 @@ end game_logic;
 architecture Behavioral of game_logic is
 
 
-component ram_mux is
-  port(
-    gamelogic_state   : in  gamelogic_state_t;
-    WEA               : out std_logic;
-    address_a         : out unsigned(12 downto 0);
-    input_a           : out unsigned(15 downto 0);
-    request_read      : in  std_logic;
-    head_write_data   : in  unsigned(15 downto 0);
-    head_cell         : in  unsigned(12 downto 0);
-    corner_write_data : in  unsigned(15 downto 0);
-    corner_cell       : in  unsigned(12 downto 0);
-    tail_write_data   : in  unsigned(15 downto 0);
-    tail_cell         : in  unsigned(12 downto 0);
-    score_write_data  : in  unsigned(15 downto 0);
-    score_cell        : in  unsigned(12 downto 0);
-    reset_data        : in  unsigned(15 downto 0);
-    reset_cell        : in  unsigned(12 downto 0)
-    );
-end component;
+  component ram_mux is
+    port(
+      gamelogic_state   : in  gamelogic_state_t;
+      WEA               : out std_logic;
+      address_a         : out unsigned(12 downto 0);
+      input_a           : out unsigned(15 downto 0);
+      request_read      : in  std_logic;
+      head_write_data   : in  unsigned(15 downto 0);
+      head_cell         : in  unsigned(12 downto 0);
+      corner_write_data : in  unsigned(15 downto 0);
+      corner_cell       : in  unsigned(12 downto 0);
+      tail_write_data   : in  unsigned(15 downto 0);
+      tail_cell         : in  unsigned(12 downto 0);
+      score_write_data  : in  unsigned(15 downto 0);
+      score_cell        : in  unsigned(12 downto 0);
+      reset_data        : in  unsigned(15 downto 0);
+      reset_cell        : in  unsigned(12 downto 0)
+      );
+  end component;
 
 
-component head_logic is
-  port(
-    clk25         : in  std_logic;
-    ext_reset     : in  std_logic;
-    WEA_head       : out std_logic;
-    address_a_head : out unsigned(12 downto 0);
-    input_a_head   : out unsigned(15 downto 0);
-    output_a_head  : in  unsigned(15 downto 0);
-    head_done     : out std_logic;
-	 reset_en : out std_logic;
-	 request_read : out std_logic
-    );
-end component;
+  component head_logic is
+    port(
+      clk25          : in  std_logic;
+      ext_reset      : in  std_logic;
+      address_a_head : out unsigned(12 downto 0);
+      input_a_head   : out unsigned(15 downto 0);
+      output_a_head  : in  unsigned(15 downto 0);
+      head_done      : out std_logic;
+      reset_en       : out std_logic;
+      request_read   : out std_logic
+      );
+  end component;
 
-signal tick : std_logic;
-signal reset_en : std_logic;
-signal head_en : std_logic;
-signal tail_en : std_logic;
-signal corner_en : std_logic;
-signal score_en : std_logic;
-signal reset_done : std_logic;
-signal head_done : std_logic;
-signal tail_done : std_logic;
-signal score_done : std_logic;
-signal crashed : std_logic;
-signal corner_done : std_logic;
+  signal tick       : std_logic;
+  signal reset_en_int    : std_logic;
+  signal head_en_int     : std_logic;
+  signal tail_en_int     : std_logic;
+  signal corner_en_int   : std_logic;
+  signal score_en_int    : std_logic;
+  signal reset_done_int  : std_logic;
+  signal head_done_int   : std_logic;
+  signal tail_done_int   : std_logic;
+  signal score_done_int  : std_logic;
+  signal crashed_int     : std_logic;
+  signal corner_done_int : std_logic;
 
 
 
@@ -137,49 +135,73 @@ signal corner_done : std_logic;
 --
 
   --- LOGIC STATE MACHINE SIGNALS
- 
+
   signal logic_state : gamelogic_state_t;
- 
-  
+
+  signal request_read_int      : std_logic;
+  signal head_write_data_int   : unsigned(15 downto 0);
+  signal head_cell_int         : unsigned(12 downto 0);
+  signal corner_write_data_int : unsigned(15 downto 0);
+  signal corner_cell_int       : unsigned(12 downto 0);
+  signal tail_write_data_int   : unsigned(15 downto 0);
+  signal tail_cell_int         : unsigned(12 downto 0);
+  signal score_write_data_int  : unsigned(15 downto 0);
+  signal score_cell_int        : unsigned(12 downto 0);
+  signal reset_data_int        : unsigned(15 downto 0);
+  signal reset_cell_int        : unsigned(12 downto 0);
   
 begin
 
 
 
-  RAM_CNTRL: ram_mux
+  RAM_CNTRL : ram_mux
     port map (
       gamelogic_state   => gamelogic_state,
-      WEA               => WEA,
-      address_a         => address_a,
-      input_a           => input_a,
-      task_done         => task_done,
-      request_read      => request_read,
-      head_write_data   => head_write_data,
-      head_cell         => head_cell,
-      corner_write_data => corner_write_data,
-      corner_cell       => corner_cell,
-      tail_write_data   => tail_write_data,
-      tail_cell         => tail_cell,
-      score_write_data  => score_write_data,
-      score_cell        => score_cell,
-      reset_data        => reset_data,
-      reset_cell        => reset_cell);
+      WEA               => ram_WEA,
+      address_a         => ram_address_a,
+      input_a           => ram_input_a,
+      request_read      => request_read_int,
+      head_write_data   => head_write_data_int,
+      head_cell         => head_cell_int,
+      corner_write_data => corner_write_data_int,
+      corner_cell       => corner_cell_int,
+      tail_write_data   => tail_write_data_int,
+      tail_cell         => tail_cell_int,
+      score_write_data  => score_write_data_int,
+      score_cell        => score_cell_int,
+      reset_data        => reset_data_int,
+      reset_cell        => reset_cell_int);
 
 
-  HEAD_CNTRL: head_logic
+  HEAD_CNTRL : head_logic
     port map (
       clk25          => clk25,
       ext_reset      => ext_reset,
-      WEA_head       => WEA_head,
-      address_a_head => address_a_head,
-      input_a_head   => input_a_head,
-      output_a_head  => output_a_head,
-      head_done      => head_done,
-      reset_en       => reset_en,
-      request_read   => request_read);
-		
-		EN_int  <= '1';
+      address_a_head => address_a_head_int,
+      input_a_head   => input_a_head_int,
+      output_a_head  => output_a_head_int,
+      head_done      => head_done_int,
+      reset_en       => reset_en_int,
+      request_read   => request_read_int);
 
+  EN_int <= '1';
+  
+ 
+  p_tick_timer : process (clk25, ext_reset)
+    variable cnt : integer;
+begin 
+    if (ext_reset = '1') then   --asynchronous reset (active high)
+      tick <= '0';
+    elsif clk25'event and clk25 = '1' then        --    rising clock edge   
+      cnt := cnt + 1;
+      if (cnt = 5000000) then
+        tick <= '1'; --  move snake head every time the  timer reaches max.
+        cnt        := 0;
+      else
+        tick <= '0';
+      end if;
+		end if;
+    end process p_tick_timer;
 
 
 
@@ -227,82 +249,74 @@ begin
     end if;
 
   end process p_state_machine;
-  
-  
-  
 
 
-
-
-
-
-
-  
+-- purpose : enable head signal
 -- type   : combinational
 -- inputs : state
 -- outputs: head_en
-p_head_en: process (state)
-begin  -- process p_head_en
-  if state = HEAD then
-    head_en <= '1';
+  p_head_en : process (state)
+  begin  -- process p_head_en
+    if state = HEAD then
+      head_en <= '1';
     else
       head_en <= '0';
-  end if;
-end process p_head_en;
+    end if;
+  end process p_head_en;
 
 -- purpose: enable tail signal
 -- type   : combinational
 -- inputs : state
 -- outputs: tail_en
-p_tail_en: process (state)
-begin  -- process p_tail_en
-  if state = TAIL then 
-   tail_en <= '1';
+  p_tail_en : process (state)
+  begin  -- process p_tail_en
+    if state = TAIL then
+      tail_en <= '1';
     else
       tail_en <= '0';
-  end if;
-end process p_tail_en;
+    end if;
+  end process p_tail_en;
 
 
 -- purpose: enable corner signal
 -- type   : combinational
 -- inputs : state
 -- outputs: corner_en
-p_corner_en: process (state)
-begin  -- process p_corner_en
-  if state = CORNER then
-    corner_en <= '1';
+  p_corner_en : process (state)
+  begin  -- process p_corner_en
+    if state = CORNER then
+      corner_en <= '1';
     else
       corner_en <= '0';
-  end if;
-end process p_corner_en;
+    end if;
+  end process p_corner_en;
 
 
 -- purpose: enable score signal
 -- type   : combinational
 -- inputs : state
 -- outputs: score_en
-p_score_en: process (state)
-begin  -- process p_score_en
-  if state = SCORE then
-    score_en <= '1';
+  p_score_en : process (state)
+  begin  -- process p_score_en
+    if state = SCORE then
+      score_en <= '1';
     else
       score_en <= '0';
-  end if;
-end process p_score_en;
+    end if;
+  end process p_score_en;
 
 -- purpose: enables game over signal
 -- type   : combinational
 -- inputs : state
 -- outputs: reset_en
-p_reset_en: process (state)
-begin  -- process p_reset_en
-  if state = RESET then
-    reset_en <= '1';
+  p_reset_en : process (state)
+  begin  -- process p_reset_en
+    if state = RESET then
+      reset_en <= '1';
     else
       reset_en <= '0';
-  end if;
-end process p_reset_en;
+    end if;
+  end process p_reset_en;
 
 
 
@@ -327,24 +341,7 @@ end process p_reset_en;
 --  end process p_keyboard_input;
 
 
--- purpose: controls the speed of the snake
--- type   : sequential
--- inputs : clk25, ext_reset, skill, game_reset, snake_moved
--- outputs: move_snake
---  p_snake_timer : process (clk25, ext_reset, game_reset)
---    variable cnt : integer;
---  begin   process p_snake_timer
---    if (ext_reset = '0') or (game_reset = '1') then   asynchronous reset (active low)
---      move_snake <= '0';
---    elsif clk25'event and clk25 = '1' then            rising clock edge   
---      cnt := cnt + 1;
---      if (cnt = 5000000) then
---        move_snake <= '1';   move snake head every time the  timer reaches max.
---        cnt        := 0;
---      elsif (snake_moved = '1') then
---        move_snake <= '0';
---      end if;
---    end process p_snake_timer;
+
 
 -- purpose: checks if the snake has crashed into a border or itself
 -- type   : sequential
@@ -358,7 +355,7 @@ end process p_reset_en;
 --        elsif clk25'event and clk25 = '1' then            rising clock edge
 
 
-          
+
 --          if (crash_check = '1') then
 --            if (crash_test = "00") then
 --                  address_a_int  <= next_head_cell;
@@ -406,36 +403,9 @@ end process p_reset_en;
 --          write_data_head   <= current_direction & body_character;
 --          WE_head           <= '1';
 --          corner_cell       <= (others => '0');
-          
-          
---        elsif clk25'event and clk25 = '1' then  -- rising clock edge
-
-
-----update display buffer for ram writer process
---          if (write_enable = '1') then
---            if (write_job = "001") then
---              WE_head <= '0';
---            elsif (write_job = "010") then
---              WE_corner <= '0';
---            elsif (write_job = "011") then
---              WE_tail <= '0';
---            elsif (write_job = "100") then
---              WE_score1 <= '0';
---            elsif (write_job = "101") then
---              WE_score2 <= '0';
---            elsif (write_job = "110") then
---              WE_score3 <= '0';
---            elsif (write_job = "111") then
---              WE_score4 <= '0';
---            end if;
---          end if;
 
 
 
-----update crash check pipeline
---          if (check_progress = "11") then
---            crash_check <= '0';
---          end if;
 
 
 --          if (move_snake = '0') then
@@ -469,7 +439,7 @@ end process p_reset_en;
 --                else
 --                  next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
 --                end if;
-                
+
 --              elsif (current_direction = "011") then  -- IF moving DOWN befoe change
 --                if (next_direction = "010") then      -- turns RIGHT
 --                  old_body_character <= to_unsigned(5*8, body_character'length);
@@ -487,7 +457,7 @@ end process p_reset_en;
 --                  --      body_character <= to_unsigned(3*8, body_character'length);
 --                  next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
 --                end if;
-                
+
 --              elsif (current_direction = "010") then  -- IF moving RIGHT before change
 --                if (next_direction = "001") then      -- turns UP
 --                  old_body_character <= to_unsigned(5*8, body_character'length);
@@ -505,7 +475,7 @@ end process p_reset_en;
 --                  --    body_character <= to_unsigned(2*8, body_character'length);
 --                  next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
 --                end if;
-                
+
 --              elsif (current_direction = "100") then  -- IF moving LEFT before change
 --                if (next_direction = "001") then      -- turns UP
 --                  old_body_character <= to_unsigned(4*8, body_character'length);
@@ -522,16 +492,16 @@ end process p_reset_en;
 --                else
 --                  next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
 --                end if;
-                
+
 --              end if;
 --              write_data_corner <= Direction & old_body_character;
 --              write_data_head   <= Direction & body_character;
 --              corner_cell       <= head_cell;
 --            end if;
-            
+
 --          end if;
 --        end if;
-        
+
 --      end process p_movesnake;
 
 
@@ -541,5 +511,5 @@ end process p_reset_en;
 
 
 
-    end Behavioral;
+end Behavioral;
 

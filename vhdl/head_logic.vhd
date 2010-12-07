@@ -32,7 +32,6 @@ entity head_logic is
   port(
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
-    WEA_head       : out std_logic;
     address_a_head : out unsigned(12 downto 0);
     input_a_head   : out unsigned(15 downto 0);
     output_a_head  : in  unsigned(15 downto 0);
@@ -46,7 +45,7 @@ architecture Behavioral of head_logic is
 
 
   -- HEAD STATE MACHINE SIGNALS
- -- type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
+  type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
   signal head_state : head_state_t;
   
 begin
