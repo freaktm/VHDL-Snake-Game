@@ -52,6 +52,7 @@ architecture Behavioral of game_logic is
       WEA               : out std_logic;
       address_a         : out unsigned(12 downto 0);
       input_a           : out unsigned(15 downto 0);
+		output_a				: in unsigned(15 downto 0);
       request_read      : in  std_logic;
       head_write_data   : in  unsigned(15 downto 0);
       head_read_data    : out unsigned(15 downto 0);
@@ -95,7 +96,7 @@ architecture Behavioral of game_logic is
   signal score_done_int  : std_logic;
   signal crashed_int     : std_logic;
   signal corner_done_int : std_logic;
-  signal logic_state : gamelogic_state_t;
+  signal gamelogic_state : gamelogic_state_t;
   signal request_read_int      : std_logic;
   signal head_write_data_int   : unsigned(15 downto 0);
   signal head_read_data_int    : unsigned(15 downto 0);
@@ -149,7 +150,7 @@ begin
 		
 		
 		
-  EN_int <= '1';
+  ram_EN <= '1';
 
 
 -- purpose: controls the timer for the snake
@@ -181,38 +182,38 @@ begin
   p_state_machine : process (clk25, ext_reset)
   begin  -- process p_state_machine
     if ext_reset = '1' then                 -- asynchronous reset (active high)
-      state <= IDLE;
+      gamelogic_state <= IDLE;
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
-      case logic_state is
+      case gamelogic_state is
         when IDLE =>
           if tick = '1' then
-            logic_state <= HEAD;
+            gamelogic_state <= HEAD;
           end if;
         when HEAD =>
-          if (head_done = '1') and (corner_en = '1') then
-            logic_state <= CORNER;
-          elsif (head_done = '1') and (corner_en = '0') then
-            logic_state <= TAIL;
+          if (head_done_int = '1') and (corner_en_int = '1') then
+            gamelogic_state <= CORNER;
+          elsif (head_done_int = '1') and (corner_en_int = '0') then
+            gamelogic_state <= TAIL;
           elsif (crashed = '1') then
-            logic_state <= RESET;
+            gamelogic_state <= RESET;
           end if;
         when CORNER =>
           if (corner_done = '1') then
-            logic_state <= TAIL;
+            gamelogic_state <= TAIL;
           end if;
         when TAIL =>
           if (tail_done = '1') and (score_en = '0') then
-            logic_state <= IDLE;
+            gamelogic_state <= IDLE;
           elsif (tail_done = '1') and (score_en = '1') then
-            logic_state <= SCORE;
+            gamelogic_state <= SCORE;
           end if;
         when SCORE =>
           if (score_done = '1') then
-            logic_state <= IDLE;
+            gamelogic_state <= IDLE;
           end if;
         when RESET =>
           if (reset_done = '1') then
-            logic_state <= IDLE;
+            gamelogic_state <= IDLE;
           end if;
       end case;
     end if;

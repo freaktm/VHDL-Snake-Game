@@ -51,6 +51,8 @@ architecture Behavioral of head_logic is
   signal gamelogic_state : gamelogic_state_t;
   signal current_direction : std_logic_vector(2 downto 0);
   signal no_crash : std_logic;
+  signal head_corner_done : std_logic;
+  signal head_head_done : std_logic;
   
 begin
   
@@ -80,7 +82,7 @@ begin
             head_state <= HEAD;
           end if;
         when HEAD =>
-          if head_done = '1' then
+          if head_head_done = '1' then
             head_state <= IDLE;
           end if;
 
@@ -90,28 +92,28 @@ begin
   
 
 
- p_reset_state : process (head_state)
- begin
-if (head_state = RESET) then
-        input_a_int  <= (others => '0');
-        ramcnt_i     := ramcnt_i + 1;
-        if (ramcnt_i = 80) then
-          ramcnt_j := ramcnt_j + 1;
-          ramcnt_i := 0;
-          if (ramcnt_j = 55) then
-            reset_done <= '1';
-            ramcnt_i   := 0;
-            ramcnt_j   := 0;
-          end if;
-       elsif (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
-          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
-          input_a   <= (others => '0');
-        else
-          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
-          input_a   <= to_unsigned(8, input_a'length);
-        end if;
-end if;
-end process p_reset_state;
+-- p_reset_state : process (head_state)
+-- begin
+--if (head_state = RESET) then
+--        input_a_int  <= (others => '0');
+--        ramcnt_i     := ramcnt_i + 1;
+--        if (ramcnt_i = 80) then
+--          ramcnt_j := ramcnt_j + 1;
+--          ramcnt_i := 0;
+--          if (ramcnt_j = 55) then
+--            reset_done <= '1';
+--            ramcnt_i   := 0;
+--            ramcnt_j   := 0;
+--          end if;
+--       elsif (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
+--          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
+--          input_a   <= (others => '0');
+--        else
+--          address_a <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a'length);
+--          input_a   <= to_unsigned(8, input_a'length);
+--        end if;
+--end if;
+--end process p_reset_state;
 
 -- purpose: checks if the snake has crashed into a border or itself
 -- type   : sequential
