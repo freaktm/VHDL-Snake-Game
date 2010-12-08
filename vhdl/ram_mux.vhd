@@ -74,16 +74,16 @@ begin
   address_a <= address_a_int;
   WEA       <= write_enable;
 
-  p_process_request : process (game_logic_state, request_read)
+  p_process_request : process (gamelogic_state, request_read)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate
-    if game_logic_state = RESET then  -- RESET STATE OF RAM                                                      
+    if gamelogic_state = RESET then  -- RESET STATE OF RAM                                                      
       input_a_int   <= reset_data;
       address_a_int <= reset_cell;
       write_enable  <= '1';
       
-    elsif (game_logic_state = HEAD) then  -- HEAD STATE OF MUX
+    elsif (gamelogic_state = HEAD) then  -- HEAD STATE OF MUX
       input_a_int   <= head_write_data;
       address_a_int <= head_cell;
       if (request_read = '1') then
@@ -93,18 +93,18 @@ begin
       end if;
       
       
-    elsif (game_logic_state = CORNER) then  -- CORNER STATE OF MUX
+    elsif (gamelogic_state = CORNER) then  -- CORNER STATE OF MUX
       input_a_int   <= corner_write_data;
       address_a_int <= corner_cell;
       write_enable  <= '1';
       
-    elsif (game_logic_state = TAIL) then  -- TAIL STATE OF MUX
+    elsif (gamelogic_state = TAIL) then  -- TAIL STATE OF MUX
 
       input_a_int   <= corner_write_data;
       address_a_int <= corner_cell;
       write_enable  <= '1';
       
-    elsif (game_logic_state = SCORE) then  -- SCORE STATE OF MUX
+    elsif (gamelogic_state = SCORE) then  -- SCORE STATE OF MUX
 
       input_a_int   <= score_write_data;
       address_a_int <= score_cell;
@@ -114,6 +114,6 @@ begin
       write_enable <= '0';              -- MUX IDLE
     end if;
     
-  end process p_cellupdate;
+  end process p_process_request;
 
 end Behavioral;

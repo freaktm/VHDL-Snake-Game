@@ -28,6 +28,8 @@ use IEEE.numeric_std.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+use work.gamelogic_pkg.all;
+
 entity head_logic is
   port(
     clk25         : in  std_logic;
@@ -40,14 +42,15 @@ entity head_logic is
 	 request_read : out std_logic;
 	 keyboard : in std_logic_vector(2 downto 0)
     );
-end game_logic;
+end head_logic;
 
 architecture Behavioral of head_logic is
 
-
-  -- HEAD STATE MACHINE SIGNALS
   type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
   signal head_state : head_state_t;
+  signal gamelogic_state : gamelogic_state_t;
+  signal current_direction : std_logic_vector(2 downto 0);
+  signal no_crash : std_logic;
   
 begin
   
@@ -59,17 +62,15 @@ begin
   p_head_state_machine: process (clk25, ext_reset)
   begin  -- process p_head_state_machine
     if ext_reset = '1' then             -- asynchronous reset (active high)
-		head_state <= IDLE;         
+		head_state <= IDLE;      		
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
-            case state is
+            case head_state is
         when IDLE =>
-          if head_en = '1' then
+          if gamelogic_state = HEAD then
             head_state <= CRASH_CHECK ;
           end if;
         when CRASH_CHECK =>
-          if reset_en = '1' then
-            head_state <= IDLE;
-          elsif (no_crash = '1') and (next_direction = current_direction) then
+          if (no_crash = '1') and (keyboard = current_direction) then
             head_state <= HEAD;
           elsif (no_crash = '1') then
             head_state <= CORNER;
@@ -146,13 +147,13 @@ end process p_reset_state;
 ---- type   : combinational
 ---- inputs : head_state
 ---- outputs: no_crash, reset_en
---p_check_crash: process (head_state)
---begin  -- process p_check_crash
---  if head_state = CRASH_CHECK then
---    
---  end if;
---end process p_check_crash;
---
+p_check_crash: process (head_state)
+begin  -- process p_check_crash
+  if head_state = CRASH_CHECK then
+    no_crash <= '1';
+  end if;
+end process p_check_crash;
+
 
 
 
