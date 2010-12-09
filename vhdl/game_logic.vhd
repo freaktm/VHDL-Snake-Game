@@ -68,6 +68,31 @@ architecture Behavioral of game_logic is
       reset_cell        : in  unsigned(12 downto 0)
       );
   end component;
+  
+  component reset_logic is
+  port(
+   clk25         : in  std_logic;
+    ext_reset     : in  std_logic;
+    address_a_reset : out unsigned(12 downto 0);
+    reset_write_data   : out unsigned(15 downto 0);
+    reset_done     : out std_logic;
+	 keyboard : in std_logic_vector(2 downto 0)
+    );
+end component;
+  
+  component check_logic is
+  port(
+    clk25         : in  std_logic;
+    ext_reset     : in  std_logic;
+    address_a_check : out unsigned(12 downto 0);
+    check_read_data  : in  unsigned(15 downto 0);
+    check_done     : out std_logic;
+	 keyboard : in std_logic_vector(2 downto 0);
+	 crashed : out std_logic;
+	 current_direction : out std_logic_vector(2 downto 0);
+	 next_cell : out unsigned(12 downto 0)
+    );
+end component;
 
 
   component head_logic is
@@ -76,11 +101,7 @@ architecture Behavioral of game_logic is
       ext_reset       : in  std_logic;
       address_a_head  : out unsigned(12 downto 0);
       head_write_data : out unsigned(15 downto 0);
-      head_read_data  : in  unsigned(15 downto 0);
-      head_done       : out std_logic;
-      reset_en        : out std_logic;
-      request_read    : out std_logic;
-		keyboard : in std_logic_vector(2 downto 0)
+      head_done       : out std_logic
       );
   end component;
 
@@ -90,6 +111,7 @@ architecture Behavioral of game_logic is
   signal tail_en     : std_logic;
   signal corner_en   : std_logic;
   signal score_en    : std_logic;
+  signal check_done_int : std_logic;
   signal reset_done_int  : std_logic;
   signal head_done_int   : std_logic;
   signal tail_done_int   : std_logic;
@@ -97,7 +119,6 @@ architecture Behavioral of game_logic is
   signal crashed_int     : std_logic;
   signal corner_done_int : std_logic;
   signal gamelogic_state : gamelogic_state_t;
-  signal request_read_int      : std_logic;
   signal head_write_data_int   : unsigned(15 downto 0);
   signal head_read_data_int    : unsigned(15 downto 0);
   signal head_cell_int         : unsigned(12 downto 0);
@@ -112,6 +133,10 @@ architecture Behavioral of game_logic is
   signal reset_cell_int        : unsigned(12 downto 0);
   signal address_a_int : unsigned(12 downto 0);
   signal next_direction : std_logic_vector(2 downto 0);
+  signal check_cell_int : unsigned(12 downto 0);
+  signal check_read_data_int : unsigned(15 downto 0);
+  signal current_direction_int : std_logic_vector(2 downto 0);
+  signal next_cell_int : unsigned(12 downto 0);
   
 begin
 
@@ -124,7 +149,6 @@ begin
       address_a         => ram_address_a,
       input_a           => ram_input_a,
       output_a          => ram_output_a,
-      request_read      => request_read_int,
       head_write_data   => head_write_data_int,
       head_cell         => head_cell_int,
       corner_write_data => corner_write_data_int,
@@ -134,7 +158,32 @@ begin
       score_write_data  => score_write_data_int,
       score_cell        => score_cell_int,
       reset_data        => reset_data_int,
-      reset_cell        => reset_cell_int);
+      reset_cell        => reset_cell_int,
+		check_read_data => check_read_data_int,
+		check_cell => check_cell_int);
+		
+		CHECK_CNTRL : check_logic
+		port map (
+		    clk25         => clk25,
+    ext_reset     => ext_reset,
+    address_a_check => check_cell_int,
+    check_read_data  => check_read_data_int,
+    check_done     => check_done_int,
+	 keyboard => next_direction,
+	 crashed => crashed_int,
+	 current_direction => current_direction_int,
+	 next_cell => next_cell_int
+	 );
+	 
+	 RESET_CNTRL : reset_logic
+	  port map (
+	  		    clk25         => clk25,
+    ext_reset     => ext_reset,
+    address_a_reset => reset_cell_int,
+    reset_write_data   => reset_data_int,
+    reset_done     => reset_done_int,
+	 keyboard => next_direction
+	 );
 
   HEAD_CNTRL : head_logic
     port map (
@@ -142,11 +191,8 @@ begin
       ext_reset       => ext_reset,
       address_a_head  => head_cell_int,
       head_write_data => head_write_data_int,
-      head_read_data  => ram_output_a,
       head_done       => head_done_int,
-      reset_en        => reset_en,
-      request_read    => request_read_int,
-		keyboard => next_direction);
+		direction => current_direction_int);
 		
 		
 		
@@ -187,24 +233,26 @@ begin
       case gamelogic_state is
         when IDLE =>
           if tick = '1' then
-            gamelogic_state <= HEAD;
+            gamelogic_state <= CHECK;
           end if;
+			 when CHECK =>
+			 if (check_done = '1') and (nochange = '1') then
+			 gamelogic_state <= HEAD;
+			 elsif (check_done = '1') and (nochange = '0') then
+			 gamelogic_state <= CORNER;
+			 elsif (crashed = '1') then
+			 gamelogic_state <= RESET;
+			 end if;
         when HEAD =>
-          if (head_done_int = '1') and (corner_en_int = '1') then
-            gamelogic_state <= CORNER;
-          elsif (head_done_int = '1') and (corner_en_int = '0') then
+          if (head_done = '1') then
             gamelogic_state <= TAIL;
-          elsif (crashed = '1') then
-            gamelogic_state <= RESET;
-          end if;
+				end if;
         when CORNER =>
           if (corner_done = '1') then
             gamelogic_state <= TAIL;
           end if;
         when TAIL =>
-          if (tail_done = '1') and (score_en = '0') then
-            gamelogic_state <= IDLE;
-          elsif (tail_done = '1') and (score_en = '1') then
+          if (tail_done = '1') then
             gamelogic_state <= SCORE;
           end if;
         when SCORE =>

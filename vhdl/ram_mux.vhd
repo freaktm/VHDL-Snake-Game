@@ -36,7 +36,8 @@ entity ram_mux is
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
     input_a           : out unsigned(15 downto 0);
-    request_read      : in  std_logic;
+	 check_read_data : out unsigned(15 downto 0);
+	 check_cell : in unsigned(12 downto 0);
     head_write_data   : in  unsigned(15 downto 0);
     head_cell         : in  unsigned(12 downto 0);
     corner_write_data : in  unsigned(15 downto 0);
@@ -74,7 +75,7 @@ begin
   address_a <= address_a_int;
   WEA       <= write_enable;
 
-  p_process_request : process (gamelogic_state, request_read)
+  p_process_request : process (gamelogic_state)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate
@@ -86,11 +87,7 @@ begin
     elsif (gamelogic_state = HEAD) then  -- HEAD STATE OF MUX
       input_a_int   <= head_write_data;
       address_a_int <= head_cell;
-      if (request_read = '1') then
-        write_enable <= '0';
-      else
-        write_enable <= '1';
-      end if;
+      write_enable <= '1';
       
       
     elsif (gamelogic_state = CORNER) then  -- CORNER STATE OF MUX

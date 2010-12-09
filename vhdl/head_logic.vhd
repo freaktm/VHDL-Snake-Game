@@ -32,64 +32,39 @@ use work.gamelogic_pkg.all;
 
 entity head_logic is
   port(
-    clk25         : in  std_logic;
-    ext_reset     : in  std_logic;
     address_a_head : out unsigned(12 downto 0);
     head_write_data   : out unsigned(15 downto 0);
-    head_read_data  : in  unsigned(15 downto 0);
     head_done     : out std_logic;
-	 reset_en : out std_logic;
-	 request_read : out std_logic;
-	 keyboard : in std_logic_vector(2 downto 0)
+	 next_cell : in unsigned(12 downto 0);
+	 current_direction : in unsigned(2 downto 0)
     );
 end head_logic;
 
 architecture Behavioral of head_logic is
 
-  type   head_state_t is (IDLE, CRASH_CHECK, CORNER, HEAD);
-  signal head_state : head_state_t;
   signal gamelogic_state : gamelogic_state_t;
-  signal current_direction : std_logic_vector(2 downto 0);
-  signal no_crash : std_logic;
-  signal head_corner_done : std_logic;
-  signal head_head_done : std_logic;
+  signal snake_character : unsigned (8 downto 0);
+ 
   
 begin
   
+  address_a_head <= next_cell;
   
-    -- purpose: controls the HEAD state
-  -- type   : sequential
-  -- inputs : clk25, ext_reset, head_en, ram_data_a, Direction 
-  -- outputs: reset_en, head_done
-  p_head_state_machine: process (clk25, ext_reset)
-  begin  -- process p_head_state_machine
-    if ext_reset = '1' then             -- asynchronous reset (active high)
-		head_state <= IDLE;      		
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge
-            case head_state is
-        when IDLE =>
-          if gamelogic_state = HEAD then
-            head_state <= CRASH_CHECK ;
-          end if;
-        when CRASH_CHECK =>
-          if (no_crash = '1') and (keyboard = current_direction) then
-            head_state <= HEAD;
-          elsif (no_crash = '1') then
-            head_state <= CORNER;
-          end if;
-        when CORNER =>
-          if head_corner_done ='1' then
-            head_state <= HEAD;
-          end if;
-        when HEAD =>
-          if head_head_done = '1' then
-            head_state <= IDLE;
-          end if;
-
-      end case;
-    end if;
-  end process p_head_state_machine;
-  
+p_update_character : process (gamelogic_state)
+begin
+   if (gamelogic_state = HEAD) then
+	if (current_direction = "001") or (current_direction = "011") then
+	 snake_character <= to_unsigned(2*8, snake_character'length);
+	 elsif (current_direction = "010") or (current_direction = "100") then
+	 snake_character <= to_unsigned(3*8, snake_character'length);
+	 end if;
+	 
+	head_write_data <= "0000" & current_direction & snake_character;
+	head_done <= '1';
+ else
+ head_done <= '0';	
+ end if;
+end process p_update_character;
 
 
 -- p_reset_state : process (head_state)
@@ -115,46 +90,6 @@ begin
 --end if;
 --end process p_reset_state;
 
--- purpose: checks if the snake has crashed into a border or itself
--- type   : sequential
--- inputs : clk25, ext_reset, crash_check, next_head_cell, output_a_int, crash_result_ready
--- outputs: crash_test, crashed
---      p_collision_checker : process (clk25, ext_reset, game_reset)
---      begin   process p_collision_checker
---        if (ext_reset = '0') or (game_reset = '0') then   asynchronous reset (active low)
---          crash_test <= (others => '0');
---          crashed    <= '0';
---        elsif clk25'event and clk25 = '1' then            rising clock edge
-
-
-
---          if (crash_check = '1') then
---            if (crash_test = "00") then
---                  address_a_int  <= next_head_cell;
---              crash_test <= "01";
---            elsif (crash_result_ready = '1') then
---              crash_test <= (others => '0');
---              if (to_integer(output_a_int) /= 0) then
---                crashed <= '1';
---              else
---                crashed <= '0';
---              end if;
---            end if;
---          end if;
---        end if;
---      end process p_collision_checker;
-
-  
---  -- purpose: checks for crash when in CRASH_CHECK state
----- type   : combinational
----- inputs : head_state
----- outputs: no_crash, reset_en
-p_check_crash: process (head_state)
-begin  -- process p_check_crash
-  if head_state = CRASH_CHECK then
-    no_crash <= '1';
-  end if;
-end process p_check_crash;
 
 
 

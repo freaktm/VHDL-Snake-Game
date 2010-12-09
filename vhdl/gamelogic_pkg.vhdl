@@ -4,7 +4,7 @@ use ieee.NUMERIC_STD.all;
 
 package gamelogic_pkg is
 
- type gamelogic_state_t is (IDLE, HEAD, CORNER, TAIL, SCORE, RESET);  
+ type gamelogic_state_t is (IDLE, CHECK, HEAD, CORNER, TAIL, SCORE, RESET);  
 
 end gamelogic_pkg;
 
