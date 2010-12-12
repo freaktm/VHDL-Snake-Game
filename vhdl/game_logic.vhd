@@ -48,24 +48,23 @@ architecture Behavioral of game_logic is
 
   component ram_mux is
     port(
-      gamelogic_state   : in  gamelogic_state_t;
-      WEA               : out std_logic;
-      address_a         : out unsigned(12 downto 0);
-      input_a           : out unsigned(15 downto 0);
-		output_a				: in unsigned(15 downto 0);
-      request_read      : in  std_logic;
-      head_write_data   : in  unsigned(15 downto 0);
-      head_read_data    : out unsigned(15 downto 0);
-      head_cell         : in  unsigned(12 downto 0);
-      corner_write_data : in  unsigned(15 downto 0);
-      corner_cell       : in  unsigned(12 downto 0);
-      tail_write_data   : in  unsigned(15 downto 0);
-      tail_read_data    : out unsigned(15 downto 0);
-      tail_cell         : in  unsigned(12 downto 0);
-      score_write_data  : in  unsigned(15 downto 0);
-      score_cell        : in  unsigned(12 downto 0);
-      reset_data        : in  unsigned(15 downto 0);
-      reset_cell        : in  unsigned(12 downto 0)
+     gamelogic_state   : in  gamelogic_state_t;
+    WEA               : out std_logic;
+    address_a         : out unsigned(12 downto 0);
+    input_a           : out unsigned(15 downto 0);
+	 check_read_data : out unsigned(15 downto 0);
+	 check_cell : in unsigned(12 downto 0);
+    head_write_data   : in  unsigned(15 downto 0);
+    head_cell         : in  unsigned(12 downto 0);
+    corner_write_data : in  unsigned(15 downto 0);
+    corner_cell       : in  unsigned(12 downto 0);
+	 tail_read_data : out unsigned(15 downto 0);
+    tail_write_data   : in  unsigned(15 downto 0);
+    tail_cell         : in  unsigned(12 downto 0);
+    score_write_data  : in  unsigned(15 downto 0);
+    score_cell        : in  unsigned(12 downto 0);
+    reset_data        : in  unsigned(15 downto 0);
+    reset_cell        : in  unsigned(12 downto 0)
       );
   end component;
   
@@ -76,7 +75,7 @@ architecture Behavioral of game_logic is
     address_a_reset : out unsigned(12 downto 0);
     reset_write_data   : out unsigned(15 downto 0);
     reset_done     : out std_logic;
-	 keyboard : in std_logic_vector(2 downto 0)
+	 keyboard : in unsigned(2 downto 0)
     );
 end component;
   
@@ -87,9 +86,9 @@ end component;
     address_a_check : out unsigned(12 downto 0);
     check_read_data  : in  unsigned(15 downto 0);
     check_done     : out std_logic;
-	 keyboard : in std_logic_vector(2 downto 0);
+	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;
-	 current_direction : out std_logic_vector(2 downto 0);
+	 current_direction : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
 end component;
@@ -101,11 +100,13 @@ end component;
       ext_reset       : in  std_logic;
       address_a_head  : out unsigned(12 downto 0);
       head_write_data : out unsigned(15 downto 0);
-      head_done       : out std_logic
+      head_done       : out std_logic;
+		direction : in unsigned(2 downto 0)
       );
   end component;
 
   signal tick            : std_logic;
+  signal nochange_int : std_logic;
   signal reset_en    : std_logic;
   signal head_en     : std_logic;
   signal tail_en     : std_logic;
@@ -132,10 +133,10 @@ end component;
   signal reset_data_int        : unsigned(15 downto 0);
   signal reset_cell_int        : unsigned(12 downto 0);
   signal address_a_int : unsigned(12 downto 0);
-  signal next_direction : std_logic_vector(2 downto 0);
+  signal next_direction : unsigned(2 downto 0);
   signal check_cell_int : unsigned(12 downto 0);
   signal check_read_data_int : unsigned(15 downto 0);
-  signal current_direction_int : std_logic_vector(2 downto 0);
+  signal current_direction_int : unsigned(2 downto 0);
   signal next_cell_int : unsigned(12 downto 0);
   
 begin
@@ -148,12 +149,12 @@ begin
       WEA               => ram_WEA,
       address_a         => ram_address_a,
       input_a           => ram_input_a,
-      output_a          => ram_output_a,
       head_write_data   => head_write_data_int,
       head_cell         => head_cell_int,
       corner_write_data => corner_write_data_int,
       corner_cell       => corner_cell_int,
       tail_write_data   => tail_write_data_int,
+		tail_read_data  => tail_read_data_int,
       tail_cell         => tail_cell_int,
       score_write_data  => score_write_data_int,
       score_cell        => score_cell_int,
@@ -236,31 +237,33 @@ begin
             gamelogic_state <= CHECK;
           end if;
 			 when CHECK =>
-			 if (check_done = '1') and (nochange = '1') then
+			 if (check_done_int = '1') and (nochange_int = '1') then
 			 gamelogic_state <= HEAD;
-			 elsif (check_done = '1') and (nochange = '0') then
+			 elsif (check_done_int = '1') and (nochange_int = '0') then
 			 gamelogic_state <= CORNER;
-			 elsif (crashed = '1') then
+			 elsif (crashed_int = '1') then
 			 gamelogic_state <= RESET;
 			 end if;
         when HEAD =>
-          if (head_done = '1') then
-            gamelogic_state <= TAIL;
+          if (head_done_int = '1') then
+            gamelogic_state <= READTAIL;
 				end if;
         when CORNER =>
-          if (corner_done = '1') then
-            gamelogic_state <= TAIL;
+          if (corner_done_int = '1') then
+            gamelogic_state <= READTAIL;
           end if;
+			 when READTAIL =>
+			   gamelogic_state <= TAIL;
         when TAIL =>
-          if (tail_done = '1') then
+          if (tail_done_int = '1') then
             gamelogic_state <= SCORE;
           end if;
         when SCORE =>
-          if (score_done = '1') then
+          if (score_done_int = '1') then
             gamelogic_state <= IDLE;
           end if;
         when RESET =>
-          if (reset_done = '1') then
+          if (reset_done_int = '1') then
             gamelogic_state <= IDLE;
           end if;
       end case;
@@ -273,9 +276,9 @@ begin
 -- type   : combinational
 -- inputs : state
 -- outputs: head_en
-  p_head_en : process (state)
+  p_head_en : process (gamelogic_state)
   begin  -- process p_head_en
-    if state = HEAD then
+    if gamelogic_state = HEAD then
       head_en <= '1';
     else
       head_en <= '0';
@@ -286,9 +289,9 @@ begin
 -- type   : combinational
 -- inputs : state
 -- outputs: tail_en
-  p_tail_en : process (state)
+  p_tail_en : process (gamelogic_state)
   begin  -- process p_tail_en
-    if state = TAIL then
+    if gamelogic_state = TAIL then
       tail_en <= '1';
     else
       tail_en <= '0';
@@ -300,9 +303,9 @@ begin
 -- type   : combinational
 -- inputs : state
 -- outputs: corner_en
-  p_corner_en : process (state)
+  p_corner_en : process (gamelogic_state)
   begin  -- process p_corner_en
-    if state = CORNER then
+    if gamelogic_state = CORNER then
       corner_en <= '1';
     else
       corner_en <= '0';
@@ -314,9 +317,9 @@ begin
 -- type   : combinational
 -- inputs : state
 -- outputs: score_en
-  p_score_en : process (state)
+  p_score_en : process (gamelogic_state)
   begin  -- process p_score_en
-    if state = SCORE then
+    if gamelogic_state = SCORE then
       score_en <= '1';
     else
       score_en <= '0';
@@ -327,9 +330,9 @@ begin
 -- type   : combinational
 -- inputs : state
 -- outputs: reset_en
-  p_reset_en : process (state)
+  p_reset_en : process (gamelogic_state)
   begin  -- process p_reset_en
-    if state = RESET then
+    if gamelogic_state = RESET then
       reset_en <= '1';
     else
       reset_en <= '0';
@@ -346,7 +349,7 @@ begin
 -- update keyboard input      
       if (Direction /= "000") and (Direction /= "101") then
         next_direction <= Direction;
-      elsif (Direction = "101") and (crashed = '1') then
+      elsif (Direction = "101") and (crashed_int = '1') then
         next_direction <= "111";
       end if;
 -- end of keyboard update

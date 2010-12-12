@@ -56,15 +56,14 @@ architecture behavioral of MAINBOARD is
 
   component game_logic is
     port(
-      clk25         : in  std_logic;
-      ext_reset     : in  std_logic;
-      WEA_int       : out std_logic;
-      EN_int        : out std_logic;
-      address_a_int : out std_logic_vector(12 downto 0);
-      input_a_int   : out unsigned(15 downto 0);
-      output_a_int  : in  unsigned(15 downto 0);
-      colour        : out unsigned(1 downto 0);
-      Direction     : in  unsigned(2 downto 0)
+    clk25         : in  std_logic;
+    ext_reset     : in  std_logic;
+    ram_WEA       : out std_logic;
+    ram_EN        : out std_logic;
+    ram_address_a : out unsigned(12 downto 0);
+    ram_input_a   : out unsigned(15 downto 0);
+    ram_output_a  : in  unsigned(15 downto 0);
+    Direction     : in  unsigned(2 downto 0)
 
       );
   end component;
@@ -93,7 +92,7 @@ architecture behavioral of MAINBOARD is
     port (clk50          : in  std_logic;
           write_enable_a : in  std_logic;
           enable_a       : in  std_logic;
-          addr_a         : in  std_logic_vector(12 downto 0);
+          addr_a         : in  unsigned(12 downto 0);
           addr_b         : in  unsigned(12 downto 0);
           data_input_a   : in  unsigned(15 downto 0);
           data_output_a  : out unsigned(15 downto 0);
@@ -122,7 +121,7 @@ architecture behavioral of MAINBOARD is
   signal clk50          : std_logic;
   signal WEA            : std_logic;
   signal EN             : std_logic;
-  signal address_a      : std_logic_vector(12 downto 0);
+  signal address_a      : unsigned(12 downto 0);
   signal address_b      : unsigned(12 downto 0);
   signal data_i_a       : unsigned(15 downto 0);
   signal data_o_a       : unsigned(15 downto 0);
@@ -164,17 +163,15 @@ begin
 --  GAME LOGIC instantiation
   LOGIC : game_logic
     port map (
-      clk25         => clk25,
-      ext_reset     => ext_reset,
-      WEA_int       => WEA,
-      EN_int        => EN,
-      address_a_int => address_a,
-      input_a_int   => data_i_a,
-      output_a_int  => data_o_a,
-      colour        => colour_int,
-      Direction     => Direction_int
-
-      );
+	     clk25         => clk25,
+    ext_reset     => ext_reset,
+    ram_WEA       => WEA,
+    ram_EN        => EN,
+    ram_address_a => address_a,
+    ram_input_a   => data_i_a,
+    ram_output_a  => data_o_a,
+    Direction     => Direction_int
+	      );
 
 
 

@@ -37,10 +37,10 @@ entity check_logic is
     address_a_check : out unsigned(12 downto 0);
     check_read_data  : in  unsigned(15 downto 0);
     check_done     : out std_logic;
-	 keyboard : in std_logic_vector(2 downto 0);
+	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;
 	 nochange : out std_logic;
-	 current_direction : out std_logic_vector(2 downto 0);
+	 current_direction : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
 end check_logic;
@@ -49,8 +49,8 @@ architecture Behavioral of check_logic is
 
 
   signal gamelogic_state : gamelogic_state_t;
-  signal current_direction_int : std_logic_vector(2 downto 0);
-  signal next_direction : std_logic_vector(2 downto 0);
+  signal current_direction_int : unsigned(2 downto 0);
+  signal next_direction : unsigned(2 downto 0);
   signal current_cell : unsigned(12 downto 0);
   signal next_cell_int : unsigned(12 downto 0);
   signal checking : std_logic;

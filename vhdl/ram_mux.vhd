@@ -42,6 +42,7 @@ entity ram_mux is
     head_cell         : in  unsigned(12 downto 0);
     corner_write_data : in  unsigned(15 downto 0);
     corner_cell       : in  unsigned(12 downto 0);
+	 tail_read_data	: out unsigned(15 downto 0);
     tail_write_data   : in  unsigned(15 downto 0);
     tail_cell         : in  unsigned(12 downto 0);
     score_write_data  : in  unsigned(15 downto 0);
@@ -94,11 +95,15 @@ begin
       input_a_int   <= corner_write_data;
       address_a_int <= corner_cell;
       write_enable  <= '1';
+		
+		elsif (gamelogic_state = READTAIL) then  -- CORNER STATE OF MUX
+      address_a_int <= tail_cell;
+      write_enable  <= '0';
       
     elsif (gamelogic_state = TAIL) then  -- TAIL STATE OF MUX
 
-      input_a_int   <= corner_write_data;
-      address_a_int <= corner_cell;
+      input_a_int   <= tail_write_data;
+      address_a_int <= tail_cell;
       write_enable  <= '1';
       
     elsif (gamelogic_state = SCORE) then  -- SCORE STATE OF MUX

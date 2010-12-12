@@ -36,7 +36,8 @@ entity reset_logic is
   ext_reset : in std_logic;
     address_a_reset : out unsigned(12 downto 0);
     reset_write_data   : out unsigned(15 downto 0);
-    reset_done     : out std_logic
+    reset_done     : out std_logic;
+	 keyboard : in unsigned(2 downto 0) 
     );
 end reset_logic;
 
