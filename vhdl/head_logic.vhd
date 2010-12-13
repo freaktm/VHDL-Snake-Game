@@ -32,6 +32,7 @@ use work.gamelogic_pkg.all;
 
 entity head_logic is
   port(
+  gamelogic_state   : in  gamelogic_state_t;
     address_a_head : out unsigned(12 downto 0);
     head_write_data   : out unsigned(15 downto 0);
     head_done     : out std_logic;
@@ -42,7 +43,7 @@ end head_logic;
 
 architecture Behavioral of head_logic is
 
-  signal gamelogic_state : gamelogic_state_t;
+ -- signal gamelogic_state : gamelogic_state_t;
   signal snake_character : unsigned(8 downto 0);
  
   

@@ -32,7 +32,7 @@ use work.gamelogic_pkg.all;
 
 entity ram_mux is
   port(
-    gamelogic_state   : in  gamelogic_state_t;
+   gamelogic_state   : in  gamelogic_state_t;
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
     input_a           : out unsigned(15 downto 0);
@@ -62,7 +62,7 @@ architecture Behavioral of ram_mux is
   signal input_a_int   : unsigned(15 downto 0);
   signal output_a_int : unsigned(15 downto 0);
   
-  signal state : gamelogic_state_t;
+ -- signal gamelogic_state : gamelogic_state_t;
   
 begin
   -- purpose: updates the ram entries for the video display also controls the reading

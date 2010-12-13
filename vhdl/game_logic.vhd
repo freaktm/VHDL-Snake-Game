@@ -48,7 +48,7 @@ architecture Behavioral of game_logic is
 
   component ram_mux is
     port(
-     gamelogic_state   : in  gamelogic_state_t;
+    gamelogic_state   : in  gamelogic_state_t;
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
     input_a           : out unsigned(15 downto 0);
@@ -70,6 +70,7 @@ architecture Behavioral of game_logic is
   
   component reset_logic is
   port(
+  gamelogic_state   : in  gamelogic_state_t;
    clk25         : in  std_logic;
     ext_reset     : in  std_logic;
     address_a_reset : out unsigned(12 downto 0);
@@ -81,6 +82,7 @@ end component;
   
   component check_logic is
   port(
+  gamelogic_state   : in  gamelogic_state_t;
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
     address_a_check : out unsigned(12 downto 0);
@@ -97,6 +99,7 @@ end component;
 
   component head_logic is
     port(
+	  gamelogic_state   : in  gamelogic_state_t;
     address_a_head : out unsigned(12 downto 0);
     head_write_data   : out unsigned(15 downto 0);
     head_done     : out std_logic;
@@ -145,7 +148,7 @@ begin
 
   RAM_CNTRL : ram_mux
     port map (
-      gamelogic_state   => gamelogic_state,
+    gamelogic_state   => gamelogic_state,
       WEA               => ram_WEA,
       address_a         => ram_address_a,
       input_a           => ram_input_a,
@@ -165,6 +168,7 @@ begin
 		
 		CHECK_CNTRL : check_logic
 		port map (
+		gamelogic_state   => gamelogic_state,
 		    clk25         => clk25,
     ext_reset     => ext_reset,
     address_a_check => check_cell_int,
@@ -179,6 +183,7 @@ begin
 	 
 	 RESET_CNTRL : reset_logic
 	  port map (
+	  gamelogic_state   => gamelogic_state,
 	  		    clk25         => clk25,
     ext_reset     => ext_reset,
     address_a_reset => reset_cell_int,
@@ -189,6 +194,7 @@ begin
 
   HEAD_CNTRL : head_logic
     port map (	
+	 gamelogic_state   => gamelogic_state,
       address_a_head  => head_cell_int,
       head_write_data => head_write_data_int,
       head_done       => head_done_int,

@@ -32,6 +32,7 @@ use work.gamelogic_pkg.all;
 
 entity reset_logic is
   port(
+  gamelogic_state   : in  gamelogic_state_t;
   clk25 : in std_logic;
   ext_reset : in std_logic;
     address_a_reset : out unsigned(12 downto 0);
@@ -43,7 +44,7 @@ end reset_logic;
 
 architecture Behavioral of reset_logic is
 
-  signal gamelogic_state : gamelogic_state_t;
+ 
  
   
 begin

@@ -32,6 +32,7 @@ use work.gamelogic_pkg.all;
 
 entity check_logic is
   port(
+   gamelogic_state   : in  gamelogic_state_t;
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
     address_a_check : out unsigned(12 downto 0);
@@ -48,7 +49,7 @@ end check_logic;
 architecture Behavioral of check_logic is
 
 
-  signal gamelogic_state : gamelogic_state_t;
+ -- signal gamelogic_state : gamelogic_state_t;
   signal current_direction_int : unsigned(2 downto 0);
   signal next_direction : unsigned(2 downto 0);
   signal current_cell : unsigned(12 downto 0);
