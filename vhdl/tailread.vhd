@@ -44,65 +44,52 @@ end tailread_logic;
 
 architecture Behavioral of tailread_logic is
 
-  signal current_direction_int : unsigned(2 downto 0);
-  signal next_direction : unsigned(2 downto 0);
-  signal current_cell : unsigned(12 downto 0);
-  signal next_cell_int : unsigned(12 downto 0);
   signal checking : std_logic;
+  signal current_cell : unsigned(12 downto 0);
+  signal next_tail_cell_int : unsigned(12 downto 0);
+  signal next_direction : unsigned(2 downto 0);
 
   
 begin
   
-  
+  next_tail_cell  <= next_tail_cell_int;
 
  --purpose: checks what the next_direction of the tail is before it  erases a cell
  --type   : sequential
 
-      p_collision_checker : process (clk25, ext_reset)
+      p_tail_checker : process (clk25, ext_reset)
       begin  -- process p_collision_checker
         if (ext_reset = '1') then --  asynchronous reset (active high)
-          crashed    <= '0';
-			 check_done <= '0';
-			 checking <= '0';
-			 current_direction_int <= "001"; -- reset to moving up
+					tailread_done <= '0';
+			next_direction <= "001"; -- reset to moving up
+			current_cell <= to_unsigned(8, current_cell'length);
+			next_tail_cell_int <= to_unsigned(8, next_tail_cell'length);
         elsif clk25'event and clk25 = '1' then       --     rising clock edge
-          if (gamelogic_state = CHECK)then
-			 old_direction_out <= current_direction_int;
-			  if (current_direction_int /= next_direction) then
-			    nochange <= '0';
-				 else
-				 nochange <= '1';
-				 end if;
+          if (gamelogic_state = READTAIL)then				
             if (checking = '0') then
 						checking <= '1';
-						current_direction_int <= next_direction;
+						current_cell <= next_tail_cell_int;
 						if (next_direction = "001") then
-                  next_cell_int  <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+                  next_tail_cell_int  <= to_unsigned(to_integer(current_cell) - 80, next_tail_cell_int'length);
 						elsif (next_direction = "010") then
-						next_cell_int  <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+						next_tail_cell_int  <= to_unsigned(to_integer(current_cell) + 1, next_tail_cell_int'length);
 						elsif (next_direction = "011") then
-						next_cell_int  <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+						next_tail_cell_int  <= to_unsigned(to_integer(current_cell) + 80, next_tail_cell_int'length);
 						elsif (next_direction = "100") then
-						next_cell_int  <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
+						next_tail_cell_int  <= to_unsigned(to_integer(current_cell) - 1, next_tail_cell_int'length);
 						end if;
-						current_cell <= next_cell_int;
-						address_a_check <= next_cell_int;
+						address_a_tailread <= next_tail_cell_int;
             elsif (checking = '1') then
 				    checking <= '0';
-              if (to_integer(check_read_data) /= 0) then
-                crashed <= '1';
-              else
-                check_done <= '1';
-              end if;
-				  
+					 next_direction <= tail_read_data(11 downto 9);   
+                tailread_done <= '1';					 
             end if;
 				else
-				check_done <= '0';
-				crashed <= '0';
+				tailread_done <= '0';
 				checking <= '0';
 				end if;
           end if;
-       end process p_collision_checker;
+       end process p_tail_checker;
 
 
 
