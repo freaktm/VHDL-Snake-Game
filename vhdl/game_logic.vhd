@@ -63,6 +63,28 @@ architecture Behavioral of game_logic is
       reset_cell        : in  unsigned(12 downto 0)
       );
   end component;
+  
+  component tail_logic is
+  port(
+  gamelogic_state   : in  gamelogic_state_t;
+    address_a_tail : out unsigned(12 downto 0);
+    tail_write_data   : out unsigned(15 downto 0);
+    tail_done     : out std_logic;
+	 next_cell : in unsigned(12 downto 0)
+    );
+end component;
+  
+  component tailcheck_logic is
+  port(
+    gamelogic_state   : in  gamelogic_state_t;
+    clk25         : in  std_logic;
+    ext_reset     : in  std_logic;
+    address_a_tailread : out unsigned(12 downto 0);
+    tail_read_data  : in  unsigned(15 downto 0);
+    tailread_done     : out std_logic;
+	 next_tail_cell : out unsigned(12 downto 0)
+    );
+end component;
 
   component reset_logic is
     port(
@@ -134,7 +156,8 @@ architecture Behavioral of game_logic is
   signal corner_cell_int       : unsigned(12 downto 0);
   signal tail_write_data_int   : unsigned(15 downto 0);
   signal tail_read_data_int    : unsigned(15 downto 0);
-  signal tail_cell_int         : unsigned(12 downto 0);
+  signal tail_readcell_int : unsigned(15 downto 0);
+  signal tail_writecell_int         : unsigned(12 downto 0);
   signal score_write_data_int  : unsigned(15 downto 0);
   signal score_cell_int        : unsigned(12 downto 0);
   signal reset_data_int        : unsigned(15 downto 0);
@@ -146,6 +169,8 @@ architecture Behavioral of game_logic is
   signal current_direction_int : unsigned(2 downto 0);
   signal old_direction_int     : unsigned(2 downto 0);
   signal next_cell_int         : unsigned(12 downto 0);
+  signal tailread_done_int : std_logic;
+  signal next_tail_cell_int : unsigned(15 downto 0);
   
 begin
 
@@ -163,13 +188,34 @@ begin
       corner_cell       => corner_cell_int,
       tail_write_data   => tail_write_data_int,
       tail_read_data    => tail_read_data_int,
-      tail_cell         => tail_cell_int,
+      tail_writecell    => tail_writecell_int,
+		tail_readcell => tail_readcell_int,
       score_write_data  => score_write_data_int,
       score_cell        => score_cell_int,
       reset_data        => reset_data_int,
       reset_cell        => reset_cell_int,
       check_read_data   => check_read_data_int,
       check_cell        => check_cell_int);
+		
+		TAILREAD_CNTRL : tailread_logic
+		  port map (
+    gamelogic_state   => gamelogic_state,
+    clk25         => clk25,
+    ext_reset     => ext_reset,
+    address_a_tailread => tail_readcell_int,
+    tail_read_data  => tail_read_data_int,
+    tailread_done     => tailread_done_int,
+	 next_tail_cell => next_tail_cell_int
+    );
+	 
+	 TAIL_CNTRL : tail_logic
+	   port map (
+  gamelogic_state   => gamelogic_state,
+    address_a_tail => tail_writecell_int,
+    tail_write_data   => tail_write_data_int,
+    tail_done     => tail_done_int,
+	 next_cell => next_tail_cell_int
+    );
 
   CHECK_CNTRL : check_logic
     port map (
