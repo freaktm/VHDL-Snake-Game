@@ -15,31 +15,24 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use work.gamelogic_pkg.all;
 
-entity tail_logic is
+entity score_logic is
   port(
     gamelogic_state : in  gamelogic_state_t;
-    address_a_tail  : out unsigned(12 downto 0);
-    tail_write_data : out unsigned(15 downto 0);
-    tail_done       : out std_logic;
-    next_cell       : in  unsigned(12 downto 0)
+    score  : out unsigned(13 downto 0)
     );
-end tail_logic;
+end score_logic;
 
-architecture Behavioral of tail_logic is
+
+
+architecture Behavioral of score_logic is
+
+
+signal score_int : unsigned(13 downto 0);
 
 begin
   
-  address_a_tail <= next_cell;
-
-  p_update_tail : process (gamelogic_state, next_cell)
-  begin
-    if (gamelogic_state = TAIL) then
-      tail_write_data <= (others => '0');
-      tail_done       <= '1';
-    else
-      head_done <= '0';
-    end if;
-  end process p_update_tail;
+score <= score_int;
 
 
 end Behavioral;
+
