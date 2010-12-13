@@ -304,72 +304,72 @@ begin
   end process p_state_machine;
 
 
--- purpose : enable head signal
--- type   : combinational
--- inputs : state
--- outputs: head_en
-  p_head_en : process (gamelogic_state)
-  begin  -- process p_head_en
-    if gamelogic_state = HEAD then
-      head_en <= '1';
-    else
-      head_en <= '0';
-    end if;
-  end process p_head_en;
+---- purpose : enable head signal
+---- type   : combinational
+---- inputs : state
+---- outputs: head_en
+--  p_head_en : process (gamelogic_state)
+--  begin  -- process p_head_en
+--    if gamelogic_state = HEAD then
+--      head_en <= '1';
+--    else
+--      head_en <= '0';
+--    end if;
+--  end process p_head_en;
 
 -- purpose: enable tail signal
 -- type   : combinational
 -- inputs : state
 -- outputs: tail_en
-  p_tail_en : process (gamelogic_state)
-  begin  -- process p_tail_en
-    if gamelogic_state = TAIL then
-      tail_en <= '1';
-    else
-      tail_en <= '0';
-    end if;
-  end process p_tail_en;
-
-
--- purpose: enable corner signal
--- type   : combinational
--- inputs : state
--- outputs: corner_en
-  p_corner_en : process (gamelogic_state)
-  begin  -- process p_corner_en
-    if gamelogic_state = CORNER then
-      corner_en <= '1';
-    else
-      corner_en <= '0';
-    end if;
-  end process p_corner_en;
+--  p_tail_en : process (gamelogic_state)
+--  begin  -- process p_tail_en
+--    if gamelogic_state = TAIL then
+--      tail_en <= '1';
+--    else
+--      tail_en <= '0';
+--    end if;
+--  end process p_tail_en;
+--
+--
+---- purpose: enable corner signal
+---- type   : combinational
+---- inputs : state
+---- outputs: corner_en
+--  p_corner_en : process (gamelogic_state)
+--  begin  -- process p_corner_en
+--    if gamelogic_state = CORNER then
+--      corner_en <= '1';
+--    else
+--      corner_en <= '0';
+--    end if;
+--  end process p_corner_en;
 
 
 -- purpose: enable score signal
 -- type   : combinational
 -- inputs : state
--- outputs: score_en
-  p_score_en : process (gamelogic_state)
-  begin  -- process p_score_en
-    if gamelogic_state = SCORE then
-      score_en <= '1';
-    else
-      score_en <= '0';
-    end if;
-  end process p_score_en;
-
--- purpose: enables game over signal
--- type   : combinational
--- inputs : state
--- outputs: reset_en
-  p_reset_en : process (gamelogic_state)
-  begin  -- process p_reset_en
-    if gamelogic_state = RESET then
-      reset_en <= '1';
-    else
-      reset_en <= '0';
-    end if;
-  end process p_reset_en;
+---- outputs: score_en
+--  p_score_en : process (gamelogic_state)
+--  begin  -- process p_score_en
+--    if gamelogic_state = SCORE then
+--      score_en <= '1';
+--    else
+--      score_en <= '0';
+--    end if;
+--  end process p_score_en;
+--
+---- purpose: enables game over signal
+---- type   : combinational
+---- inputs : state
+---- outputs: reset_en
+--  p_reset_en : process (gamelogic_state)
+--  begin  -- process p_reset_en
+--    if gamelogic_state = RESET then
+--      reset_en <= '1';
+--    else
+--      reset_en <= '0';
+--    end if;
+--  end process p_reset_en;
 
 
 -- purpose: updates the user input from keyboard
@@ -386,147 +386,6 @@ begin
       end if;
 -- end of keyboard update
   end process p_keyboard_input;
-
-
-
-
-
-
-
-
-
-
-
---      p_movesnake : process (clk25, ext_reset, game_reset)
-
---      begin
---        if (ext_reset = '1') or (game_reset = '1') then  -- asynchronous reset (active low)
---          current_direction <= (others => '0');
---          --     speed             <= (others => '0');     -- slowest speed
---          --     skill             <= (others => '0');          -- lowest skill
---          body_character    <= to_unsigned(3*8, 13);     --     
---          WE_corner         <= '0';
---          WE_tail           <= '0';
---          WE_score1         <= '0';
---          WE_score2         <= '0';
---          WE_score3         <= '0';
---          WE_score4         <= '0';
---          write_data_corner <= (others => '0');
---          write_data_tail   <= (others => '0');
---          write_data_score1 <= (others => '0');
---          write_data_score2 <= (others => '0');
---          write_data_score3 <= (others => '0');
---          write_data_score4 <= (others => '0');
---          crash_check       <= '0';
---          reset_game        <= '0';
---          next_head_cell    <= to_unsigned(2360, head_cell'length);
---          write_data_head   <= current_direction & body_character;
---          WE_head           <= '1';
---          corner_cell       <= (others => '0');
-
-
-
-
-
---          if (move_snake = '0') then
---            WE_head     <= '1';
---            crash_check <= '1';
---            if (next_direction = current_direction) then  -- IF NO CHANGE IN DIRECTION
---              if (current_direction = "001") then  -- moving vertical
---                next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
---              elsif (current_direction = "010") then      -- moving right
---                next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
---              elsif (current_direction = "011") then      -- moving down
---                next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
---              elsif (current_direction = "100") then      -- moving right
---                next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
---              end if;
---              write_data_head <= current_direction & body_character;
---            else
---              if (current_direction = "001") then  -- IF moving UP before change
---                if (next_direction = "010") then   -- turns RIGHT
---                  old_body_character <= to_unsigned(6*8, body_character'length);
---                  body_character     <= to_unsigned(2*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
---                  current_direction  <= "010";
---                  WE_corner          <= '1';
---                elsif (next_direction = "100") then       -- turns LEFT
---                  old_body_character <= to_unsigned(7*8, body_character'length);
---                  body_character     <= to_unsigned(2*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
---                  current_direction  <= "100";
---                  WE_corner          <= '1';
---                else
---                  next_head_cell <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
---                end if;
-
---              elsif (current_direction = "011") then  -- IF moving DOWN befoe change
---                if (next_direction = "010") then      -- turns RIGHT
---                  old_body_character <= to_unsigned(5*8, body_character'length);
---                  body_character     <= to_unsigned(2*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
---                  current_direction  <= "010";
---                  WE_corner          <= '1';
---                elsif (next_direction = "100") then   -- turns  LEFT
---                  old_body_character <= to_unsigned(4*8, body_character'length);
---                  body_character     <= to_unsigned(2*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
---                  current_direction  <= "100";
---                  WE_corner          <= '1';
---                else
---                  --      body_character <= to_unsigned(3*8, body_character'length);
---                  next_head_cell <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
---                end if;
-
---              elsif (current_direction = "010") then  -- IF moving RIGHT before change
---                if (next_direction = "001") then      -- turns UP
---                  old_body_character <= to_unsigned(5*8, body_character'length);
---                  body_character     <= to_unsigned(3*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
---                  current_direction  <= "001";
---                  WE_corner          <= '1';
---                elsif (next_direction = "011") then   -- turns  DOWN
---                  old_body_character <= to_unsigned(7*8, body_character'length);
---                  body_character     <= to_unsigned(3*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
---                  current_direction  <= "011";
---                  WE_corner          <= '1';
---                else
---                  --    body_character <= to_unsigned(2*8, body_character'length);
---                  next_head_cell <= to_unsigned(to_integer(next_head_cell) + 1, next_head_cell'length);
---                end if;
-
---              elsif (current_direction = "100") then  -- IF moving LEFT before change
---                if (next_direction = "001") then      -- turns UP
---                  old_body_character <= to_unsigned(4*8, body_character'length);
---                  body_character     <= to_unsigned(3*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) - 80, next_head_cell'length);
---                  current_direction  <= "001";
---                  WE_corner          <= '1';
---                elsif (next_direction = "011") then   --turns DOWN
---                  old_body_character <= to_unsigned(6*8, body_character'length);
---                  body_character     <= to_unsigned(3*8, body_character'length);
---                  next_head_cell     <= to_unsigned(to_integer(next_head_cell) + 80, next_head_cell'length);
---                  current_direction  <= "011";
---                  WE_corner          <= '1';
---                else
---                  next_head_cell <= to_unsigned(to_integer(next_head_cell) - 1, next_head_cell'length);
---                end if;
-
---              end if;
---              write_data_corner <= Direction & old_body_character;
---              write_data_head   <= Direction & body_character;
---              corner_cell       <= head_cell;
---            end if;
-
---          end if;
---        end if;
-
---      end process p_movesnake;
-
-
-
-
 
 
 
