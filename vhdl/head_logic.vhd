@@ -37,7 +37,7 @@ entity head_logic is
     head_write_data   : out unsigned(15 downto 0);
     head_done     : out std_logic;
 	 next_cell : in unsigned(12 downto 0);
-	 current_direction : in unsigned(2 downto 0)
+	 current_direction_in : in unsigned(2 downto 0)
     );
 end head_logic;
 
@@ -51,16 +51,16 @@ begin
   
   address_a_head <= next_cell;
   
-p_update_character : process (gamelogic_state, current_direction, snake_character)
+p_update_character : process (gamelogic_state, current_direction_in, snake_character)
 begin
    if (gamelogic_state = HEAD) then
-	if (current_direction = "001") or (current_direction = "011") then
+	if (current_direction_in = "001") or (current_direction_in = "011") then
 	 snake_character <= to_unsigned(2*8, snake_character'length);
-	 elsif (current_direction = "010") or (current_direction = "100") then
+	 elsif (current_direction_in = "010") or (current_direction_in = "100") then
 	 snake_character <= to_unsigned(3*8, snake_character'length);
 	 end if;
 	 
-	head_write_data <= "0000" & current_direction & snake_character;
+	head_write_data <= "0000" & current_direction_in & snake_character;
 	head_done <= '1';
  else
  head_done <= '0';	

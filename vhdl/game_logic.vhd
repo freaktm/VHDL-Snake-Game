@@ -91,7 +91,7 @@ end component;
 	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;
 	 nochange : out std_logic;
-	 current_direction : out unsigned(2 downto 0);
+	 current_direction_out : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
 end component;
@@ -104,7 +104,7 @@ end component;
     head_write_data   : out unsigned(15 downto 0);
     head_done     : out std_logic;
 	 next_cell : in unsigned(12 downto 0);
-	 current_direction : in unsigned(2 downto 0)
+	 current_direction_in : in unsigned(2 downto 0)
       );
   end component;
 
@@ -177,7 +177,7 @@ begin
 	 nochange => nochange_int,
 	 keyboard => next_direction,
 	 crashed => crashed_int,
-	 current_direction => current_direction_int,
+	 current_direction_out => current_direction_int,
 	 next_cell => next_cell_int
 	 );
 	 
@@ -198,7 +198,7 @@ begin
       address_a_head  => head_cell_int,
       head_write_data => head_write_data_int,
       head_done       => head_done_int,
-		current_direction => current_direction_int,
+		current_direction_in => current_direction_int,
 	   next_cell => next_cell_int);
 		
 		

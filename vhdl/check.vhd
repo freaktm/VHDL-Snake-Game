@@ -41,7 +41,7 @@ entity check_logic is
 	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;
 	 nochange : out std_logic;
-	 current_direction : out unsigned(2 downto 0);
+	 current_direction_out : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
 end check_logic;
@@ -60,7 +60,7 @@ architecture Behavioral of check_logic is
 begin
   
   
-current_direction <= current_direction_int;
+current_direction_out <= current_direction_int;
   
 next_direction <= keyboard;
 next_cell <= next_cell_int;
@@ -76,7 +76,7 @@ next_cell <= next_cell_int;
           crashed    <= '0';
 			 check_done <= '0';
 			 checking <= '0';
-			 current_direction <= "001"; -- reset to moving up
+			 current_direction_int <= "001"; -- reset to moving up
         elsif clk25'event and clk25 = '1' then       --     rising clock edge
           if (gamelogic_state = CHECK)then
 			  if (current_direction_int /= next_direction) then
