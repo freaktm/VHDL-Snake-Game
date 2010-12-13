@@ -42,6 +42,7 @@ entity check_logic is
 	 crashed : out std_logic;
 	 nochange : out std_logic;
 	 current_direction_out : out unsigned(2 downto 0);
+	 old_direction_out : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
 end check_logic;
@@ -79,6 +80,7 @@ next_cell <= next_cell_int;
 			 current_direction_int <= "001"; -- reset to moving up
         elsif clk25'event and clk25 = '1' then       --     rising clock edge
           if (gamelogic_state = CHECK)then
+			 old_direction_out <= current_direction_int;
 			  if (current_direction_int /= next_direction) then
 			    nochange <= '0';
 				 else

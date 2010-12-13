@@ -79,6 +79,18 @@ architecture Behavioral of game_logic is
 	 keyboard : in unsigned(2 downto 0)
     );
 end component;
+
+component corner_logic is
+  port(
+  gamelogic_state   : in  gamelogic_state_t;
+    address_a_corner : out unsigned(12 downto 0);
+    corner_write_data   : out unsigned(15 downto 0);
+    corner_done     : out std_logic;
+	 next_cell : in unsigned(12 downto 0);
+	 old_direction_in : in unsigned(2 downto 0);
+	 current_direction_in : in unsigned(2 downto 0)
+    );
+end component;
   
   component check_logic is
   port(
@@ -91,6 +103,7 @@ end component;
 	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;
 	 nochange : out std_logic;
+	 old_direction_out : out unsigned(2 downto 0);
 	 current_direction_out : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
@@ -122,9 +135,9 @@ end component;
   signal score_done_int  : std_logic;
   signal crashed_int     : std_logic;
   signal corner_done_int : std_logic;
+  signal corner_data_int : unsigned(15 downto 0);
   signal gamelogic_state : gamelogic_state_t;
   signal head_write_data_int   : unsigned(15 downto 0);
-  signal head_read_data_int    : unsigned(15 downto 0);
   signal head_cell_int         : unsigned(12 downto 0);
   signal corner_write_data_int : unsigned(15 downto 0);
   signal corner_cell_int       : unsigned(12 downto 0);
@@ -140,6 +153,7 @@ end component;
   signal check_cell_int : unsigned(12 downto 0);
   signal check_read_data_int : unsigned(15 downto 0);
   signal current_direction_int : unsigned(2 downto 0);
+  signal old_direction_int : unsigned(2 downto 0);
   signal next_cell_int : unsigned(12 downto 0);
   
 begin
@@ -172,6 +186,7 @@ begin
 		    clk25         => clk25,
     ext_reset     => ext_reset,
     address_a_check => check_cell_int,
+	 old_direction_out => old_direction_int,
     check_read_data  => check_read_data_int,
     check_done     => check_done_int,
 	 nochange => nochange_int,
@@ -180,6 +195,17 @@ begin
 	 current_direction_out => current_direction_int,
 	 next_cell => next_cell_int
 	 );
+	 
+	 CORNER_CNTRL : corner_logic
+	   port map (
+  gamelogic_state   => gamelogic_state,
+    address_a_corner => corner_cell_int,
+    corner_write_data   => corner_data_int,
+    corner_done     => corner_done_int,
+	 next_cell => next_cell_int,
+	 old_direction_in => old_direction_int,
+	 current_direction_in => current_direction_int
+    );
 	 
 	 RESET_CNTRL : reset_logic
 	  port map (
