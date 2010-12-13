@@ -50,7 +50,7 @@ begin
   
   address_a_head <= next_cell;
   
-p_update_character : process (gamelogic_state, current_direction)
+p_update_character : process (gamelogic_state, current_direction, snake_character)
 begin
    if (gamelogic_state = HEAD) then
 	if (current_direction = "001") or (current_direction = "011") then

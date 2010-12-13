@@ -62,6 +62,7 @@ begin
 current_direction <= current_direction_int;
   
 next_direction <= keyboard;
+next_cell <= next_cell_int;
 
 
  --purpose: checks if the snake has crashed into a border or itself

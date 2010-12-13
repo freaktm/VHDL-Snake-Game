@@ -76,7 +76,7 @@ begin
   address_a <= address_a_int;
   WEA       <= write_enable;
 
-  p_process_request : process (gamelogic_state)
+  p_process_request : process (gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_cell, tail_write_data, score_write_data, score_cell)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate

@@ -88,6 +88,7 @@ end component;
     check_done     : out std_logic;
 	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;
+	 nochange : out std_logic;
 	 current_direction : out unsigned(2 downto 0);
 	 next_cell : out unsigned(12 downto 0)
     );
@@ -169,6 +170,7 @@ begin
     address_a_check => check_cell_int,
     check_read_data  => check_read_data_int,
     check_done     => check_done_int,
+	 nochange => nochange_int,
 	 keyboard => next_direction,
 	 crashed => crashed_int,
 	 current_direction => current_direction_int,
@@ -342,7 +344,7 @@ begin
 -- type   : combinational
 -- inputs : clk25, ext_reset, Direction, crashed
 -- outputs: next_direction, reset_game
-  p_keyboard_input : process (Direction)
+  p_keyboard_input : process (Direction, crashed_int)
   begin  
 -- update keyboard input      
       if (Direction /= "000") and (Direction /= "101") then
