@@ -96,12 +96,11 @@ end component;
 
   component head_logic is
     port(
-      clk25           : in  std_logic;
-      ext_reset       : in  std_logic;
-      address_a_head  : out unsigned(12 downto 0);
-      head_write_data : out unsigned(15 downto 0);
-      head_done       : out std_logic;
-		direction : in unsigned(2 downto 0)
+    address_a_head : out unsigned(12 downto 0);
+    head_write_data   : out unsigned(15 downto 0);
+    head_done     : out std_logic;
+	 next_cell : in unsigned(12 downto 0);
+	 current_direction : in unsigned(2 downto 0)
       );
   end component;
 
@@ -187,13 +186,12 @@ begin
 	 );
 
   HEAD_CNTRL : head_logic
-    port map (
-      clk25           => clk25,
-      ext_reset       => ext_reset,
+    port map (	
       address_a_head  => head_cell_int,
       head_write_data => head_write_data_int,
       head_done       => head_done_int,
-		direction => current_direction_int);
+		current_direction => current_direction_int,
+	   next_cell => next_cell_int);
 		
 		
 		
