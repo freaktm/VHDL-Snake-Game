@@ -35,20 +35,20 @@ entity ram_mux is
    gamelogic_state   : in  gamelogic_state_t;
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
-    input_a           : out unsigned(15 downto 0);
-	 check_read_data : out unsigned(15 downto 0);
+    input_a           : out unsigned(11 downto 0);
+	 check_read_data : out unsigned(11 downto 0);
 	 check_cell : in unsigned(12 downto 0);
-    head_write_data   : in  unsigned(15 downto 0);
+    head_write_data   : in  unsigned(11 downto 0);
     head_cell         : in  unsigned(12 downto 0);
-    corner_write_data : in  unsigned(15 downto 0);
+    corner_write_data : in  unsigned(11 downto 0);
     corner_cell       : in  unsigned(12 downto 0);
-	 tail_read_data	: out unsigned(15 downto 0);
-    tail_write_data   : in  unsigned(15 downto 0);
+	 tail_read_data	: out unsigned(11 downto 0);
+    tail_write_data   : in  unsigned(11 downto 0);
     tail_writecell         : in  unsigned(12 downto 0);
 	 tail_readcell         : in  unsigned(12 downto 0);
-    score_write_data  : in  unsigned(15 downto 0);
+    score_write_data  : in  unsigned(11 downto 0);
     score_cell        : in  unsigned(12 downto 0);
-    reset_data        : in  unsigned(15 downto 0);
+    reset_data        : in  unsigned(11 downto 0);
     reset_cell        : in  unsigned(12 downto 0)
     );
 end ram_mux;
@@ -60,8 +60,8 @@ architecture Behavioral of ram_mux is
   
   signal write_enable  : std_logic;
   signal address_a_int : unsigned(12 downto 0);
-  signal input_a_int   : unsigned(15 downto 0);
-  signal output_a_int : unsigned(15 downto 0);
+  signal input_a_int   : unsigned(11 downto 0);
+  signal output_a_int : unsigned(11 downto 0);
   
  -- signal gamelogic_state : gamelogic_state_t;
   

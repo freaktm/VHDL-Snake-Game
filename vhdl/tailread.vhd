@@ -21,7 +21,7 @@ entity tailread_logic is
     clk25              : in  std_logic;
     ext_reset          : in  std_logic;
     address_a_tailread : out unsigned(12 downto 0);
-    tail_read_data     : in  unsigned(15 downto 0);
+    tail_read_data     : in  unsigned(11 downto 0);
     tailread_done      : out std_logic;
     next_tail_cell     : out unsigned(12 downto 0)
     );

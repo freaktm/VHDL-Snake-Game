@@ -33,8 +33,8 @@ entity game_logic is
     ram_WEA       : out std_logic;
     ram_EN        : out std_logic;
     ram_address_a : out unsigned(12 downto 0) := "0000000000000";
-    ram_input_a   : out unsigned(15 downto 0) := "0000000000000000";
-    ram_output_a  : in  unsigned(15 downto 0) := "0000000000000000";
+    ram_input_a   : out unsigned(11 downto 0) := "0000000000000000";
+    ram_output_a  : in  unsigned(11 downto 0) := "0000000000000000";
     Direction     : in  unsigned(2 downto 0)
     );
 end game_logic;
@@ -47,20 +47,20 @@ architecture Behavioral of game_logic is
       gamelogic_state   : in  gamelogic_state_t;
       WEA               : out std_logic;
       address_a         : out unsigned(12 downto 0);
-      input_a           : out unsigned(15 downto 0);
-      check_read_data   : out unsigned(15 downto 0);
+      input_a           : out unsigned(11 downto 0);
+      check_read_data   : out unsigned(11 downto 0);
       check_cell        : in  unsigned(12 downto 0);
-      head_write_data   : in  unsigned(15 downto 0);
+      head_write_data   : in  unsigned(11 downto 0);
       head_cell         : in  unsigned(12 downto 0);
-      corner_write_data : in  unsigned(15 downto 0);
+      corner_write_data : in  unsigned(11 downto 0);
       corner_cell       : in  unsigned(12 downto 0);
-      tail_read_data    : out unsigned(15 downto 0);
-      tail_write_data   : in  unsigned(15 downto 0);
+      tail_read_data    : out unsigned(11 downto 0);
+      tail_write_data   : in  unsigned(11 downto 0);
       tail_writecell         : in  unsigned(12 downto 0);
 		tail_readcell         : in  unsigned(12 downto 0);
-      score_write_data  : in  unsigned(15 downto 0);
+      score_write_data  : in  unsigned(11 downto 0);
       score_cell        : in  unsigned(12 downto 0);
-      reset_data        : in  unsigned(15 downto 0);
+      reset_data        : in  unsigned(11 downto 0);
       reset_cell        : in  unsigned(12 downto 0)
       );
   end component;
@@ -77,7 +77,7 @@ architecture Behavioral of game_logic is
     port(
       gamelogic_state : in  gamelogic_state_t;
       address_a_tail  : out unsigned(12 downto 0);
-      tail_write_data : out unsigned(15 downto 0);
+      tail_write_data : out unsigned(11 downto 0);
       tail_done       : out std_logic;
       next_cell       : in  unsigned(12 downto 0)
       );
@@ -89,7 +89,7 @@ architecture Behavioral of game_logic is
       clk25              : in  std_logic;
       ext_reset          : in  std_logic;
       address_a_tailread : out unsigned(12 downto 0);
-      tail_read_data     : in  unsigned(15 downto 0);
+      tail_read_data     : in  unsigned(11 downto 0);
       tailread_done      : out std_logic;
       next_tail_cell     : out unsigned(12 downto 0)
       );
@@ -101,7 +101,7 @@ architecture Behavioral of game_logic is
       clk25            : in  std_logic;
       ext_reset        : in  std_logic;
       address_a_reset  : out unsigned(12 downto 0);
-      reset_write_data : out unsigned(15 downto 0);
+      reset_write_data : out unsigned(11 downto 0);
       reset_done       : out std_logic;
       keyboard         : in  unsigned(2 downto 0)
       );
@@ -111,7 +111,7 @@ architecture Behavioral of game_logic is
     port(
       gamelogic_state      : in  gamelogic_state_t;
       address_a_corner     : out unsigned(12 downto 0);
-      corner_write_data    : out unsigned(15 downto 0);
+      corner_write_data    : out unsigned(11 downto 0);
       corner_done          : out std_logic;
       next_cell            : in  unsigned(12 downto 0);
       old_direction_in     : in  unsigned(2 downto 0);
@@ -125,7 +125,7 @@ architecture Behavioral of game_logic is
       clk25                 : in  std_logic;
       ext_reset             : in  std_logic;
       address_a_check       : out unsigned(12 downto 0);
-      check_read_data       : in  unsigned(15 downto 0);
+      check_read_data       : in  unsigned(11 downto 0);
       check_done            : out std_logic;
       keyboard              : in  unsigned(2 downto 0);
       crashed               : out std_logic;
@@ -141,7 +141,7 @@ architecture Behavioral of game_logic is
     port(
       gamelogic_state      : in  gamelogic_state_t;
       address_a_head       : out unsigned(12 downto 0);
-      head_write_data      : out unsigned(15 downto 0);
+      head_write_data      : out unsigned(11 downto 0);
       head_done            : out std_logic;
       next_cell            : in  unsigned(12 downto 0);
       current_direction_in : in  unsigned(2 downto 0)
@@ -157,25 +157,25 @@ architecture Behavioral of game_logic is
   signal score_done_int        : std_logic;
   signal crashed_int           : std_logic;
   signal corner_done_int       : std_logic;
-  signal corner_data_int       : unsigned(15 downto 0);
+  signal corner_data_int       : unsigned(11 downto 0);
   signal gamelogic_state       : gamelogic_state_t;
-  signal head_write_data_int   : unsigned(15 downto 0);
+  signal head_write_data_int   : unsigned(11 downto 0);
   signal head_cell_int         : unsigned(12 downto 0);
-  signal corner_write_data_int : unsigned(15 downto 0);
+  signal corner_write_data_int : unsigned(11 downto 0);
   signal corner_cell_int       : unsigned(12 downto 0);
-  signal tail_write_data_int   : unsigned(15 downto 0);
-  signal tail_read_data_int    : unsigned(15 downto 0);
+  signal tail_write_data_int   : unsigned(11 downto 0);
+  signal tail_read_data_int    : unsigned(11 downto 0);
   signal tail_readcell_int     : unsigned(12 downto 0);
   signal tail_writecell_int    : unsigned(12 downto 0);
-  signal score_write_data_int  : unsigned(15 downto 0);
+  signal score_write_data_int  : unsigned(11 downto 0);
   signal score_cell_int        : unsigned(12 downto 0);
   signal score_int             : unsigned(13 downto 0);
-  signal reset_data_int        : unsigned(15 downto 0);
+  signal reset_data_int        : unsigned(11 downto 0);
   signal reset_cell_int        : unsigned(12 downto 0);
   signal address_a_int         : unsigned(12 downto 0);
   signal next_direction        : unsigned(2 downto 0);
   signal check_cell_int        : unsigned(12 downto 0);
-  signal check_read_data_int   : unsigned(15 downto 0);
+  signal check_read_data_int   : unsigned(11 downto 0);
   signal current_direction_int : unsigned(2 downto 0);
   signal old_direction_int     : unsigned(2 downto 0);
   signal next_cell_int         : unsigned(12 downto 0);

@@ -19,7 +19,7 @@ entity tail_logic is
   port(
     gamelogic_state : in  gamelogic_state_t;
     address_a_tail  : out unsigned(12 downto 0);
-    tail_write_data : out unsigned(15 downto 0);
+    tail_write_data : out unsigned(11 downto 0);
     tail_done       : out std_logic;
     next_cell       : in  unsigned(12 downto 0)
     );

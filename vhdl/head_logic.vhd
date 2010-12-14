@@ -34,7 +34,7 @@ entity head_logic is
   port(
   gamelogic_state   : in  gamelogic_state_t;
     address_a_head : out unsigned(12 downto 0);
-    head_write_data   : out unsigned(15 downto 0);
+    head_write_data   : out unsigned(11 downto 0);
     head_done     : out std_logic;
 	 next_cell : in unsigned(12 downto 0);
 	 current_direction_in : in unsigned(2 downto 0)

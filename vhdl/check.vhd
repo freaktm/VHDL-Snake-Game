@@ -36,7 +36,7 @@ entity check_logic is
     clk25         : in  std_logic;
     ext_reset     : in  std_logic;
     address_a_check : out unsigned(12 downto 0);
-    check_read_data  : in  unsigned(15 downto 0);
+    check_read_data  : in  unsigned(11 downto 0);
     check_done     : out std_logic;
 	 keyboard : in unsigned(2 downto 0);
 	 crashed : out std_logic;

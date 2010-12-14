@@ -21,7 +21,7 @@ entity corner_logic is
   port(
   gamelogic_state   : in  gamelogic_state_t;
     address_a_corner : out unsigned(12 downto 0);
-    corner_write_data   : out unsigned(15 downto 0);
+    corner_write_data   : out unsigned(11 downto 0);
     corner_done     : out std_logic;
 	 next_cell : in unsigned(12 downto 0);
 	 old_direction_in : in unsigned(2 downto 0);
@@ -52,7 +52,7 @@ begin
 	 snake_character <= to_unsigned(7*8, snake_character'length);
 	 end if;
 	 
-	corner_write_data <= "0000" & current_direction_in & snake_character;
+	corner_write_data <= current_direction_in & snake_character;
 	corner_done <= '1';
  else
  corner_done <= '0';	

@@ -31,7 +31,7 @@ entity vga_core is
     hs_out        : out std_logic;
     vs_out        : out std_logic;
     ram_address_b : out unsigned(12 downto 0);
-    ram_data_b    : in  unsigned(15 downto 0);
+    ram_data_b    : in  unsigned(11 downto 0);
     rom_address   : out unsigned(8 downto 0);
     rom_data      : in  unsigned(7 downto 0);
     strobe        : out std_logic;

@@ -61,8 +61,8 @@ architecture behavioral of MAINBOARD is
     ram_WEA       : out std_logic;
     ram_EN        : out std_logic;
     ram_address_a : out unsigned(12 downto 0);
-    ram_input_a   : out unsigned(15 downto 0);
-    ram_output_a  : in  unsigned(15 downto 0);
+    ram_input_a   : out unsigned(11 downto 0);
+    ram_output_a  : in  unsigned(11 downto 0);
     Direction     : in  unsigned(2 downto 0)
 
       );
@@ -78,7 +78,7 @@ architecture behavioral of MAINBOARD is
       hs_out        : out std_logic;
       vs_out        : out std_logic;
       ram_address_b : out unsigned(12 downto 0);
-      ram_data_b    : in  unsigned(15 downto 0);
+      ram_data_b    : in  unsigned(11 downto 0);
       rom_address   : out unsigned(8 downto 0);
       rom_data      : in  unsigned(7 downto 0);
       strobe        : out std_logic;
@@ -94,9 +94,9 @@ architecture behavioral of MAINBOARD is
           enable_a       : in  std_logic;
           addr_a         : in  unsigned(12 downto 0);
           addr_b         : in  unsigned(12 downto 0);
-          data_input_a   : in  unsigned(15 downto 0);
-          data_output_a  : out unsigned(15 downto 0);
-          data_output_b  : out unsigned(15 downto 0)
+          data_input_a   : in  unsigned(11 downto 0);
+          data_output_a  : out unsigned(11 downto 0);
+          data_output_b  : out unsigned(11 downto 0)
           );
   end component;
 
@@ -123,9 +123,9 @@ architecture behavioral of MAINBOARD is
   signal EN             : std_logic;
   signal address_a      : unsigned(12 downto 0);
   signal address_b      : unsigned(12 downto 0);
-  signal data_i_a       : unsigned(15 downto 0);
-  signal data_o_a       : unsigned(15 downto 0);
-  signal data_o_b       : unsigned(15 downto 0);
+  signal data_i_a       : unsigned(11 downto 0);
+  signal data_o_a       : unsigned(11 downto 0);
+  signal data_o_b       : unsigned(11 downto 0);
   signal number_data    : unsigned(7 downto 0);
   signal number_address : unsigned(8 downto 0);
   signal strobe_sig     : std_logic;
