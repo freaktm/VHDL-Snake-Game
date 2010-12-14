@@ -77,6 +77,7 @@ next_cell <= next_cell_int;
           crashed    <= '0';
 			 check_done <= '0';
 			 checking <= '0';
+			 current_cell <= to_unsigned(2440, current_cell'length);
 			 current_direction_int <= "001"; -- reset to moving up
         elsif clk25'event and clk25 = '1' then       --     rising clock edge
           if (gamelogic_state = CHECK)then

@@ -37,7 +37,7 @@ begin
       tail_write_data <= (others => '0');
       tail_done       <= '1';
     else
-      head_done <= '0';
+      tail_done <= '0';
     end if;
   end process p_update_tail;
 

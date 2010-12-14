@@ -44,7 +44,8 @@ entity ram_mux is
     corner_cell       : in  unsigned(12 downto 0);
 	 tail_read_data	: out unsigned(15 downto 0);
     tail_write_data   : in  unsigned(15 downto 0);
-    tail_cell         : in  unsigned(12 downto 0);
+    tail_writecell         : in  unsigned(12 downto 0);
+	 tail_readcell         : in  unsigned(12 downto 0);
     score_write_data  : in  unsigned(15 downto 0);
     score_cell        : in  unsigned(12 downto 0);
     reset_data        : in  unsigned(15 downto 0);
@@ -76,7 +77,7 @@ begin
   address_a <= address_a_int;
   WEA       <= write_enable;
 
-  p_process_request : process (gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_cell, tail_write_data, score_write_data, score_cell)
+  p_process_request : process (gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_readcell, tail_writecell, tail_write_data, score_write_data, score_cell)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate
@@ -97,13 +98,13 @@ begin
       write_enable  <= '1';
 		
 		elsif (gamelogic_state = READTAIL) then  -- CORNER STATE OF MUX
-      address_a_int <= tail_cell;
+      address_a_int <= tail_readcell;
       write_enable  <= '0';
       
     elsif (gamelogic_state = TAIL) then  -- TAIL STATE OF MUX
 
       input_a_int   <= tail_write_data;
-      address_a_int <= tail_cell;
+      address_a_int <= tail_writecell;
       write_enable  <= '1';
       
     elsif (gamelogic_state = SCORE) then  -- SCORE STATE OF MUX

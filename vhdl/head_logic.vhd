@@ -43,7 +43,7 @@ end head_logic;
 
 architecture Behavioral of head_logic is
 
- -- signal gamelogic_state : gamelogic_state_t;
+
   signal snake_character : unsigned(8 downto 0);
  
   

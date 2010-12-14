@@ -56,7 +56,8 @@ architecture Behavioral of game_logic is
       corner_cell       : in  unsigned(12 downto 0);
       tail_read_data    : out unsigned(15 downto 0);
       tail_write_data   : in  unsigned(15 downto 0);
-      tail_cell         : in  unsigned(12 downto 0);
+      tail_writecell         : in  unsigned(12 downto 0);
+		tail_readcell         : in  unsigned(12 downto 0);
       score_write_data  : in  unsigned(15 downto 0);
       score_cell        : in  unsigned(12 downto 0);
       reset_data        : in  unsigned(15 downto 0);
@@ -81,7 +82,7 @@ architecture Behavioral of game_logic is
       );
   end component;
 
-  component tailcheck_logic is
+  component tailread_logic is
     port(
       gamelogic_state    : in  gamelogic_state_t;
       clk25              : in  std_logic;
@@ -163,7 +164,7 @@ architecture Behavioral of game_logic is
   signal corner_cell_int       : unsigned(12 downto 0);
   signal tail_write_data_int   : unsigned(15 downto 0);
   signal tail_read_data_int    : unsigned(15 downto 0);
-  signal tail_readcell_int     : unsigned(15 downto 0);
+  signal tail_readcell_int     : unsigned(12 downto 0);
   signal tail_writecell_int    : unsigned(12 downto 0);
   signal score_write_data_int  : unsigned(15 downto 0);
   signal score_cell_int        : unsigned(12 downto 0);
@@ -178,7 +179,7 @@ architecture Behavioral of game_logic is
   signal old_direction_int     : unsigned(2 downto 0);
   signal next_cell_int         : unsigned(12 downto 0);
   signal tailread_done_int     : std_logic;
-  signal next_tail_cell_int    : unsigned(15 downto 0);
+  signal next_tail_cell_int    : unsigned(12 downto 0);
   
 begin
 

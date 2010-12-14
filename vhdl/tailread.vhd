@@ -47,8 +47,8 @@ begin
     if (ext_reset = '1') then           --  asynchronous reset (active high)
       tailread_done      <= '0';
       next_direction     <= "001";      -- reset to moving up
-      current_cell       <= to_unsigned(8, current_cell'length);
-      next_tail_cell_int <= to_unsigned(8, next_tail_cell'length);
+      current_cell       <= to_unsigned(2600, current_cell'length);
+      next_tail_cell_int <= to_unsigned(2520, next_tail_cell'length);
     elsif clk25'event and clk25 = '1' then  --     rising clock edge
       if (gamelogic_state = READTAIL)then
         if (checking = '0') then
