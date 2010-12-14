@@ -193,7 +193,7 @@ begin
       WEA               => ram_WEA,
       address_a         => ram_address_a,
       input_a           => ram_input_a,
-			 output_a			=> ram_output_a,
+	output_a			=> ram_output_a,
       head_write_data   => head_write_data_int,
       head_cell         => head_cell_int,
       corner_write_data => corner_write_data_int,

@@ -78,7 +78,7 @@ begin
   output_a_int <= output_a;
   WEA       <= write_enable;
 
-  p_process_request : process (gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_readcell, tail_writecell, tail_write_data, score_write_data, score_cell)
+  p_process_request : process (check_cell, output_a_int, gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_readcell, tail_writecell, tail_write_data, score_write_data, score_cell)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin  -- process p_cellupdate
@@ -100,8 +100,9 @@ begin
       address_a_int <= corner_cell;
       write_enable  <= '1';
 		
-		elsif (gamelogic_state = READTAIL) then  -- CORNER STATE OF MUX
+	elsif (gamelogic_state = READTAIL) then  -- CORNER STATE OF MUX
       address_a_int <= tail_readcell;
+		tail_read_data <= output_a_int;
       write_enable  <= '0';
       
     elsif (gamelogic_state = TAIL) then  -- TAIL STATE OF MUX
