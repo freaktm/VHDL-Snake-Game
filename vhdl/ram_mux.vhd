@@ -36,6 +36,7 @@ entity ram_mux is
     WEA               : out std_logic;
     address_a         : out unsigned(12 downto 0);
     input_a           : out unsigned(11 downto 0);
+	 output_a			: in unsigned(11 downto 0);
 	 check_read_data : out unsigned(11 downto 0);
 	 check_cell : in unsigned(12 downto 0);
     head_write_data   : in  unsigned(11 downto 0);
@@ -63,7 +64,6 @@ architecture Behavioral of ram_mux is
   signal input_a_int   : unsigned(11 downto 0);
   signal output_a_int : unsigned(11 downto 0);
   
- -- signal gamelogic_state : gamelogic_state_t;
   
 begin
   -- purpose: updates the ram entries for the video display also controls the reading
@@ -75,6 +75,7 @@ begin
   
   input_a   <= input_a_int;
   address_a <= address_a_int;
+  output_a_int <= output_a;
   WEA       <= write_enable;
 
   p_process_request : process (gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_readcell, tail_writecell, tail_write_data, score_write_data, score_cell)
@@ -85,12 +86,14 @@ begin
       input_a_int   <= reset_data;
       address_a_int <= reset_cell;
       write_enable  <= '1';
-      
+		elsif (gamelogic_state = CHECK) then
+		address_a_int <= check_cell;
+		write_enable <= '0';		
+		check_read_data <= output_a_int;      
     elsif (gamelogic_state = HEAD) then  -- HEAD STATE OF MUX
       input_a_int   <= head_write_data;
       address_a_int <= head_cell;
-      write_enable <= '1';
-      
+      write_enable <= '1';    
       
     elsif (gamelogic_state = CORNER) then  -- CORNER STATE OF MUX
       input_a_int   <= corner_write_data;

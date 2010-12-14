@@ -33,8 +33,8 @@ entity game_logic is
     ram_WEA       : out std_logic;
     ram_EN        : out std_logic;
     ram_address_a : out unsigned(12 downto 0) := "0000000000000";
-    ram_input_a   : out unsigned(11 downto 0) := "0000000000000000";
-    ram_output_a  : in  unsigned(11 downto 0) := "0000000000000000";
+    ram_input_a   : out unsigned(11 downto 0) := "000000000000";
+    ram_output_a  : in  unsigned(11 downto 0) := "000000000000";
     Direction     : in  unsigned(2 downto 0)
     );
 end game_logic;
@@ -48,6 +48,7 @@ architecture Behavioral of game_logic is
       WEA               : out std_logic;
       address_a         : out unsigned(12 downto 0);
       input_a           : out unsigned(11 downto 0);
+			 output_a			: in unsigned(11 downto 0);
       check_read_data   : out unsigned(11 downto 0);
       check_cell        : in  unsigned(12 downto 0);
       head_write_data   : in  unsigned(11 downto 0);
@@ -192,6 +193,7 @@ begin
       WEA               => ram_WEA,
       address_a         => ram_address_a,
       input_a           => ram_input_a,
+			 output_a			=> ram_output_a,
       head_write_data   => head_write_data_int,
       head_cell         => head_cell_int,
       corner_write_data => corner_write_data_int,
