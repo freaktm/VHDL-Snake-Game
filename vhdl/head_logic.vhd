@@ -60,7 +60,7 @@ begin
 	 snake_character <= to_unsigned(2*8, snake_character'length);
 	 end if;
 	 
-	head_write_data <= "0000" & current_direction_in & snake_character;
+	head_write_data <= current_direction_in & snake_character;
 	head_done <= '1';
  else
  head_done <= '0';	
