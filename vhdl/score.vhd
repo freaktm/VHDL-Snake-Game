@@ -18,7 +18,8 @@ use work.gamelogic_pkg.all;
 entity score_logic is
   port(
     gamelogic_state : in  gamelogic_state_t;
-    score  : out unsigned(13 downto 0)
+    score  : out unsigned(13 downto 0);
+	 score_done : out std_logic
     );
 end score_logic;
 
@@ -32,6 +33,7 @@ signal score_int : unsigned(13 downto 0);
 begin
   
 score <= score_int;
+score_done <= '1';
 
 
 end Behavioral;

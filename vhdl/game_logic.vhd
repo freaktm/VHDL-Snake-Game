@@ -68,7 +68,8 @@ architecture Behavioral of game_logic is
   component score_logic is
     port(
       gamelogic_state : in  gamelogic_state_t;
-      score           : out unsigned(13 downto 0)
+      score           : out unsigned(13 downto 0);
+		score_done : out std_logic
       );
   end component;
 
@@ -220,7 +221,8 @@ begin
   SCORE_CNTRL : score_logic
     port map (
       gamelogic_state => gamelogic_state,
-      score           => score_int
+      score           => score_int,
+		score_done => score_done_int
       );
 
   TAIL_CNTRL : tail_logic
