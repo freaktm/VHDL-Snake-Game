@@ -89,7 +89,7 @@ architecture behavioral of MAINBOARD is
   end component;
 
   component screen_ram is
-    port (clk50          : in  std_logic;
+    port (clk25          : in  std_logic;
           write_enable_a : in  std_logic;
           enable_a       : in  std_logic;
           addr_a         : in  unsigned(12 downto 0);
@@ -197,7 +197,7 @@ begin
   -- VRAM instantiation
   VRAM : screen_ram
     port map (
-      clk50          => clk50,
+      clk25          => clk25,
       write_enable_a => WEA,
       enable_a       => EN,
       addr_a         => address_a,

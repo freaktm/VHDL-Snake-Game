@@ -20,7 +20,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity screen_ram is
-  port (clk50          : in  std_logic;
+  port (clk25          : in  std_logic;
         write_enable_a : in  std_logic;
         enable_a       : in  std_logic;
         addr_a         : in  std_logic_vector(12 downto 0);
@@ -96,9 +96,9 @@ architecture syn of screen_ram is
 begin
 
 
-  process (clk50)
+  process (clk25)
   begin
-    if (clk50'event and clk50 = '1') then
+    if (clk25'event and clk25 = '1') then
       if (enable_a = '1') then
         if (write_enable_a = '1') then
           vidram(to_integer(unsigned(addr_a))) <= data_input_a;
