@@ -53,7 +53,6 @@ begin
       if (gamelogic_state = READTAIL)then
         if (checking = '0') then
           checking     <= '1';
-          current_cell <= next_tail_cell_int;
           if (next_direction = "001") then
             next_tail_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_tail_cell_int'length);
           elsif (next_direction = "010") then
@@ -63,6 +62,7 @@ begin
           elsif (next_direction = "100") then
             next_tail_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_tail_cell_int'length);
           end if;
+			 current_cell <= next_tail_cell_int;
           address_a_tailread <= next_tail_cell_int;
         elsif (checking = '1') then
           checking       <= '0';

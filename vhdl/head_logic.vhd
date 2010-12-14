@@ -55,9 +55,9 @@ p_update_character : process (gamelogic_state, current_direction_in, snake_chara
 begin
    if (gamelogic_state = HEAD) then
 	if (current_direction_in = "001") or (current_direction_in = "011") then
-	 snake_character <= to_unsigned(2*8, snake_character'length);
-	 elsif (current_direction_in = "010") or (current_direction_in = "100") then
 	 snake_character <= to_unsigned(3*8, snake_character'length);
+	 elsif (current_direction_in = "010") or (current_direction_in = "100") then
+	 snake_character <= to_unsigned(2*8, snake_character'length);
 	 end if;
 	 
 	head_write_data <= "0000" & current_direction_in & snake_character;

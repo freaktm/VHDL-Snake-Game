@@ -365,14 +365,18 @@ begin
 -- type   : combinational
 -- inputs : clk25, ext_reset, Direction, crashed
 -- outputs: next_direction, reset_game
-  p_keyboard_input : process (Direction, crashed_int)
+  p_keyboard_input : process (clk25, ext_reset)
   begin
+     if (ext_reset = '1') then           --asynchronous reset (active high)
+      next_direction <= "001";
+    elsif clk25'event and clk25 = '1' then  --    rising clock edge   
 -- update keyboard input      
     if (Direction /= "000") and (Direction /= "101") then
       next_direction <= Direction;
     elsif (Direction = "101") and (crashed_int = '1') then
       next_direction <= "111";
     end if;
+	 end if;
 -- end of keyboard update
   end process p_keyboard_input;
 
