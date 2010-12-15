@@ -59,12 +59,12 @@ end ram_mux;
 
 architecture Behavioral of ram_mux is
   
-  signal write_enable  : std_logic;
-  signal address_a_int : unsigned(12 downto 0);
-  signal input_a_int   : unsigned(11 downto 0);
-  signal output_a_int  : unsigned(11 downto 0);
-  constant WE_EN : std_logic := '1';
-  constant WE_OFF : std_logic := '0';
+  signal   write_enable  : std_logic;
+  signal   address_a_int : unsigned(12 downto 0);
+  signal   input_a_int   : unsigned(11 downto 0);
+  signal   output_a_int  : unsigned(11 downto 0);
+  constant WE_EN         : std_logic := '1';
+  constant WE_OFF        : std_logic := '0';
   
   
 begin
@@ -99,56 +99,10 @@ begin
     write_enable <=
     WE_OFF when CHECK,
     WE_OFF when READTAIL,
-    WE_EN when others;
-	 
- tail_read_data <= output_a_int;
- check_read_data <= output_a_int;
-			  
-
-
-  --p_process_request : process (check_cell, output_a_int, gamelogic_state, reset_data, reset_cell, head_write_data, head_cell, corner_write_data, corner_cell, tail_readcell, tail_writecell, tail_write_data, score_write_data, score_cell)
-  --  variable ramcnt_i : integer;
-  --  variable ramcnt_j : integer;
-  --begin  -- process p_cellupdate
-  --  if gamelogic_state = RESET then  -- RESET STATE OF RAM                                                      
-  --    input_a_int   <= reset_data;
-  --    address_a_int <= reset_cell;
-  --    write_enable  <= '1';
-  --  elsif (gamelogic_state = CHECK) then
-  --    address_a_int   <= check_cell;
-  --    write_enable    <= '0';
-  --    check_read_data <= output_a_int;
-  --  elsif (gamelogic_state = HEAD) then  -- HEAD STATE OF MUX
-  --    input_a_int   <= head_write_data;
-  --    address_a_int <= head_cell;
-  --    write_enable  <= '1';
-
-  --  elsif (gamelogic_state = CORNER) then  -- CORNER STATE OF MUX
-  --    input_a_int   <= corner_write_data;
-  --    address_a_int <= corner_cell;
-  --    write_enable  <= '1';
-
-  --  elsif (gamelogic_state = READTAIL) then  -- CORNER STATE OF MUX
-  --    address_a_int  <= tail_readcell;
-  --    tail_read_data <= output_a_int;
-  --    write_enable   <= '0';
-
-  --  elsif (gamelogic_state = TAIL) then  -- TAIL STATE OF MUX
-
-  --    input_a_int   <= tail_write_data;
-  --    address_a_int <= tail_writecell;
-  --    write_enable  <= '1';
-
-  --  elsif (gamelogic_state = SCORE) then  -- SCORE STATE OF MUX
-
-  --    input_a_int   <= score_write_data;
-  --    address_a_int <= score_cell;
-  --    write_enable  <= '1';
-
-  --  else
-  --    write_enable <= '0';              -- MUX IDLE
-  --  end if;
-
-  --end process p_process_request;
+    WE_EN  when others;
+  
+  tail_read_data  <= output_a_int;
+  check_read_data <= output_a_int;
+  
 
 end Behavioral;
