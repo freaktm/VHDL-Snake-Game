@@ -49,7 +49,7 @@ architecture Behavioral of head_logic is
   
 begin
   
-  address_a_head <= next_cell;
+ 
   
 p_update_character : process (gamelogic_state, current_direction_in, snake_character)
 begin
@@ -59,7 +59,7 @@ begin
 	 elsif (current_direction_in = "010") or (current_direction_in = "100") then
 	 snake_character <= to_unsigned(2*8, snake_character'length);
 	 end if;
-	 
+	address_a_head <= next_cell;
 	head_write_data <= current_direction_in & snake_character;
 	head_done <= '1';
  else

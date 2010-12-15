@@ -83,8 +83,7 @@ architecture behavioral of MAINBOARD is
       rom_data      : in  unsigned(7 downto 0);
       strobe        : out std_logic;
       row_data      : out unsigned(7 downto 0);
-      pixel         : in  std_logic;
-      colour_in     : in  unsigned(1 downto 0)
+      pixel         : in  std_logic
       );
   end component;
 
@@ -131,9 +130,8 @@ architecture behavioral of MAINBOARD is
   signal strobe_sig     : std_logic;
   signal dout_int       : std_logic;
   signal din_int        : unsigned(7 downto 0);
-  signal colour_int     : unsigned(1 downto 0);
   signal Direction_int  : unsigned(2 downto 0);
-  -- signal kb_data : std_logic;
+
   
 
 
@@ -190,8 +188,7 @@ begin
     rom_data      => number_data,
     strobe        => strobe_sig,
     row_data      => din_int,
-    pixel         => dout_int,
-    colour_in     => colour_int
+    pixel         => dout_int
     );
 
   -- VRAM instantiation

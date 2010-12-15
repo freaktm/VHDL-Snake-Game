@@ -71,6 +71,7 @@ begin
       checking              <= '0';
       current_cell          <= to_unsigned(2440, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up
+		next_cell_int <= to_unsigned(2440, next_cell_int'length);
     elsif clk25'event and clk25 = '1' then  --     rising clock edge
       if (gamelogic_state = CHECK)then
         old_direction_out <= current_direction_int;

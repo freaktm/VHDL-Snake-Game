@@ -50,6 +50,8 @@ begin
 	 snake_character <= to_unsigned(6*8, snake_character'length);
 	 	 elsif ((current_direction_in = "011") and (old_direction_in = "010")) or ((current_direction_in ="100") and (old_direction_in = "001")) then
 	 snake_character <= to_unsigned(7*8, snake_character'length);
+	 else
+	 snake_character <= to_unsigned(7*8, snake_character'length);
 	 end if;
 	 
 	corner_write_data <= current_direction_in & snake_character;

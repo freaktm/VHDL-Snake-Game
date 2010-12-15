@@ -64,7 +64,7 @@ begin
           end if;
 			 current_cell <= next_tail_cell_int;
           address_a_tailread <= next_tail_cell_int;
-        elsif (checking = '1') then
+        else
           checking       <= '0';
           next_direction <= tail_read_data(11 downto 9);
           tailread_done  <= '1';

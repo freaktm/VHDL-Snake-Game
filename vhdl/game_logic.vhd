@@ -48,7 +48,7 @@ architecture Behavioral of game_logic is
       WEA               : out std_logic;
       address_a         : out unsigned(12 downto 0);
       input_a           : out unsigned(11 downto 0);
-			 output_a			: in unsigned(11 downto 0);
+   	output_a			: in unsigned(11 downto 0);
       check_read_data   : out unsigned(11 downto 0);
       check_cell        : in  unsigned(12 downto 0);
       head_write_data   : in  unsigned(11 downto 0);
@@ -322,7 +322,7 @@ begin
       case gamelogic_state is
         when IDLE =>
           if tick = '1' then
-            gamelogic_state <= CHECK;
+            gamelogic_state <= CHECK;	
           end if;
         when CHECK =>
           if (check_done_int = '1') and (nochange_int = '1') then
@@ -330,15 +330,17 @@ begin
           elsif (check_done_int = '1') and (nochange_int = '0') then
             gamelogic_state <= CORNER;
           elsif (crashed_int = '1') then
-            gamelogic_state <= RESET;
+            gamelogic_state <= SCORE;
           end if;
         when HEAD =>
           if (head_done_int = '1') then
-            gamelogic_state <= READTAIL;
+           -- gamelogic_state <= READTAIL;
+			  gamelogic_state <= SCORE;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-            gamelogic_state <= READTAIL;
+         --   gamelogic_state <= READTAIL;
+			gamelogic_state <= SCORE;
           end if;
         when READTAIL =>
           if (tailread_done_int = '1') then

@@ -36,8 +36,7 @@ entity vga_core is
     rom_data      : in  unsigned(7 downto 0);
     strobe        : out std_logic;
     row_data      : out unsigned(7 downto 0);
-    pixel         : in  std_logic;
-    colour_in     : in  unsigned(1 downto 0)
+    pixel         : in  std_logic
     );
 end vga_core;
 
@@ -93,23 +92,11 @@ begin
         and (to_integer(vcounter) >= 39)  -- 39
         and (to_integer(vcounter) < 519)  -- 519
       then
-        if (colour_in = "00") then
+      
           red_out   <= '0';
           green_out <= '0';
           blue_out  <= pixel;
-        elsif (colour_in = "01") then
-          red_out   <= pixel;
-          green_out <= '0';
-          blue_out  <= '0';
-        elsif (colour_in = "10") then
-          red_out   <= '0';
-          green_out <= pixel;
-          blue_out  <= '0';
-        elsif (colour_in = "11") then
-          red_out   <= pixel;
-          green_out <= pixel;
-          blue_out  <= '0';
-        end if;
+
       else
         red_out   <= '0';
         green_out <= '0';
