@@ -3,10 +3,10 @@
 -- Project    : 
 -------------------------------------------------------------------------------
 -- File       : MAINBOARD_tb.vhd
--- Author     : Aaron Storey  <freaktm@freaktm>
+-- Author     : CompSci temp account 2  <cs002@nui.cs.waikato.ac.nz>
 -- Company    : 
--- Created    : 2010-12-15
--- Last update: 2010-12-15
+-- Created    : 2010-12-17
+-- Last update: 2010-12-17
 -- Platform   : 
 -- Standard   : VHDL'87
 -------------------------------------------------------------------------------
@@ -16,7 +16,7 @@
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date        Version  Author  Description
--- 2010-12-15  1.0      freaktm Created
+-- 2010-12-17  1.0      cs002	Created
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -47,16 +47,16 @@ architecture tb of MAINBOARD_tb is
   end component;
 
   -- component ports
-  signal ext_clk_50  : std_logic;
-  signal ext_reset   : std_logic;
-  signal clks_locked : std_logic;
-  signal red_out     : std_logic;
-  signal green_out   : std_logic;
-  signal blue_out    : std_logic;
-  signal hs_out      : std_logic;
-  signal vs_out      : std_logic;
-  signal ps2d        : std_logic;
-  signal ps2c        : std_logic;
+  signal ext_clk_50_i  : std_logic;
+  signal ext_reset_i   : std_logic;
+  signal clks_locked_i : std_logic;
+  signal red_out_i     : std_logic;
+  signal green_out_i   : std_logic;
+  signal blue_out_i    : std_logic;
+  signal hs_out_i      : std_logic;
+  signal vs_out_i      : std_logic;
+  signal ps2d_i        : std_logic;
+  signal ps2c_i        : std_logic;
 
   -- clock
   signal Clk : std_logic := '1';
@@ -64,51 +64,37 @@ architecture tb of MAINBOARD_tb is
 begin  -- tb
 
   -- component instantiation
-  DUT : MAINBOARD
+  DUT: MAINBOARD
     port map (
-      ext_clk_50  => ext_clk_50,
-      ext_reset   => ext_reset,
-      clks_locked => clks_locked,
-      red_out     => red_out,
-      green_out   => green_out,
-      blue_out    => blue_out,
-      hs_out      => hs_out,
-      vs_out      => vs_out,
-      ps2d        => ps2d,
-      ps2c        => ps2c);
+      ext_clk_50  => ext_clk_50_i,
+      ext_reset   => ext_reset_i,
+      clks_locked => clks_locked_i,
+      red_out     => red_out_i,
+      green_out   => green_out_i,
+      blue_out    => blue_out_i,
+      hs_out      => hs_out_i,
+      vs_out      => vs_out_i,
+      ps2d        => ps2d_i,
+      ps2c        => ps2c_i);
 
   -- clock generation
-  Clk <= not Clk after 10 ns;
+  ext_clk_50_i <= not ext_clk_50_i after 10 ns;
 
   -- waveform generation
-  WaveGen_Proc : process
+  WaveGen_Proc: process
   begin
-    -- insert signal assignments here
-
-    wait 100 ns;
-    ext_reset <= '1';
-    wait 100 ns;
-    ext_reset <= '0';
-    wait 100 ns;
-    for loop
-      wait 200 ns;
-      tick <= '1';
-      wait 1 ns;
-      tick <= '0';
-    end loop;  -- loop
-
+   
+    ext_reset_i <= '0';
+    wait for 100 ns;
+    ext_reset_i <= '1';
+    wait for 100 ns;
+    ext_reset_i <= '0';
     wait;
+
+    
   end process WaveGen_Proc;
 
-  
 
 end tb;
 
--------------------------------------------------------------------------------
 
-configuration MAINBOARD_tb_tb_cfg of MAINBOARD_tb is
-  for tb
-  end for;
-end MAINBOARD_tb_tb_cfg;
-
--------------------------------------------------------------------------------
