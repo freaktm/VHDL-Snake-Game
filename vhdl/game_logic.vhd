@@ -48,7 +48,7 @@ architecture Behavioral of game_logic is
       WEA               : out std_logic;
       address_a         : out unsigned(12 downto 0);
       input_a           : out unsigned(11 downto 0);
-   	output_a			: in unsigned(11 downto 0);
+      output_a          : in  unsigned(11 downto 0);
       check_read_data   : out unsigned(11 downto 0);
       check_cell        : in  unsigned(12 downto 0);
       head_write_data   : in  unsigned(11 downto 0);
@@ -57,8 +57,8 @@ architecture Behavioral of game_logic is
       corner_cell       : in  unsigned(12 downto 0);
       tail_read_data    : out unsigned(11 downto 0);
       tail_write_data   : in  unsigned(11 downto 0);
-      tail_writecell         : in  unsigned(12 downto 0);
-		tail_readcell         : in  unsigned(12 downto 0);
+      tail_writecell    : in  unsigned(12 downto 0);
+      tail_readcell     : in  unsigned(12 downto 0);
       score_write_data  : in  unsigned(11 downto 0);
       score_cell        : in  unsigned(12 downto 0);
       reset_data        : in  unsigned(11 downto 0);
@@ -70,7 +70,7 @@ architecture Behavioral of game_logic is
     port(
       gamelogic_state : in  gamelogic_state_t;
       score           : out unsigned(13 downto 0);
-		score_done : out std_logic
+      score_done      : out std_logic
       );
   end component;
 
@@ -193,7 +193,7 @@ begin
       WEA               => ram_WEA,
       address_a         => ram_address_a,
       input_a           => ram_input_a,
-	output_a			=> ram_output_a,
+      output_a          => ram_output_a,
       head_write_data   => head_write_data_int,
       head_cell         => head_cell_int,
       corner_write_data => corner_write_data_int,
@@ -224,7 +224,7 @@ begin
     port map (
       gamelogic_state => gamelogic_state,
       score           => score_int,
-		score_done => score_done_int
+      score_done      => score_done_int
       );
 
   TAIL_CNTRL : tail_logic
@@ -322,7 +322,7 @@ begin
       case gamelogic_state is
         when IDLE =>
           if tick = '1' then
-            gamelogic_state <= CHECK;	
+            gamelogic_state <= CHECK;
           end if;
         when CHECK =>
           if (check_done_int = '1') and (nochange_int = '1') then
@@ -330,17 +330,19 @@ begin
           elsif (check_done_int = '1') and (nochange_int = '0') then
             gamelogic_state <= CORNER;
           elsif (crashed_int = '1') then
-            gamelogic_state <= SCORE;
+            gamelogic_state <= RESET;
+          else
+            gamelogic_state <= CHECK;
           end if;
         when HEAD =>
           if (head_done_int = '1') then
-           -- gamelogic_state <= READTAIL;
-			  gamelogic_state <= SCORE;
+            -- gamelogic_state <= READTAIL;
+            gamelogic_state <= SCORE;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-         --   gamelogic_state <= READTAIL;
-			gamelogic_state <= SCORE;
+            --   gamelogic_state <= READTAIL;
+            gamelogic_state <= SCORE;
           end if;
         when READTAIL =>
           if (tailread_done_int = '1') then
@@ -371,16 +373,16 @@ begin
 -- outputs: next_direction, reset_game
   p_keyboard_input : process (clk25, ext_reset)
   begin
-     if (ext_reset = '1') then           --asynchronous reset (active high)
+    if (ext_reset = '1') then               --asynchronous reset (active high)
       next_direction <= "001";
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
 -- update keyboard input      
-    if (Direction /= "000") and (Direction /= "101") then
-      next_direction <= Direction;
-    elsif (Direction = "101") and (crashed_int = '1') then
-      next_direction <= "111";
+      if (Direction /= "000") and (Direction /= "101") then
+        next_direction <= Direction;
+      elsif (Direction = "101") and (crashed_int = '1') then
+        next_direction <= "111";
+      end if;
     end if;
-	 end if;
 -- end of keyboard update
   end process p_keyboard_input;
 
