@@ -23,7 +23,7 @@ use work.gamelogic_pkg.all;
 entity check_logic is
   port(
     gamelogic_state       : in  gamelogic_state_t;
-    clk25                 : in  std_logic;
+    clk_slow                 : in  std_logic;
     ext_reset             : in  std_logic;
     address_a_check       : out unsigned(12 downto 0);
     check_read_data       : in  unsigned(11 downto 0);
@@ -62,7 +62,7 @@ begin
   --type   : sequential
   --inputs : clk25, ext_reset, state, next_direction, output_a_int, crash_result_ready
   --outputs: crash_test, crashed
-  p_collision_checker : process (clk25, ext_reset)
+  p_collision_checker : process (clk_slow, ext_reset)
   begin  -- process p_collision_checker
     if (ext_reset = '1') then           --  asynchronous reset (active high)
       crashed               <= '0';
@@ -71,7 +71,7 @@ begin
       current_cell          <= to_unsigned(2520, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up
       next_cell_int         <= to_unsigned(2440, next_cell_int'length);
-    elsif (clk25'event and clk25 = '1') then
+    elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
         old_direction_out <= current_direction_int;
         if (current_direction_int /= next_direction) then

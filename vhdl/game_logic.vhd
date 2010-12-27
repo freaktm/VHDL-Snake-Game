@@ -29,6 +29,7 @@ use work.gamelogic_pkg.all;
 entity game_logic is
   port(
     clk25         : in  std_logic;
+    clk_slow      : in  std_logic;
     ext_reset     : in  std_logic;
     ram_WEA       : out std_logic;
     ram_EN        : out std_logic;
@@ -123,7 +124,7 @@ architecture Behavioral of game_logic is
   component check_logic is
     port(
       gamelogic_state       : in  gamelogic_state_t;
-      clk25                 : in  std_logic;
+      clk_slow              : in  std_logic;
       ext_reset             : in  std_logic;
       address_a_check       : out unsigned(12 downto 0);
       check_read_data       : in  unsigned(11 downto 0);
@@ -239,7 +240,7 @@ begin
   CHECK_CNTRL : check_logic
     port map (
       gamelogic_state       => gamelogic_state,
-      clk25                 => clk25,
+      clk_slow              => clk_slow,
       ext_reset             => ext_reset,
       address_a_check       => check_cell_int,
       old_direction_out     => old_direction_int,

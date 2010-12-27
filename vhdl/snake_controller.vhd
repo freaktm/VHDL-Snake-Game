@@ -40,9 +40,9 @@ architecture behavioral of MAINBOARD is
 
   component KeyboardController is
     port (KeyboardClock : in  std_logic;
-           KeyboardData : in  std_logic;
-           Direction    : out unsigned(2 downto 0)
-           );
+          KeyboardData  : in  std_logic;
+          Direction     : out unsigned(2 downto 0)
+          );
   end component;
 
   component clock_sync is port (
@@ -56,14 +56,15 @@ architecture behavioral of MAINBOARD is
 
   component game_logic is
     port(
-    clk25         : in  std_logic;
-    ext_reset     : in  std_logic;
-    ram_WEA       : out std_logic;
-    ram_EN        : out std_logic;
-    ram_address_a : out unsigned(12 downto 0);
-    ram_input_a   : out unsigned(11 downto 0);
-    ram_output_a  : in  unsigned(11 downto 0);
-    Direction     : in  unsigned(2 downto 0)
+      clk25         : in  std_logic;
+      clk_slow      : in  std_logic;
+      ext_reset     : in  std_logic;
+      ram_WEA       : out std_logic;
+      ram_EN        : out std_logic;
+      ram_address_a : out unsigned(12 downto 0);
+      ram_input_a   : out unsigned(11 downto 0);
+      ram_output_a  : in  unsigned(11 downto 0);
+      Direction     : in  unsigned(2 downto 0)
 
       );
   end component;
@@ -117,8 +118,8 @@ architecture behavioral of MAINBOARD is
 
 
   signal clk25          : std_logic;
- -- signal clk50          : std_logic;
-  signal clk_slow : std_logic;          -- game logic clock
+  -- signal clk50          : std_logic;
+  signal clk_slow       : std_logic;    -- game logic clock
   signal WEA            : std_logic;
   signal EN             : std_logic;
   signal address_a      : unsigned(12 downto 0);
@@ -162,15 +163,16 @@ begin
 --  GAME LOGIC instantiation
   LOGIC : game_logic
     port map (
-	     clk25         => clk25,
-    ext_reset     => ext_reset,
-    ram_WEA       => WEA,
-    ram_EN        => EN,
-    ram_address_a => address_a,
-    ram_input_a   => data_i_a,
-    ram_output_a  => data_o_a,
-    Direction     => Direction_int
-	      );
+      clk25         => clk25,
+      clk_slow      => clk_slow,
+      ext_reset     => ext_reset,
+      ram_WEA       => WEA,
+      ram_EN        => EN,
+      ram_address_a => address_a,
+      ram_input_a   => data_i_a,
+      ram_output_a  => data_o_a,
+      Direction     => Direction_int
+      );
 
 
 
