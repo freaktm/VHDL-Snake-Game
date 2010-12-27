@@ -29,8 +29,8 @@ entity clock_sync is
   port (CLKIN_IN    : in  std_logic;
          RST_IN     : in  std_logic;
          --CLKIN_IBUFG_OUT : out   std_logic; 
+         CLK_SLOW   : out std_logic;
          CLK_25_0   : out std_logic;
-         CLK_50_0   : out std_logic;
          --CLK0_OUT        : out   std_logic; 
          LOCKED_OUT : out std_logic);
 end clock_sync;
@@ -41,18 +41,18 @@ architecture BEHAVIORAL of clock_sync is
   signal CLKIN_IBUFG  : std_logic;
   signal CLK0_BUF     : std_logic;
   signal GND_BIT      : std_logic;
-  signal clk_50_0_int : std_logic;
+  signal clk_25_0_int : std_logic;
   
 begin
   
-  CLK_50_0 <= clk_50_0_int;
+  CLK_25_0 <= clk_25_0_int;
 
   GND_BIT <= '0';
   --CLKIN_IBUFG_OUT <= CLKIN_IBUFG;
   --CLK0_OUT <= CLKFB_IN;
   CLKDV_BUFG_INST : BUFG
     port map (I => CLKDV_BUF,
-              O => CLK_25_0);
+              O => CLK_SLOW);
 
   CLKIN_IBUFG_INST : IBUFG
     port map (I => CLKIN_IN,
@@ -62,14 +62,14 @@ begin
 
   CLK0_BUFG_INST1 : BUFG
     port map (I => CLK0_BUF,
-              O => clk_50_0_int);
+              O => clk_25_0_int);
 
   DCM_INST : DCM
     generic map(CLK_FEEDBACK           => "1X",
-                 CLKDV_DIVIDE          => 2.0,
+                 CLKDV_DIVIDE          => 6.0,
                  CLKFX_DIVIDE          => 1,
                  CLKFX_MULTIPLY        => 4,
-                 CLKIN_DIVIDE_BY_2     => false,
+                 CLKIN_DIVIDE_BY_2     => TRUE,
                  CLKIN_PERIOD          => 20.000,
                  CLKOUT_PHASE_SHIFT    => "NONE",
                  DESKEW_ADJUST         => "SYSTEM_SYNCHRONOUS",
@@ -79,7 +79,7 @@ begin
                  FACTORY_JF            => x"8080",
                  PHASE_SHIFT           => 0,
                  STARTUP_WAIT          => false)
-    port map (CLKFB    => clk_50_0_int,
+    port map (CLKFB    => clk_25_0_int,
               CLKIN    => CLKIN_IBUFG,
               DSSEN    => GND_BIT,
               PSCLK    => GND_BIT,

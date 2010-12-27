@@ -19,8 +19,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 
-library UNISIM;
-use UNISIM.Vcomponents.all;
+--library UNISIM;
+--use UNISIM.Vcomponents.all;
 
 entity MAINBOARD is
   port(ext_clk_50  : in  std_logic;
@@ -49,7 +49,7 @@ architecture behavioral of MAINBOARD is
     CLKIN_IN   : in  std_logic;
     RST_IN     : in  std_logic;
     CLK_25_0   : out std_logic;
-    CLK_50_0   : out std_logic;
+    CLK_SLOW   : out std_logic;
     LOCKED_OUT : out std_logic
     );
   end component;
@@ -87,18 +87,18 @@ architecture behavioral of MAINBOARD is
       );
   end component;
 
-  component screen_ram is
-    port (clk25          : in  std_logic;
-          write_enable_a : in  std_logic;
-          enable_a       : in  std_logic;
-          addr_a         : in  unsigned(12 downto 0);
-          addr_b         : in  unsigned(12 downto 0);
-          data_input_a   : in  unsigned(11 downto 0);
-          data_output_a  : out unsigned(11 downto 0);
-          data_output_b  : out unsigned(11 downto 0)
-          );
+  component screen_ram
+    port (
+      clk25          : in  std_logic;
+      write_enable_a : in  std_logic;
+      enable_a       : in  std_logic;
+      addr_a         : in  std_logic_vector(12 downto 0);
+      addr_b         : in  std_logic_vector(12 downto 0);
+      data_input_a   : in  unsigned(11 downto 0);
+      data_output_a  : out unsigned(11 downto 0);
+      data_output_b  : out unsigned(11 downto 0));
   end component;
-
+  
   component fontrom is port (
     clk25   : in  std_logic;
     address : in  unsigned(8 downto 0);
@@ -117,7 +117,8 @@ architecture behavioral of MAINBOARD is
 
 
   signal clk25          : std_logic;
-  signal clk50          : std_logic;
+ -- signal clk50          : std_logic;
+  signal clk_slow : std_logic;          -- game logic clock
   signal WEA            : std_logic;
   signal EN             : std_logic;
   signal address_a      : unsigned(12 downto 0);
@@ -153,7 +154,7 @@ begin
     CLKIN_IN   => ext_clk_50,
     RST_IN     => ext_reset,
     CLK_25_0   => clk25,
-    CLK_50_0   => clk50,
+    CLK_SLOW   => clk_slow,
     LOCKED_OUT => clks_locked
     );
 
@@ -197,8 +198,8 @@ begin
       clk25          => clk25,
       write_enable_a => WEA,
       enable_a       => EN,
-      addr_a         => address_a,
-      addr_b         => address_b,
+      addr_a         => std_logic_vector(address_a),
+      addr_b         => std_logic_vector(address_b),
       data_input_a   => data_i_a,
       data_output_a  => data_o_a,
       data_output_b  => data_o_b);
