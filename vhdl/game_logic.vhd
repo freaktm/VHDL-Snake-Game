@@ -337,12 +337,12 @@ begin
         when HEAD =>
           if (head_done_int = '1') then
             -- gamelogic_state <= READTAIL;
-            gamelogic_state <= SCORE;
+            gamelogic_state <= IDLE;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
             --   gamelogic_state <= READTAIL;
-            gamelogic_state <= SCORE;
+            gamelogic_state <= IDLE;
           end if;
         when READTAIL =>
           if (tailread_done_int = '1') then
