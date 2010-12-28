@@ -100,6 +100,7 @@ begin
     WE_OFF when CHECK,
     WE_OFF when READTAIL,
     WE_EN  when others;
+	 
   
   tail_read_data  <= output_a_int;
   check_read_data <= output_a_int;

@@ -66,7 +66,7 @@ begin
 
   DCM_INST : DCM
     generic map(CLK_FEEDBACK           => "1X",
-                 CLKDV_DIVIDE          => 4.0,
+                 CLKDV_DIVIDE          => 6.0,
                  CLKFX_DIVIDE          => 1,
                  CLKFX_MULTIPLY        => 4,
                  CLKIN_DIVIDE_BY_2     => TRUE,

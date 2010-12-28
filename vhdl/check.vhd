@@ -67,9 +67,8 @@ begin
     if (ext_reset = '1') then           --  asynchronous reset (active high)
       crashed               <= '0';
       check_done            <= '0';
-      no_change             <= '1';
+      nochange              <= '1';
       checking              <= "00";
-      next_direction        <= "001";
       current_cell          <= to_unsigned(2520, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up
       next_cell_int         <= to_unsigned(2440, next_cell_int'length);
@@ -94,17 +93,18 @@ begin
           elsif (next_direction = "100") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
           end if;
-          checking        <= "010";
+			 elsif (checking = "01") then
+			 checking <= "10";
           address_a_check <= next_cell_int;
           current_cell    <= next_cell_int;
-        elsif (checking = "01") then
-          checking <= "10";
+        elsif (checking = "10") then
+          checking <= "11";
           if (to_integer(check_read_data) = 0) then
             crashed <= '0';
           else
             crashed <= '1';
           end if;
-        elsif (checking = "10") then
+        elsif (checking = "11") then
           checking   <= "00";
           check_done <= '1';
         end if;

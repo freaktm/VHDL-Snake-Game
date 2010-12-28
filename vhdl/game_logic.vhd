@@ -141,6 +141,8 @@ architecture Behavioral of game_logic is
 
   component head_logic is
     port(
+      clk_slow             : in  std_logic;
+      ext_reset            : in  std_logic;
       gamelogic_state      : in  gamelogic_state_t;
       address_a_head       : out unsigned(12 downto 0);
       head_write_data      : out unsigned(11 downto 0);
@@ -277,6 +279,8 @@ begin
 
   HEAD_CNTRL : head_logic
     port map (
+      clk_slow             => clk_slow,
+      ext_reset            => ext_reset,
       gamelogic_state      => gamelogic_state,
       address_a_head       => head_cell_int,
       head_write_data      => head_write_data_int,
@@ -300,7 +304,7 @@ begin
       tick <= '0';
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
-      if (cnt = 5000000) then
+      if (cnt = 2500000) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
