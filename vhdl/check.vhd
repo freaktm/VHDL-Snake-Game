@@ -39,8 +39,6 @@ end check_logic;
 
 architecture Behavioral of check_logic is
 
-
-  -- signal gamelogic_state : gamelogic_state_t;
   signal current_direction_int : unsigned(2 downto 0);
   signal next_direction        : unsigned(2 downto 0);
   signal current_cell          : unsigned(12 downto 0);
@@ -55,7 +53,6 @@ begin
 
   next_direction <= keyboard;
   next_cell      <= next_cell_int;
-  --       current_cell    <= next_cell_int;
 
 
   --purpose: checks if the snake has crashed into a border or itself
@@ -102,7 +99,7 @@ begin
           if (to_integer(check_read_data) = 0) then
             crashed <= '0';
           else
-            crashed <= '1';
+            crashed <= '0';
           end if;
         elsif (checking = "11") then
           checking   <= "00";
