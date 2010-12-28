@@ -111,6 +111,8 @@ architecture Behavioral of game_logic is
 
   component corner_logic is
     port(
+      ext_reset            : in  std_logic;
+      clk_slow             : in  std_logic;
       gamelogic_state      : in  gamelogic_state_t;
       address_a_corner     : out unsigned(12 downto 0);
       corner_write_data    : out unsigned(11 downto 0);
@@ -257,6 +259,8 @@ begin
 
   CORNER_CNTRL : corner_logic
     port map (
+      ext_reset            => ext_reset,
+      clk_slow             => clk_slow,
       gamelogic_state      => gamelogic_state,
       address_a_corner     => corner_cell_int,
       corner_write_data    => corner_data_int,
