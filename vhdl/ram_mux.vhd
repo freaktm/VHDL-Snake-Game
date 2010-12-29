@@ -76,6 +76,7 @@ begin
   WEA          <= write_enable;
 
 
+
   with gamelogic_state select
     input_a_int <=
     head_write_data   when HEAD,
@@ -97,11 +98,14 @@ begin
 
   with gamelogic_state select
     write_enable <=
-    WE_OFF when CHECK,
-    WE_OFF when READTAIL,
-    WE_EN  when others;
-	 
-  
+    WE_EN when HEAD,
+    WE_EN when TAIL,
+    WE_EN when RESET,
+    WE_EN when CORNER,
+    WE_EN when SCORE,
+    WE_OFF  when others;
+
+
   tail_read_data  <= output_a_int;
   check_read_data <= output_a_int;
   

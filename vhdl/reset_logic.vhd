@@ -50,13 +50,15 @@ architecture Behavioral of reset_logic is
 begin
   
 
-  p_reset_state : process (gamelogic_state, clk25, ext_reset)
+  p_reset_state : process (clk25, ext_reset)
     variable ramcnt_i : integer;
     variable ramcnt_j : integer;
   begin
     
     if (ext_reset = '1') then           --asynchronous reset (active high)
       reset_done <= '0';
+      address_a_reset <= (others => '0');
+      reset_write_data <= (others => '0');
     elsif clk25'event and clk25 = '1' then
       if (gamelogic_state = RESET) then
         reset_write_data <= (others => '0');

@@ -302,13 +302,13 @@ begin
 -- inputs : clk25, ext_reset
 -- outputs: tick
   p_tick_timer : process (clk25, ext_reset)
-    variable cnt : integer;
+    variable cnt : integer := 0;
   begin
     if (ext_reset = '1') then           --asynchronous reset (active high)
       tick <= '0';
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
-      if (cnt = 2500000) then
+      if (cnt = 250) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else

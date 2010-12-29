@@ -50,7 +50,8 @@ begin
   p_process_corner : process (clk_slow, ext_reset)
   begin  -- process p_process_corner
     if ext_reset = '1' then             -- asynchronous reset (active high)
-
+      snake_character <= to_unsigned(5*8, snake_character'length);
+      corner_done     <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
       if (gamelogic_state = CORNER) then
         if ((current_direction_in = "001") and (old_direction_in = "010")) or ((current_direction_in = "100") and (old_direction_in = "011")) then

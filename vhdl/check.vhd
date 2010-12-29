@@ -44,11 +44,12 @@ architecture Behavioral of check_logic is
   signal current_cell          : unsigned(12 downto 0);
   signal next_cell_int         : unsigned(12 downto 0);
   signal checking              : unsigned(1 downto 0);
+  signal old_direction_out_int : unsigned(2 downto 0) := "001";
 
   
 begin
   
-  
+  old_direction_out     <= old_direction_out_int;
   current_direction_out <= current_direction_int;
 
   next_direction <= keyboard;
@@ -69,9 +70,10 @@ begin
       current_cell          <= to_unsigned(2520, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up
       next_cell_int         <= to_unsigned(2440, next_cell_int'length);
+      old_direction_out_int <= "001";
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
-        old_direction_out <= current_direction_int;
+        old_direction_out_int <= current_direction_int;
         if (current_direction_int /= next_direction) then
           nochange <= '0';
         else
@@ -90,8 +92,8 @@ begin
           elsif (next_direction = "100") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
           end if;
-			 elsif (checking = "01") then
-			 checking <= "10";
+        elsif (checking = "01") then
+          checking        <= "10";
           address_a_check <= next_cell_int;
           current_cell    <= next_cell_int;
         elsif (checking = "10") then
