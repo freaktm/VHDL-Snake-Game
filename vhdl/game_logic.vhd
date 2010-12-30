@@ -31,8 +31,8 @@ entity game_logic is
     clk25         : in  std_logic;
     clk_slow      : in  std_logic;
     ext_reset     : in  std_logic;
-    ram_WEA       : out std_logic;
-    ram_EN        : out std_logic;
+    ram_WEA       : out std_logic             := '0';
+    ram_EN        : out std_logic             := '1';
     ram_address_a : out unsigned(12 downto 0) := "0000000000000";
     ram_input_a   : out unsigned(11 downto 0) := "000000000000";
     ram_output_a  : in  unsigned(11 downto 0) := "000000000000";
@@ -163,7 +163,7 @@ architecture Behavioral of game_logic is
   signal score_done_int        : std_logic             := '0';
   signal crashed_int           : std_logic             := '0';
   signal corner_done_int       : std_logic             := '0';
-  signal corner_data_int       : unsigned(11 downto 0);
+  signal corner_data_int       : unsigned(11 downto 0) := (others => '0');
   signal gamelogic_state       : gamelogic_state_t;
   signal head_write_data_int   : unsigned(11 downto 0) := (others => '0');
   signal head_cell_int         : unsigned(12 downto 0) := (others => '0');
