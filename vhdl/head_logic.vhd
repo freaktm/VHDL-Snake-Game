@@ -36,11 +36,21 @@ end head_logic;
 architecture Behavioral of head_logic is
 
 
-  signal snake_character : unsigned(8 downto 0)         := (others => '0');
-  signal checking        : std_logic_vector(1 downto 0) := (others => '0');
+  signal snake_character     : unsigned(8 downto 0)         := (others => '0');
+  signal checking            : std_logic_vector(1 downto 0) := (others => '0');
+  signal address_a_head_int  : unsigned(12 downto 0)        := (others => '0');
+  signal head_write_data_int : unsigned(11 downto 0)        := (others => '0');
+  signal head_done_int       : std_logic                    := '0';
+
+  
   
   
 begin
+
+
+  address_a_head  <= address_a_head_int;
+  head_write_data <= head_write_data_int;
+  head_done       <= head_done_int;
 
 
   -- purpose: update head movement
@@ -50,9 +60,11 @@ begin
   p_process_head : process (clk_slow, ext_reset)
   begin  -- process
     if ext_reset = '1' then             -- asynchronous reset (active high)
-      checking        <= (others => '0');
-      head_done       <= '0';
-      snake_character <= to_unsigned(3*8, snake_character'length);
+      checking            <= (others => '0');
+      head_done_int       <= '0';
+      snake_character     <= to_unsigned(3*8, snake_character'length);
+      address_a_head_int  <= next_cell;
+      head_write_data_int <= (others => '0');
       
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
 
@@ -69,17 +81,17 @@ begin
           end if;
 
         elsif (checking = "01") then
-          checking        <= "10";
-          address_a_head  <= next_cell;
-          head_write_data <= current_direction_in & snake_character;
+          checking            <= "10";
+          address_a_head_int  <= next_cell;
+          head_write_data_int <= current_direction_in & snake_character;
         elsif (checking = "10") then
-          checking  <= (others => '0');
-          head_done <= '1';
+          checking      <= (others => '0');
+          head_done_int <= '1';
         end if;
 
       else
-        checking  <= (others => '0');
-        head_done <= '0';
+        checking      <= (others => '0');
+        head_done_int <= '0';
       end if;
       
     end if;
