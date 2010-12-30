@@ -29,17 +29,17 @@ architecture Behavioral of tail_logic is
 
 begin
   
-  address_a_tail <= next_cell;
+--  address_a_tail <= next_cell;
 
-  p_update_tail : process (gamelogic_state, next_cell)
-  begin
-    if (gamelogic_state = TAIL) then
-      tail_write_data <= (others => '0');
-      tail_done       <= '1';
-    else
-      tail_done <= '0';
-    end if;
-  end process p_update_tail;
+--  p_update_tail : process (gamelogic_state, next_cell)
+--  begin
+--    if (gamelogic_state = TAIL) then
+--      tail_write_data <= (others => '0');
+--      tail_done       <= '1';
+--    else
+--      tail_done <= '0';
+--    end if;
+--  end process p_update_tail;
 
 
 end Behavioral;
