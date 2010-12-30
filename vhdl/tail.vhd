@@ -27,8 +27,18 @@ end tail_logic;
 
 architecture Behavioral of tail_logic is
 
+
+  signal address_a_tail_int  : unsigned(12 downto 0) := (others => '0');
+  signal tail_write_data_int : unsigned(11 downto 0) := (others => '0');
+  signal tail_done_int       : std_logic             := '0';
+
 begin
-  
+
+  address_a_tail  <= address_a_tail_int;
+  tail_write_data <= tail_write_data_int;
+  tail_done       <= tail_done_int;
+
+
 --  address_a_tail <= next_cell;
 
 --  p_update_tail : process (gamelogic_state, next_cell)
