@@ -41,11 +41,11 @@ architecture Behavioral of check_logic is
 
   signal current_direction_int : unsigned(2 downto 0)  := "001";
   signal next_direction        : unsigned(2 downto 0)  := "001";
-  signal current_cell          : unsigned(12 downto 0) := to_unsigned(2520, 13);
-  signal next_cell_int         : unsigned(12 downto 0) := to_unsigned(2440, 13);
-  signal checking              : unsigned(1 downto 0)  := (others => '0');
+  signal current_cell          : unsigned(12 downto 0) := to_unsigned(2440, 13);
+  signal next_cell_int         : unsigned(12 downto 0) := to_unsigned(2360, 13);
+  signal checking              : unsigned(2 downto 0)  := (others => '0');
   signal old_direction_out_int : unsigned(2 downto 0)  := "001";
-  signal address_a_check_int   : unsigned(12 downto 0) := (others => '0');
+  signal address_a_check_int   : unsigned(12 downto 0) := to_unsigned(2360, 13);
 
   
 begin
@@ -68,10 +68,10 @@ begin
       crashed               <= '0';
       check_done            <= '0';
       nochange              <= '1';
-      checking              <= "00";
-      current_cell          <= to_unsigned(2520, current_cell'length);
+      checking              <= "000";
+      current_cell          <= to_unsigned(2440, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up
-      next_cell_int         <= to_unsigned(2440, next_cell_int'length);
+      next_cell_int         <= to_unsigned(2360, next_cell_int'length);
       old_direction_out_int <= "001";
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
@@ -81,9 +81,11 @@ begin
         else
           nochange <= '1';
         end if;
-        if (checking = "00") then
-          check_done            <= '0';
-          checking              <= "01";
+        if (checking = "000") then
+          check_done <= '0';
+          checking   <= "001";
+        elsif (checking = "001") then
+          checking              <= "010";
           current_direction_int <= next_direction;
           if (next_direction = "001") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
@@ -94,25 +96,25 @@ begin
           elsif (next_direction = "100") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
           end if;
-        elsif (checking = "01") then
-          checking            <= "10";
+        elsif (checking = "010") then
+          checking            <= "011";
           address_a_check_int <= next_cell_int;
           current_cell        <= next_cell_int;
-        elsif (checking = "10") then
-          checking <= "11";
+        elsif (checking = "011") then
+          checking <= "100";
           if (to_integer(check_read_data) = 0) then
             crashed <= '0';
           else
             crashed <= '1';
           end if;
-        elsif (checking = "11") then
-          checking   <= "00";
+        elsif (checking = "100") then
+          checking   <= "000";
           check_done <= '1';
         end if;
       else
         check_done <= '0';
         crashed    <= '0';
-        checking   <= "00";
+        checking   <= "000";
       end if;
     end if;
   end process p_collision_checker;
