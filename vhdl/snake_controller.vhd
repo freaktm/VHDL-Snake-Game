@@ -199,10 +199,8 @@ begin
       clk25          => clk25,
       write_enable_a => WEA,
       enable_a       => EN,
---      addr_a         => std_logic_vector(address_a),
---      addr_b         => std_logic_vector(address_b),
-      addr_a         => address_a,
-      addr_b         => address_b,
+      addr_a         => std_logic_vector(address_a),
+      addr_b         => std_logic_vector(address_b),
       data_input_a   => data_i_a,
       data_output_a  => data_o_a,
       data_output_b  => data_o_b);
