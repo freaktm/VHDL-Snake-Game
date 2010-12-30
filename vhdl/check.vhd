@@ -39,12 +39,12 @@ end check_logic;
 
 architecture Behavioral of check_logic is
 
-  signal current_direction_int : unsigned(2 downto 0);
-  signal next_direction        : unsigned(2 downto 0);
-  signal current_cell          : unsigned(12 downto 0);
-  signal next_cell_int         : unsigned(12 downto 0);
-  signal checking              : unsigned(1 downto 0);
-  signal old_direction_out_int : unsigned(2 downto 0) := "001";
+  signal current_direction_int : unsigned(2 downto 0)  := (others => '0');
+  signal next_direction        : unsigned(2 downto 0)  := (others => '0');
+  signal current_cell          : unsigned(12 downto 0) := (others => '0');
+  signal next_cell_int         : unsigned(12 downto 0) := (others => '0');
+  signal checking              : unsigned(1 downto 0)  := (others => '0');
+  signal old_direction_out_int : unsigned(2 downto 0)  := "001";
 
   
 begin
