@@ -29,15 +29,22 @@ end tailread_logic;
 
 architecture Behavioral of tailread_logic is
 
-  signal checking           : std_logic := '0';
-  signal current_cell       : unsigned(12 downto 0) := (others => '0');
-  signal next_tail_cell_int : unsigned(12 downto 0) := (others => '0');
-  signal next_direction     : unsigned(2 downto 0) := (others => '0');
+  signal checking               : std_logic             := '0';
+  signal current_cell           : unsigned(12 downto 0) := (others => '0');
+  signal next_tail_cell_int     : unsigned(12 downto 0) := (others => '0');
+  signal next_direction         : unsigned(2 downto 0)  := (others => '0');
+  signal address_a_tailread_int : unsigned(12 downto 0) := (others => '0');
+  signal tailread_done_int      : std_logic             := '0';
+  
 
   
 begin
   
-  next_tail_cell <= next_tail_cell_int;
+  next_tail_cell     <= next_tail_cell_int;
+  address_a_tailread <= address_a_tailread_int;
+  tailread_done      <= tailread_done_int;
+
+
 
   --purpose: checks what the next_direction of the tail is before it  erases a cell
   --type   : sequential
@@ -62,7 +69,7 @@ begin
 --          elsif (next_direction = "100") then
 --            next_tail_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_tail_cell_int'length);
 --          end if;
---			 current_cell <= next_tail_cell_int;
+--                       current_cell <= next_tail_cell_int;
 --          address_a_tailread <= next_tail_cell_int;
 --        else
 --          checking       <= '0';
