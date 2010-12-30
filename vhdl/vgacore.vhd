@@ -43,15 +43,15 @@ end vga_core;
 architecture behavioral of vga_core is
 
   
-  signal hcounter     : unsigned(9 downto 0);  --1100100000 is 800
-  signal vcounter     : unsigned(9 downto 0);  --1000001001 is 521
-  signal pixelcount_w : unsigned(2 downto 0);  -- 8 pixels wide for each cell.
+  signal hcounter     : unsigned(9 downto 0)  := (others => '0');  --1100100000 is 800
+  signal vcounter     : unsigned(9 downto 0)  := (others => '0');  --1000001001 is 521
+  signal pixelcount_w : unsigned(2 downto 0)  := (others => '0');  -- 8 pixels wide for each cell.
   signal row_count    : unsigned(2 downto 0)  := "000";  -- 8 pixels deep for each cell.
   signal cell         : unsigned(12 downto 0) := "0000000000000";
-  signal x            : unsigned(9 downto 0);
-  signal y            : unsigned(9 downto 0);
-  signal x_temp       : unsigned(9 downto 0);
-  signal y_temp       : unsigned(9 downto 0);
+  signal x            : unsigned(9 downto 0)  := (others => '0');
+  signal y            : unsigned(9 downto 0)  := (others => '0');
+  signal x_temp       : unsigned(9 downto 0)  := (others => '0');
+  signal y_temp       : unsigned(9 downto 0)  := (others => '0');
 
 
 
@@ -74,28 +74,28 @@ begin
       -- and set its color to any value between 1 to 7. The following example simply sets
       -- the whole display area to a single-color wash, which is changed every one
       -- second.
-		
-		
-			x <= to_unsigned((to_integer(hcounter) - 144), x'length);
-			y <= to_unsigned((to_integer(vcounter) - 39), y'length);
-			x_temp <= "000" & x(9 downto 3);
-			y_temp <= "000" & y(9 downto 3);
+      
+      
+      x      <= to_unsigned((to_integer(hcounter) - 144), x'length);
+      y      <= to_unsigned((to_integer(vcounter) - 39), y'length);
+      x_temp <= "000" & x(9 downto 3);
+      y_temp <= "000" & y(9 downto 3);
 
-			if (to_integer(hcounter) < 144) and (to_integer(vcounter) < 39) then
-				cell <= (others => '0');
-				else
-					cell   <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
-			end if;
+      if (to_integer(hcounter) < 144) and (to_integer(vcounter) < 39) then
+        cell <= (others => '0');
+      else
+        cell <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
+      end if;
 
       if (to_integer(hcounter) >= 144)    -- 144
         and (to_integer(hcounter) < 808)  -- 784
         and (to_integer(vcounter) >= 39)  -- 39
         and (to_integer(vcounter) < 519)  -- 519
       then
-      
-          red_out   <= '0';
-          green_out <= '0';
-          blue_out  <= pixel;
+        
+        red_out   <= '0';
+        green_out <= '0';
+        blue_out  <= pixel;
 
       else
         red_out   <= '0';
@@ -125,7 +125,7 @@ begin
       -- Front porch: Tfp = 8000 cycles (10 lines)
       -- Sync pulse time (total cycles) Ts = 416800 cycles (521 lines)
       if (to_integer(vcounter) > 0)
-        and (to_integer(vcounter) < 3)   -- 2+1
+        and (to_integer(vcounter) < 3)    -- 2+1
       then
         vs_out_int <= '0';
       else
@@ -134,11 +134,11 @@ begin
       -- horizontal counts from 0 to 799 , checks if it has counted to 800
       hcounter <= hcounter+1;
       if (to_integer(hcounter) = 800) then
-        vcounter  <= vcounter+1;
-        hcounter  <= (others => '0');
-		  if (vcounter > 39) then
-        row_count <= row_count + 1;
-		  end if;
+        vcounter <= vcounter+1;
+        hcounter <= (others => '0');
+        if (vcounter > 39) then
+          row_count <= row_count + 1;
+        end if;
         if (to_integer(row_count) = 8) then
           row_count <= (others => '0');
         end if;
