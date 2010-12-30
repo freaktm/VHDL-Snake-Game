@@ -37,7 +37,7 @@ architecture Behavioral of corner_logic is
   signal snake_character       : unsigned(8 downto 0)         := (others => '0');
   signal counting              : std_logic_vector(1 downto 0) := "00";
   signal corner_done_int       : std_logic                    := '0';
-  signal corner_write_data_int : unsigned(11 downto 0)        := (others <= '0');
+  signal corner_write_data_int : unsigned(11 downto 0)        := (others => '0');
   
 begin
   
