@@ -6,7 +6,7 @@
 -- Author     : CompSci temp account 2  <cs002@nui.cs.waikato.ac.nz>
 -- Company    : 
 -- Created    : 2010-12-17
--- Last update: 2010-12-24
+-- Last update: 2010-12-31
 -- Platform   : 
 -- Standard   : VHDL'87
 -------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ begin  -- tb
        ext_reset <= '1';
        wait for 100 ns;
        ext_reset <= '0';
-       wait for 1000 ns;
+       wait for 5000 ns;
        keyboard <= "010";
        
        wait;
