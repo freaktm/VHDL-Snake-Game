@@ -36,10 +36,11 @@ end KeyboardController;
 
 architecture Behavioral of KeyboardController is
 
-  signal bitCount      : integer range 0 to 10 := 0;
-  signal scancodeReady : std_logic             := '0';
-  signal scancode      : std_logic_vector(7 downto 0);
-  signal breakReceived : std_logic             := '0';
+  signal bitCount      : integer range 0 to 10        := 0;
+  signal scancodeReady : std_logic                    := '0';
+  signal scancode      : std_logic_vector(7 downto 0) := (others => '0');
+  signal breakReceived : std_logic                    := '0';
+  signal KDirection    : unsigned(2 downto 0)         := (others => '0');
 
   constant keyboardA     : std_logic_vector(7 downto 0) := X"1C";
   constant keyboardD     : std_logic_vector(7 downto 0) := X"23";
@@ -48,6 +49,8 @@ architecture Behavioral of KeyboardController is
   constant keyboardSPACE : std_logic_vector(7 downto 0) := X"29";
 
 begin
+
+  Direction <= KDirection;
 
   scankeyboard : process(KeyboardClock)
   begin
@@ -81,17 +84,17 @@ begin
         end if;
 
         if scancode = keyboardW then
-          Direction <= "001";
+          KDirection <= "001";
         elsif scancode = keyboardD then
-          Direction <= "010";
+          KDirection <= "010";
         elsif scancode = keyboardS then
-          Direction <= "011";
+          KDirection <= "011";
         elsif scancode = keyboardA then
-          Direction <= "100";
+          KDirection <= "100";
         elsif scancode = keyboardSPACE then
-          Direction <= "101";
+          KDirection <= "101";
         else
-          Direction <= "000";
+          KDirection <= "000";
         end if;
       end if;
     end if;
