@@ -93,7 +93,7 @@ begin
     tail_readcell  when READTAIL,
     tail_writecell when TAIL,
     score_cell     when SCORE,
-    reset_cell     when others;
+    check_cell     when others;
 
 
   with gamelogic_state select
