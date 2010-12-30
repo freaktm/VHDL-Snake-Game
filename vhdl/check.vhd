@@ -105,7 +105,7 @@ begin
           if (to_integer(check_read_data) = 0) then
             crashed <= '0';
           else
-            crashed <= '0';
+            crashed <= '1';
           end if;
         elsif (checking = "100") then
           checking   <= "000";
