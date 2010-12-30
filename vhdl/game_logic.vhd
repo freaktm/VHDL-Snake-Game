@@ -154,39 +154,39 @@ architecture Behavioral of game_logic is
       );
   end component;
 
-  signal tick                  : std_logic;
-  signal nochange_int          : std_logic;
-  signal check_done_int        : std_logic;
-  signal reset_done_int        : std_logic;
-  signal head_done_int         : std_logic;
-  signal tail_done_int         : std_logic;
-  signal score_done_int        : std_logic;
-  signal crashed_int           : std_logic;
-  signal corner_done_int       : std_logic;
+  signal tick                  : std_logic             := '0';
+  signal nochange_int          : std_logic             := '0';
+  signal check_done_int        : std_logic             := '0';
+  signal reset_done_int        : std_logic             := '0';
+  signal head_done_int         : std_logic             := '0';
+  signal tail_done_int         : std_logic             := '0';
+  signal score_done_int        : std_logic             := '0';
+  signal crashed_int           : std_logic             := '0';
+  signal corner_done_int       : std_logic             := '0';
   signal corner_data_int       : unsigned(11 downto 0);
   signal gamelogic_state       : gamelogic_state_t;
-  signal head_write_data_int   : unsigned(11 downto 0);
-  signal head_cell_int         : unsigned(12 downto 0);
-  signal corner_write_data_int : unsigned(11 downto 0);
-  signal corner_cell_int       : unsigned(12 downto 0);
-  signal tail_write_data_int   : unsigned(11 downto 0);
-  signal tail_read_data_int    : unsigned(11 downto 0);
-  signal tail_readcell_int     : unsigned(12 downto 0);
-  signal tail_writecell_int    : unsigned(12 downto 0);
-  signal score_write_data_int  : unsigned(11 downto 0);
-  signal score_cell_int        : unsigned(12 downto 0);
-  signal score_int             : unsigned(13 downto 0);
-  signal reset_data_int        : unsigned(11 downto 0);
-  signal reset_cell_int        : unsigned(12 downto 0);
-  signal address_a_int         : unsigned(12 downto 0);
-  signal next_direction        : unsigned(2 downto 0);
-  signal check_cell_int        : unsigned(12 downto 0);
-  signal check_read_data_int   : unsigned(11 downto 0);
-  signal current_direction_int : unsigned(2 downto 0);
-  signal old_direction_int     : unsigned(2 downto 0);
-  signal next_cell_int         : unsigned(12 downto 0);
-  signal tailread_done_int     : std_logic;
-  signal next_tail_cell_int    : unsigned(12 downto 0);
+  signal head_write_data_int   : unsigned(11 downto 0) := (others => '0');
+  signal head_cell_int         : unsigned(12 downto 0) := (others => '0');
+  signal corner_write_data_int : unsigned(11 downto 0) := (others => '0');
+  signal corner_cell_int       : unsigned(12 downto 0) := (others => '0');
+  signal tail_write_data_int   : unsigned(11 downto 0) := (others => '0');
+  signal tail_read_data_int    : unsigned(11 downto 0) := (others => '0');
+  signal tail_readcell_int     : unsigned(12 downto 0) := (others => '0');
+  signal tail_writecell_int    : unsigned(12 downto 0) := (others => '0');
+  signal score_write_data_int  : unsigned(11 downto 0) := (others => '0');
+  signal score_cell_int        : unsigned(12 downto 0) := (others => '0');
+  signal score_int             : unsigned(13 downto 0) := (others => '0');
+  signal reset_data_int        : unsigned(11 downto 0) := (others => '0');
+  signal reset_cell_int        : unsigned(12 downto 0) := (others => '0');
+  signal address_a_int         : unsigned(12 downto 0) := (others => '0');
+  signal next_direction        : unsigned(2 downto 0)  := "001";
+  signal check_cell_int        : unsigned(12 downto 0) := (others => '0');
+  signal check_read_data_int   : unsigned(11 downto 0) := (others => '0');
+  signal current_direction_int : unsigned(2 downto 0)  := (others => '0');
+  signal old_direction_int     : unsigned(2 downto 0)  := (others => '0');
+  signal next_cell_int         : unsigned(12 downto 0) := (others => '0');
+  signal tailread_done_int     : std_logic             := '0';
+  signal next_tail_cell_int    : unsigned(12 downto 0) := (others => '0');
   
 begin
 
@@ -306,6 +306,7 @@ begin
   begin
     if (ext_reset = '1') then           --asynchronous reset (active high)
       tick <= '0';
+      cnt  <= '0';
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
       if (cnt = 250) then
