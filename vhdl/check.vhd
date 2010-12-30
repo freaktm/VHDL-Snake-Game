@@ -39,18 +39,20 @@ end check_logic;
 
 architecture Behavioral of check_logic is
 
-  signal current_direction_int : unsigned(2 downto 0)  := (others => '0');
-  signal next_direction        : unsigned(2 downto 0)  := (others => '0');
-  signal current_cell          : unsigned(12 downto 0) := (others => '0');
-  signal next_cell_int         : unsigned(12 downto 0) := (others => '0');
+  signal current_direction_int : unsigned(2 downto 0)  := "001";
+  signal next_direction        : unsigned(2 downto 0)  := "001";
+  signal current_cell          : unsigned(12 downto 0) := to_unsigned(2520, 13);
+  signal next_cell_int         : unsigned(12 downto 0) := to_unsigned(2440, 13);
   signal checking              : unsigned(1 downto 0)  := (others => '0');
   signal old_direction_out_int : unsigned(2 downto 0)  := "001";
+  signal address_a_check_int   : unsigned(12 downto 0) := (others => '0');
 
   
 begin
   
   old_direction_out     <= old_direction_out_int;
   current_direction_out <= current_direction_int;
+  address_a_check       <= address_a_check_int;
 
   next_direction <= keyboard;
   next_cell      <= next_cell_int;
@@ -93,9 +95,9 @@ begin
             next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
           end if;
         elsif (checking = "01") then
-          checking        <= "10";
-          address_a_check <= next_cell_int;
-          current_cell    <= next_cell_int;
+          checking            <= "10";
+          address_a_check_int <= next_cell_int;
+          current_cell        <= next_cell_int;
         elsif (checking = "10") then
           checking <= "11";
           if (to_integer(check_read_data) = 0) then
