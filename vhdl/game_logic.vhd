@@ -306,7 +306,7 @@ begin
   begin
     if (ext_reset = '1') then           --asynchronous reset (active high)
       tick <= '0';
-      cnt  <= '0';
+      cnt  := 0;
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
       if (cnt = 250) then

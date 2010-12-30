@@ -117,22 +117,21 @@ architecture behavioral of MAINBOARD is
   end component;
 
 
-  signal clk25          : std_logic;
-  -- signal clk50          : std_logic;
-  signal clk_slow       : std_logic;    -- game logic clock
-  signal WEA            : std_logic;
-  signal EN             : std_logic;
-  signal address_a      : unsigned(12 downto 0);
-  signal address_b      : unsigned(12 downto 0);
-  signal data_i_a       : unsigned(11 downto 0);
-  signal data_o_a       : unsigned(11 downto 0);
-  signal data_o_b       : unsigned(11 downto 0);
-  signal number_data    : unsigned(7 downto 0);
-  signal number_address : unsigned(8 downto 0);
-  signal strobe_sig     : std_logic;
-  signal dout_int       : std_logic;
-  signal din_int        : unsigned(7 downto 0);
-  signal Direction_int  : unsigned(2 downto 0);
+  signal clk25          : std_logic             := '0';
+  signal clk_slow       : std_logic             := '0';  -- game logic clock
+  signal WEA            : std_logic             := '0';
+  signal EN             : std_logic             := '0';
+  signal address_a      : unsigned(12 downto 0) := (others => '0');
+  signal address_b      : unsigned(12 downto 0) := (others => '0');
+  signal data_i_a       : unsigned(11 downto 0) := (others => '0');
+  signal data_o_a       : unsigned(11 downto 0) := (others => '0');
+  signal data_o_b       : unsigned(11 downto 0) := (others => '0');
+  signal number_data    : unsigned(7 downto 0)  := (others => '0');
+  signal number_address : unsigned(8 downto 0)  := (others => '0');
+  signal strobe_sig     : std_logic             := '0';
+  signal dout_int       : std_logic             := '0';
+  signal din_int        : unsigned(7 downto 0)  := (others => '0');
+  signal Direction_int  : unsigned(2 downto 0)  := (others => '0');
 
   
 
