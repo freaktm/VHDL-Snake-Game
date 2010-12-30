@@ -36,8 +36,8 @@ end head_logic;
 architecture Behavioral of head_logic is
 
 
-  signal snake_character : unsigned(8 downto 0);
-  signal checking        : std_logic_vector(1 downto 0) := "00";
+  signal snake_character : unsigned(8 downto 0)         := (others => '0');
+  signal checking        : std_logic_vector(1 downto 0) := (others => '0');
   
   
 begin
