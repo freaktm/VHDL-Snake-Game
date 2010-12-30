@@ -87,23 +87,24 @@ begin
 
   with gamelogic_state select
     address_a_int <=
-    check_cell     when CHECK,
+    -- check_cell     when CHECK,
     head_cell      when HEAD,
     corner_cell    when CORNER,
     tail_readcell  when READTAIL,
     tail_writecell when TAIL,
     score_cell     when SCORE,
+    reset_cell     when RESET,
     check_cell     when others;
 
 
   with gamelogic_state select
     write_enable <=
-    WE_EN when HEAD,
-    WE_EN when TAIL,
-    WE_EN when RESET,
-    WE_EN when CORNER,
-    WE_EN when SCORE,
-    WE_OFF  when others;
+    WE_EN  when HEAD,
+    WE_EN  when TAIL,
+    WE_EN  when RESET,
+    WE_EN  when CORNER,
+    WE_EN  when SCORE,
+    WE_OFF when others;
 
 
   tail_read_data  <= output_a_int;
