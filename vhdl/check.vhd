@@ -76,15 +76,14 @@ begin
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
         old_direction_out_int <= current_direction_int;
-        if (current_direction_int /= next_direction) then
-          nochange <= '0';
-        else
-          nochange <= '1';
-        end if;
-
         if (checking = "000") then
-          check_done            <= '0';
-          checking              <= "001";
+          check_done <= '0';
+          checking   <= "001";
+          if (current_direction_int /= next_direction) then
+            nochange <= '0';
+          else
+            nochange <= '1';
+          end if;
           current_direction_int <= next_direction;
           if (next_direction = "001") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
