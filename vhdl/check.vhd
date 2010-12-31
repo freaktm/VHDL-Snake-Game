@@ -81,11 +81,10 @@ begin
         else
           nochange <= '1';
         end if;
+
         if (checking = "000") then
-          check_done <= '0';
-          checking   <= "001";
-        elsif (checking = "001") then
-          checking              <= "010";
+          check_done            <= '0';
+          checking              <= "001";
           current_direction_int <= next_direction;
           if (next_direction = "001") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
@@ -96,18 +95,18 @@ begin
           elsif (next_direction = "100") then
             next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
           end if;
-        elsif (checking = "010") then
-          checking            <= "011";
+        elsif (checking = "001") then
+          checking            <= "010";
           address_a_check_int <= next_cell_int;
           current_cell        <= next_cell_int;
-        elsif (checking = "011") then
-          checking <= "100";
+        elsif (checking = "010") then
+          checking <= "011";
           if (to_integer(check_read_data) = 0) then
             crashed <= '0';
           else
             crashed <= '1';
           end if;
-        elsif (checking = "100") then
+        elsif (checking = "011") then
           checking   <= "000";
           check_done <= '1';
         end if;
