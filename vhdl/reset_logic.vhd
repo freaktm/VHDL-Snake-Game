@@ -45,10 +45,15 @@ end reset_logic;
 architecture Behavioral of reset_logic is
 
 
-
+  signal reset_done_int       : std_logic             := '0';
+  signal reset_write_data_int : unsigned(11 downto 0) := (others => '0');
+  signal address_a_reset_int  : unsigned(12 downto 0) := (others => '0');
 
 begin
-  
+
+  reset_done       <= reset_done_int;
+  reset_write_data <= reset_write_data_int;
+  address_a_reset  <= address_a_reset_int;
 
   p_reset_state : process (clk25, ext_reset)
     variable ramcnt_i : integer;
@@ -56,30 +61,30 @@ begin
   begin
     
     if (ext_reset = '1') then           --asynchronous reset (active high)
-      reset_done <= '0';
-      address_a_reset <= (others => '0');
-      reset_write_data <= (others => '0');
+      reset_done_int       <= '0';
+      address_a_reset_int  <= (others => '0');
+      reset_write_data_int <= (others => '0');
     elsif clk25'event and clk25 = '1' then
       if (gamelogic_state = RESET) then
-        reset_write_data <= (others => '0');
-        ramcnt_i         := ramcnt_i + 1;
+        reset_write_data_int <= (others => '0');
+        ramcnt_i             := ramcnt_i + 1;
         if (ramcnt_i = 80) then
           ramcnt_j := ramcnt_j + 1;
           ramcnt_i := 0;
           if (ramcnt_j = 55) then
-            reset_done <= '1';
-            ramcnt_i := 0;
-            ramcnt_j := 0;
+            reset_done_int <= '1';
+            ramcnt_i       := 0;
+            ramcnt_j       := 0;
           end if;
         elsif (ramcnt_i > 0) and (ramcnt_i < 79) and (ramcnt_j > 0) and (ramcnt_j < 55) then
-          address_a_reset  <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_reset'length);
-          reset_write_data <= (others => '0');
+          address_a_reset_int  <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_reset_int'length);
+          reset_write_data_int <= (others => '0');
         else
-          address_a_reset  <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_reset'length);
-          reset_write_data <= to_unsigned(8, reset_write_data'length);
+          address_a_reset_int  <= to_unsigned((ramcnt_j*80) + ramcnt_i, address_a_reset_int'length);
+          reset_write_data_int <= to_unsigned(8, reset_write_data_int'length);
         end if;
       else
-        reset_done <= '0';
+        reset_done_int <= '0';
       end if;
     end if;
   end process p_reset_state;
