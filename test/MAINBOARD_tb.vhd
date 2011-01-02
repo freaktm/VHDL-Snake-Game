@@ -139,7 +139,7 @@ begin  -- tb
 
 
 
-    wait for 1000 ns;
+    wait for 5000 ns;
 
     --simulate down keyboard press
     wait until clk'event and clk = '1';
@@ -160,7 +160,7 @@ begin  -- tb
 
 
 
-        wait for 1000 ns;
+        wait for 5000 ns;
 
     --simulate right keyboard press
     wait until clk'event and clk = '1';
