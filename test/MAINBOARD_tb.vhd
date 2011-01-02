@@ -120,7 +120,7 @@ begin  -- tb
 
     wait for 10000 ns;
 
-    --simulate right keyboard press
+    --simulate left keyboard press
     wait until clk'event and clk = '1';
     keyboard_data_in <= X"1C";
     keyboard_wr_en   <= '1';
@@ -139,7 +139,7 @@ begin  -- tb
 
 
 
-    wait for 10000 ns;
+    wait for 1000 ns;
 
     --simulate down keyboard press
     wait until clk'event and clk = '1';
@@ -158,6 +158,26 @@ begin  -- tb
     wait until clk'event and clk = '1';
     keyboard_wr_en   <= '0';
 
+
+
+        wait for 1000 ns;
+
+    --simulate right keyboard press
+    wait until clk'event and clk = '1';
+    keyboard_data_in <= X"23";
+    keyboard_wr_en   <= '1';
+    wait until clk'event and clk = '1';
+    keyboard_wr_en   <= '0';
+
+    wait until keyboard_ready = '1';
+    wait for 1000 ns;
+
+    --simulate keyboard break (release key)
+    wait until clk'event and clk = '1';
+    keyboard_data_in <= X"F0";
+    keyboard_wr_en   <= '1';
+    wait until clk'event and clk = '1';
+    keyboard_wr_en   <= '0';
 
     wait;
   end process WaveGen_Proc;
