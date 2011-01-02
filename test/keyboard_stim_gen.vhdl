@@ -19,7 +19,7 @@ end keyboard_stim_gen;
 architecture rtl of keyboard_stim_gen is
 
 
-  type state_t is (IDLE, TRANSMITTING, PARITY, STOPBIT, STARTBIT);
+  type state_t is (IDLE, TRANSMITTING, PARITY, STOPBIT, STARTBIT, CLOCK0, CLOCK1);
   signal state : state_t;
   
   signal counter : unsigned(5 downto 0);
@@ -28,7 +28,13 @@ architecture rtl of keyboard_stim_gen is
   
 begin  -- rtl
 
-  data_out <= data_int(0);
+  with state select
+    data_out <=
+    data_int(0) when TRANSMITTING,
+    '0'           when others;
+  
+  
+--  data_out <= data_int(0);
   clk_out <= not counter(2);
 
   with state select
@@ -70,9 +76,14 @@ begin  -- rtl
       elsif state=PARITY and counter(2 downto 0)="111" then
         state <= STOPBIT;
       elsif state=STOPBIT and counter(2 downto 0)="111" then
-        state <= IDLE;
+        state <= CLOCK0;
       elsif state=STARTBIT and counter(2 downto 0)="111" then
         state <= TRANSMITTING;
+      elsif state=CLOCK0 and counter(2 downto 0)="111" then
+        state <= IDLE;
+      elsif state=CLOCK1 and counter(2 downto 0)="111" then
+        state <= IDLE;
+
       end if;
      
     end if;
