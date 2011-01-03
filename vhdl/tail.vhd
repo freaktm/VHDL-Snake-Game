@@ -19,7 +19,7 @@ use work.gamelogic_pkg.all;
 entity tail_logic is
   port(
     gamelogic_state    : in  gamelogic_state_t;
-    clk25              : in  std_logic;
+    clk_slow           : in  std_logic;
     ext_reset          : in  std_logic;
     address_a_tailread : out unsigned(12 downto 0);
     tail_read_data     : in  unsigned(11 downto 0);
@@ -29,7 +29,7 @@ end tail_logic;
 
 architecture Behavioral of tail_logic is
 
-  signal                : std_logic             := '0';
+  signal                        : std_logic             := '0';
   signal current_cell           : unsigned(12 downto 0) := (others => '0');
   signal next_tail_cell_int     : unsigned(12 downto 0) := (others => '0');
   signal next_direction         : unsigned(2 downto 0)  := (others => '0');
@@ -49,14 +49,14 @@ begin
   --purpose: checks what the next_direction of the tail is before it  erases a cell
   --type   : sequential
 
-  p_tail_checker : process (clk25, ext_reset)
+  p_tail_checker : process (clk_slow, ext_reset)
   begin  -- process p_collision_checker
     if (ext_reset = '1') then           --  asynchronous reset (active high)
       tailread_done_int  <= '0';
       next_direction     <= "001";      -- reset to moving up
       current_cell       <= to_unsigned(2600, current_cell'length);
       next_tail_cell_int <= to_unsigned(2520, next_tail_cell'length);
-    elsif clk25'event and clk25 = '1' then  --     rising clock edge
+    elsif clk_slow'event and clk_slow = '1' then  --     rising clock edge
       if (gamelogic_state = TAIL)then
         if (checking = '0') then
           checking <= '1';

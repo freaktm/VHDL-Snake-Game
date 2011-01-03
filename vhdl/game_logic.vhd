@@ -79,7 +79,7 @@ architecture Behavioral of game_logic is
   component tail_logic is
     port(
       gamelogic_state    : in  gamelogic_state_t;
-      clk25              : in  std_logic;
+      clk_slow           : in  std_logic;
       ext_reset          : in  std_logic;
       address_a_tailread : out unsigned(12 downto 0);
       tail_read_data     : in  unsigned(11 downto 0);
@@ -207,7 +207,7 @@ begin
   TAIL_CNTRL : tail_logic
     port map (
       gamelogic_state    => gamelogic_state,
-      clk25              => clk25,
+      clk_slow           => clk_slow,
       ext_reset          => ext_reset,
       address_a_tailread => tail_readcell_int,
       tail_read_data     => tail_read_data_int,
