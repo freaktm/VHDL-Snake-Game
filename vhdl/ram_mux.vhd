@@ -3,7 +3,7 @@
 --
 -- Author: Aaron Storey
 -- 
--- Description: This module controls the game logic for the snake physics etc.
+-- Description: This module controls the ram mux for the game logic
 --              
 -- 
 -- 
@@ -86,13 +86,13 @@ begin
 
   with gamelogic_state select
     address_a_int <=
-    head_cell     when HEAD,
-    corner_cell   when CORNER,
-    tail_readcell when TAIL_READ,
-    tail_cell     when TAIL_WRITE,
-    score_cell    when SCORE,
-    reset_cell    when RESET,
-    check_cell    when others;
+    head_cell   when HEAD,
+    corner_cell when CORNER,
+    tail_cell   when TAIL_READ,
+    tail_cell   when TAIL_WRITE,
+    score_cell  when SCORE,
+    reset_cell  when RESET,
+    check_cell  when others;
 
 
   with gamelogic_state select
