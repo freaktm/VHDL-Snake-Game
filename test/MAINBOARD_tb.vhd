@@ -6,7 +6,7 @@
 -- Author     : Aaron Storey  <freaktm@freaktm>
 -- Company    : 
 -- Created    : 2010-12-26
--- Last update: 2011-01-02
+-- Last update: 2011-01-03
 -- Platform   : 
 -- Standard   : VHDL'87
 -------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ begin  -- tb
 
 
 
-    wait for 5000 ns;
+    wait for 10000 ns;
 
     --simulate down keyboard press
     wait until clk'event and clk = '1';
@@ -160,7 +160,7 @@ begin  -- tb
 
 
 
-        wait for 5000 ns;
+        wait for 10000 ns;
 
     --simulate right keyboard press
     wait until clk'event and clk = '1';
