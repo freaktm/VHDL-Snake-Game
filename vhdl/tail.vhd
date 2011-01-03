@@ -3,7 +3,8 @@
 --
 -- Author: Aaron Storey
 -- 
--- Description: This module controls the game logic for the snake physics etc.
+-- Description: This module controls the TAILREAD logic for the gamelogic_state
+-- 
 --              
 -- Assisted by:
 --
@@ -17,39 +18,71 @@ use work.gamelogic_pkg.all;
 
 entity tail_logic is
   port(
-    gamelogic_state : in  gamelogic_state_t;
-    address_a_tail  : out unsigned(12 downto 0);
-    tail_write_data : out unsigned(11 downto 0);
-    tail_done       : out std_logic;
-    next_cell       : in  unsigned(12 downto 0)
+    gamelogic_state    : in  gamelogic_state_t;
+    clk25              : in  std_logic;
+    ext_reset          : in  std_logic;
+    address_a_tailread : out unsigned(12 downto 0);
+    tail_read_data     : in  unsigned(11 downto 0);
+    tailread_done      : out std_logic
     );
 end tail_logic;
 
 architecture Behavioral of tail_logic is
 
+  signal                : std_logic             := '0';
+  signal current_cell           : unsigned(12 downto 0) := (others => '0');
+  signal next_tail_cell_int     : unsigned(12 downto 0) := (others => '0');
+  signal next_direction         : unsigned(2 downto 0)  := (others => '0');
+  signal address_a_tailread_int : unsigned(12 downto 0) := (others => '0');
+  signal tailread_done_int      : std_logic             := '0';
+  
 
-  signal address_a_tail_int  : unsigned(12 downto 0) := (others => '0');
-  signal tail_write_data_int : unsigned(11 downto 0) := (others => '0');
-  signal tail_done_int       : std_logic             := '0';
-
+  
 begin
+  
+  next_tail_cell     <= next_tail_cell_int;
+  address_a_tailread <= address_a_tailread_int;
+  tailread_done      <= tailread_done_int;
 
-  address_a_tail  <= address_a_tail_int;
-  tail_write_data <= tail_write_data_int;
-  tail_done       <= tail_done_int;
 
 
---  address_a_tail <= next_cell;
+  --purpose: checks what the next_direction of the tail is before it  erases a cell
+  --type   : sequential
 
---  p_update_tail : process (gamelogic_state, next_cell)
---  begin
---    if (gamelogic_state = TAIL) then
---      tail_write_data <= (others => '0');
---      tail_done       <= '1';
---    else
---      tail_done <= '0';
---    end if;
---  end process p_update_tail;
+  p_tail_checker : process (clk25, ext_reset)
+  begin  -- process p_collision_checker
+    if (ext_reset = '1') then           --  asynchronous reset (active high)
+      tailread_done_int  <= '0';
+      next_direction     <= "001";      -- reset to moving up
+      current_cell       <= to_unsigned(2600, current_cell'length);
+      next_tail_cell_int <= to_unsigned(2520, next_tail_cell'length);
+    elsif clk25'event and clk25 = '1' then  --     rising clock edge
+      if (gamelogic_state = TAIL)then
+        if (checking = '0') then
+          checking <= '1';
+          if (next_direction = "001") then
+            next_tail_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_tail_cell_int'length);
+          elsif (next_direction = "010") then
+            next_tail_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_tail_cell_int'length);
+          elsif (next_direction = "011") then
+            next_tail_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_tail_cell_int'length);
+          elsif (next_direction = "100") then
+            next_tail_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_tail_cell_int'length);
+          end if;
+          current_cell           <= next_tail_cell_int;
+          address_a_tailread_int <= next_tail_cell_int;
+        else
+          checking          <= '0';
+          next_direction    <= tail_read_data(11 downto 9);
+          tailread_done_int <= '1';
+        end if;
+      else
+        tailread_done_int <= '0';
+        checking          <= '0';
+      end if;
+    end if;
+  end process p_tail_checker;
+
 
 
 end Behavioral;
