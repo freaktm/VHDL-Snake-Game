@@ -3,7 +3,7 @@
 --
 -- Author: Aaron Storey
 -- 
--- Description: This module controls the TAILREAD logic for the gamelogic_state
+-- Description: This module controls the TAIL logic for the gamelogic_state
 -- 
 --              
 -- Assisted by:
@@ -50,7 +50,9 @@ begin
 
 
 
-  --purpose: checks what the next_direction of the tail is before it  erases a cell
+  --purpose: Updates the next_direction of the tail before it erases the
+  -- next tail cell
+
   --type   : sequential
 
   p_tail_checker : process (clk_slow, ext_reset)
@@ -74,10 +76,9 @@ begin
             next_tail_cell_int <= to_unsigned(to_integer(next_tail_cell_int) - 1, next_tail_cell_int'length);
           end if;
         elsif (state = "01") then
-          next_direction <= tail_read_data(11 downto 9);
-        else
-          state             <= (others => '0');
+          next_direction    <= tail_read_data(11 downto 9);
           tailread_done_int <= '1';
+          state             <= (others => '0');
         end if;
       else
         tailread_done_int <= '0';
