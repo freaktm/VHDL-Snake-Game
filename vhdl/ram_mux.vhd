@@ -45,8 +45,7 @@ entity ram_mux is
     corner_cell       : in  unsigned(12 downto 0);
     tail_read_data    : out unsigned(11 downto 0);
     tail_write_data   : in  unsigned(11 downto 0);
-    tail_writecell    : in  unsigned(12 downto 0);
-    tail_readcell     : in  unsigned(12 downto 0);
+    tail_cell         : in  unsigned(12 downto 0);
     score_write_data  : in  unsigned(11 downto 0);
     score_cell        : in  unsigned(12 downto 0);
     reset_data        : in  unsigned(11 downto 0);
@@ -81,26 +80,25 @@ begin
     input_a_int <=
     head_write_data   when HEAD,
     corner_write_data when CORNER,
-    tail_write_data   when TAIL,
+    tail_write_data   when TAIL_WRITE,
     score_write_data  when SCORE,
     reset_data        when others;
 
   with gamelogic_state select
     address_a_int <=
-    -- check_cell     when CHECK,
-    head_cell      when HEAD,
-    corner_cell    when CORNER,
-    tail_readcell  when READTAIL,
-    tail_writecell when TAIL,
-    score_cell     when SCORE,
-    reset_cell     when RESET,
-    check_cell     when others;
+    head_cell     when HEAD,
+    corner_cell   when CORNER,
+    tail_readcell when TAIL_READ,
+    tail_cell     when TAIL_WRITE,
+    score_cell    when SCORE,
+    reset_cell    when RESET,
+    check_cell    when others;
 
 
   with gamelogic_state select
     write_enable <=
     WE_EN  when HEAD,
-    WE_EN  when TAIL,
+    WE_EN  when TAIL_WRITE,
     WE_EN  when RESET,
     WE_EN  when CORNER,
     WE_EN  when SCORE,
