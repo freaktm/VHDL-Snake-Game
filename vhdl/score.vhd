@@ -3,7 +3,7 @@
 --
 -- Author: Aaron Storey
 -- 
--- Description: This module controls the game logic for the snake physics etc.
+-- Description: This module controls the score logic for the game.
 --              
 -- Assisted by:
 --
