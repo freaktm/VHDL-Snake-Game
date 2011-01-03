@@ -77,14 +77,14 @@ architecture Behavioral of game_logic is
 
   component tail_logic is
     port(
-      gamelogic_state    : in  gamelogic_state_t;
-      clk_slow           : in  std_logic;
-      ext_reset          : in  std_logic;
-      address_a_tailread : out unsigned(12 downto 0);
-      tail_read_data     : in  unsigned(11 downto 0);
-      tail_write_data    : out unsigned(11 downto 0);
-      tailread_done      : out std_logic;
-      tailwrite_done     : out std_logic
+      gamelogic_state : in  gamelogic_state_t;
+      clk_slow        : in  std_logic;
+      ext_reset       : in  std_logic;
+      address_a_tail  : out unsigned(12 downto 0);
+      tail_read_data  : in  unsigned(11 downto 0);
+      tail_write_data : out unsigned(11 downto 0);
+      tailread_done   : out std_logic;
+      tailwrite_done  : out std_logic
       );
   end component;
 
@@ -206,14 +206,14 @@ begin
 
   TAIL_CNTRL : tail_logic
     port map (
-      gamelogic_state    => gamelogic_state,
-      clk_slow           => clk_slow,
-      ext_reset          => ext_reset,
-      address_a_tailread => tail_cell_int,
-      tail_read_data     => tail_read_data_int,
-      tail_write_data    => tail_write_data_int,
-      tailread_done      => tailread_done_int,
-      tailwrite_done     => tailwrite_done_int
+      gamelogic_state => gamelogic_state,
+      clk_slow        => clk_slow,
+      ext_reset       => ext_reset,
+      address_a_tail  => tail_cell_int,
+      tail_read_data  => tail_read_data_int,
+      tail_write_data => tail_write_data_int,
+      tailread_done   => tailread_done_int,
+      tailwrite_done  => tailwrite_done_int
       );
 
   SCORE_CNTRL : score_logic
