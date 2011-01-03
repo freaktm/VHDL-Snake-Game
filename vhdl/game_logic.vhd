@@ -58,8 +58,7 @@ architecture Behavioral of game_logic is
       corner_cell       : in  unsigned(12 downto 0);
       tail_read_data    : out unsigned(11 downto 0);
       tail_write_data   : in  unsigned(11 downto 0);
-      tail_writecell    : in  unsigned(12 downto 0);
-      tail_readcell     : in  unsigned(12 downto 0);
+      tail_cell         : in  unsigned(12 downto 0);
       score_write_data  : in  unsigned(11 downto 0);
       score_cell        : in  unsigned(12 downto 0);
       reset_data        : in  unsigned(11 downto 0);
@@ -83,7 +82,9 @@ architecture Behavioral of game_logic is
       ext_reset          : in  std_logic;
       address_a_tailread : out unsigned(12 downto 0);
       tail_read_data     : in  unsigned(11 downto 0);
-      tailread_done      : out std_logic
+      tail_write_data    : out unsigned(11 downto 0);
+      tailread_done      : out std_logic;
+      tailwrite_done     : out std_logic
       );
   end component;
 
@@ -149,7 +150,8 @@ architecture Behavioral of game_logic is
   signal check_done_int        : std_logic             := '0';
   signal reset_done_int        : std_logic             := '0';
   signal head_done_int         : std_logic             := '0';
-  signal tail_done_int         : std_logic             := '0';
+  signal tailread_done_int     : std_logic             := '0';
+  signal tailwrite_done_int    : std_logic             := '0';
   signal score_done_int        : std_logic             := '0';
   signal crashed_int           : std_logic             := '0';
   signal corner_done_int       : std_logic             := '0';
@@ -161,8 +163,7 @@ architecture Behavioral of game_logic is
   signal corner_cell_int       : unsigned(12 downto 0) := (others => '0');
   signal tail_write_data_int   : unsigned(11 downto 0) := (others => '0');
   signal tail_read_data_int    : unsigned(11 downto 0) := (others => '0');
-  signal tail_readcell_int     : unsigned(12 downto 0) := (others => '0');
-  signal tail_writecell_int    : unsigned(12 downto 0) := (others => '0');
+  signal tail_cell_int         : unsigned(12 downto 0) := (others => '0');
   signal score_write_data_int  : unsigned(11 downto 0) := (others => '0');
   signal score_cell_int        : unsigned(12 downto 0) := (others => '0');
   signal score_int             : unsigned(13 downto 0) := (others => '0');
@@ -175,8 +176,8 @@ architecture Behavioral of game_logic is
   signal current_direction_int : unsigned(2 downto 0)  := (others => '0');
   signal old_direction_int     : unsigned(2 downto 0)  := (others => '0');
   signal next_cell_int         : unsigned(12 downto 0) := (others => '0');
-  signal tailread_done_int     : std_logic             := '0';
-  signal next_tail_cell_int    : unsigned(12 downto 0) := (others => '0');
+
+
   
 begin
 
@@ -195,8 +196,7 @@ begin
       corner_cell       => corner_cell_int,
       tail_write_data   => tail_write_data_int,
       tail_read_data    => tail_read_data_int,
-      tail_writecell    => tail_writecell_int,
-      tail_readcell     => tail_readcell_int,
+      tail_cell         => tail_cell_int,
       score_write_data  => score_write_data_int,
       score_cell        => score_cell_int,
       reset_data        => reset_data_int,
@@ -209,9 +209,11 @@ begin
       gamelogic_state    => gamelogic_state,
       clk_slow           => clk_slow,
       ext_reset          => ext_reset,
-      address_a_tailread => tail_readcell_int,
+      address_a_tailread => tail_cell_int,
       tail_read_data     => tail_read_data_int,
-      tailread_done      => tailread_done_int
+      tail_write_data    => tail_write_data_int,
+      tailread_done      => tailread_done_int,
+      tailwrite_done     => tailwrite_done_int
       );
 
   SCORE_CNTRL : score_logic
@@ -290,8 +292,8 @@ begin
       cnt  := 0;
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
-      if (cnt = 2500000) then
-        --    if (cnt = 50) then
+      if (cnt = 1500000) then
+        --         if (cnt = 50) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
@@ -328,14 +330,18 @@ begin
           end if;
         when HEAD =>
           if (head_done_int = '1') then
-            gamelogic_state <= TAIL;
+            gamelogic_state <= TAIL_READ;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-            gamelogic_state <= TAIL;
+            gamelogic_state <= TAIL_READ;
           end if;
-        when TAIL =>
-          if (tail_done_int = '1') then
+        when TAIL_READ =>
+          if (tailread_done_int = '1') then
+            gamelogic_state <= TAIL_WRITE;
+          end if;
+        when TAIL_WRITE =>
+          if (tailwrite_done_int = '1') then
             gamelogic_state <= IDLE;
           end if;
         when SCORE =>
