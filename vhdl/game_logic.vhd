@@ -355,11 +355,11 @@ begin
           end if;
         when READTAIL =>
           if (tailread_done_int = '1') then
-            gamelogic_state <= IDLE;
+            gamelogic_state <= TAIL;
           end if;
         when TAIL =>
           if (tail_done_int = '1') then
-            gamelogic_state <= SCORE;
+            gamelogic_state <= IDLE;
           end if;
         when SCORE =>
           if (score_done_int = '1') then
