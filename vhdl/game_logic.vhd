@@ -292,8 +292,8 @@ begin
       cnt  := 0;
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
- --     if (cnt = 1500000) then
-                if (cnt = 50) then
+     if (cnt = 5000000) then
+   --             if (cnt = 50) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
