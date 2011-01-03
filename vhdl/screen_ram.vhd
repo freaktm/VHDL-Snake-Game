@@ -78,7 +78,9 @@ architecture syn of screen_ram is
 		        elsif (i = 40 and j = 30) then
           temp_ram(j*80+i) := "001000011000";  -- Snake Head  
 		        elsif (i = 40 and j = 31) then
-          temp_ram(j*80+i) := "001000011000";  -- Snake Tail 			 
+          temp_ram(j*80+i) := "001000011000";  -- Snake Body 		
+		        elsif (i = 40 and j = 32) then
+          temp_ram(j*80+i) := "001000011000";  -- Snake Tail 				 
         else
           temp_ram(j*80+i) := (others => '0');
         end if;
