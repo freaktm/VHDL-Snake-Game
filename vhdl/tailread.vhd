@@ -3,7 +3,8 @@
 --
 -- Author: Aaron Storey
 -- 
--- Description: This module controls the game logic for the snake physics etc.
+-- Description: This module controls the TAILREAD logic for the gamelogic_state
+-- 
 --              
 -- Assisted by:
 --
