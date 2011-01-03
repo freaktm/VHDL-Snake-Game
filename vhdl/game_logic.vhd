@@ -310,7 +310,7 @@ begin
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
       if (cnt = 2500000) then
- --    if (cnt = 50) then
+        --    if (cnt = 50) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
@@ -347,17 +347,15 @@ begin
           end if;
         when HEAD =>
           if (head_done_int = '1') then
-            -- gamelogic_state <= READTAIL;
-            gamelogic_state <= IDLE;
+            gamelogic_state <= READTAIL;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-            --   gamelogic_state <= READTAIL;
-            gamelogic_state <= IDLE;
+            gamelogic_state <= READTAIL;
           end if;
         when READTAIL =>
           if (tailread_done_int = '1') then
-            gamelogic_state <= TAIL;
+            gamelogic_state <= IDLE;
           end if;
         when TAIL =>
           if (tail_done_int = '1') then
