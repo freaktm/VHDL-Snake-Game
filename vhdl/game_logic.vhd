@@ -68,8 +68,12 @@ architecture Behavioral of game_logic is
 
   component score_logic is
     port(
+      ext_reset       : in  std_logic;
+      clk25           : in  std_logic;
+      clk_slow        : in  std_logic;
       gamelogic_state : in  gamelogic_state_t;
-      score           : out unsigned(13 downto 0);
+      score_address   : out unsigned(12 downto 0);
+      score_data      : out unsigned(11 downto 0);
       score_done      : out std_logic
       );
   end component;
@@ -164,9 +168,8 @@ architecture Behavioral of game_logic is
   signal tail_write_data_int   : unsigned(11 downto 0) := (others => '0');
   signal tail_read_data_int    : unsigned(11 downto 0) := (others => '0');
   signal tail_cell_int         : unsigned(12 downto 0) := (others => '0');
-  signal score_write_data_int  : unsigned(11 downto 0) := (others => '0');
-  signal score_cell_int        : unsigned(12 downto 0) := (others => '0');
-  signal score_int             : unsigned(13 downto 0) := (others => '0');
+  signal score_data_int        : unsigned(11 downto 0) := (others => '0');
+  signal score_address_int     : unsigned(12 downto 0) := (others => '0');
   signal reset_data_int        : unsigned(11 downto 0) := (others => '0');
   signal reset_cell_int        : unsigned(12 downto 0) := (others => '0');
   signal address_a_int         : unsigned(12 downto 0) := (others => '0');
@@ -197,8 +200,8 @@ begin
       tail_write_data   => tail_write_data_int,
       tail_read_data    => tail_read_data_int,
       tail_cell         => tail_cell_int,
-      score_write_data  => score_write_data_int,
-      score_cell        => score_cell_int,
+      score_write_data  => score_data_int,
+      score_cell        => score_address_int,
       reset_data        => reset_data_int,
       reset_cell        => reset_cell_int,
       check_read_data   => check_read_data_int,
@@ -218,8 +221,12 @@ begin
 
   SCORE_CNTRL : score_logic
     port map (
+      ext_reset       => ext_reset,
+      clk25           => clk25,
+      clk_slow        => clk_slow,
       gamelogic_state => gamelogic_state,
-      score           => score_int,
+      score_address   => score_address_int,
+      score_data      => score_data_int,
       score_done      => score_done_int
       );
 
@@ -292,8 +299,8 @@ begin
       cnt  := 0;
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
-     if (cnt = 5000000) then
-   --             if (cnt = 50) then
+      if (cnt = 5000000) then
+        --             if (cnt = 50) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
@@ -342,7 +349,7 @@ begin
           end if;
         when TAIL_WRITE =>
           if (tailwrite_done_int = '1') then
-            gamelogic_state <= IDLE;
+            gamelogic_state <= SCORE;
           end if;
         when SCORE =>
           if (score_done_int = '1') then
