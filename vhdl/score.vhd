@@ -44,13 +44,15 @@ architecture Behavioral of score_logic is
   signal score1_done       : std_logic                    := '0';
   signal score2_done       : std_logic                    := '0';
   signal score3_done       : std_logic                    := '0';
+  signal score4_done       : std_logic                    := '0';
   signal score1_max        : std_logic                    := '0';
   signal score2_max        : std_logic                    := '0';
   signal score3_max        : std_logic                    := '0';
-  signal score1            : std_logic_vector(3 downto 0) := (others => '0');
-  signal score2            : std_logic_vector(3 downto 0) := (others => '0');
-  signal score3            : std_logic_vector(3 downto 0) := (others => '0');
-  signal score4            : std_logic_vector(3 downto 0) := (others => '0');
+  signal score4_max        : std_logic                    := '0';
+  signal score1_v          : unsigned(3 downto 0)         := (others => '0');
+  signal score2_v          : unsigned(3 downto 0)         := (others => '0');
+  signal score3_v          : unsigned(3 downto 0)         := (others => '0');
+  signal score4_v          : unsigned(3 downto 0)         := (others => '0');
   signal tick_done         : std_logic                    := '0';
   signal write_state       : std_logic_vector(1 downto 0) := (others => '0');
 
@@ -134,28 +136,28 @@ begin
 
 
 
-  p_score1_data : process (score1)
+  p_score1_data : process (score1_v)
   begin  -- process score1 output data
-    case score1 is
+    case score1_v is
       when "0000" =>
         score1_data <= to_unsigned(24*8, 12);  -- 0
-      when "0000" =>
+      when "0001" =>
         score1_data <= to_unsigned(25*8, 12);  -- 1
-      when "0000" =>
+      when "0010" =>
         score1_data <= to_unsigned(26*8, 12);  -- 2
-      when "0000" =>
+      when "0011" =>
         score1_data <= to_unsigned(27*8, 12);  -- 3
-      when "0000" =>
+      when "0100" =>
         score1_data <= to_unsigned(28*8, 12);  -- 4
-      when "0000" =>
+      when "0101" =>
         score1_data <= to_unsigned(29*8, 12);  -- 5
-      when "0000" =>
+      when "0110" =>
         score1_data <= to_unsigned(30*8, 12);  -- 6
-      when "0000" =>
+      when "0111" =>
         score1_data <= to_unsigned(31*8, 12);  -- 7
-      when "0000" =>
+      when "1000" =>
         score1_data <= to_unsigned(32*8, 12);  -- 8
-      when "0000" =>
+      when "1001" =>
         score1_data <= to_unsigned(33*8, 12);  -- 9
       when others =>
         score1_data <= (others => '0');
@@ -163,28 +165,28 @@ begin
   end process p_score1_data;
 
 
-  p_score2_data : process (score2)
+  p_score2_data : process (score2_v)
   begin  -- process score2 output data
-    case score2 is
+    case score2_v is
       when "0000" =>
         score2_data <= to_unsigned(24*8, 12);  -- 0
-      when "0000" =>
+      when "0001" =>
         score2_data <= to_unsigned(25*8, 12);  -- 1
-      when "0000" =>
+      when "0010" =>
         score2_data <= to_unsigned(26*8, 12);  -- 2
-      when "0000" =>
+      when "0011" =>
         score2_data <= to_unsigned(27*8, 12);  -- 3
-      when "0000" =>
+      when "0100" =>
         score2_data <= to_unsigned(28*8, 12);  -- 4
-      when "0000" =>
+      when "0101" =>
         score2_data <= to_unsigned(29*8, 12);  -- 5
-      when "0000" =>
+      when "0110" =>
         score2_data <= to_unsigned(30*8, 12);  -- 6
-      when "0000" =>
+      when "0111" =>
         score2_data <= to_unsigned(31*8, 12);  -- 7
-      when "0000" =>
+      when "1000" =>
         score2_data <= to_unsigned(32*8, 12);  -- 8
-      when "0000" =>
+      when "1001" =>
         score2_data <= to_unsigned(33*8, 12);  -- 9
       when others =>
         score2_data <= (others => '0');
@@ -192,28 +194,28 @@ begin
   end process p_score2_data;
 
 
-  p_score3_data : process (score3)
+  p_score3_data : process (score3_v)
   begin  -- process score3 output data
-    case score3 is
+    case score3_v is
       when "0000" =>
         score3_data <= to_unsigned(24*8, 12);  -- 0
-      when "0000" =>
+      when "0001" =>
         score3_data <= to_unsigned(25*8, 12);  -- 1
-      when "0000" =>
+      when "0010" =>
         score3_data <= to_unsigned(26*8, 12);  -- 2
-      when "0000" =>
+      when "0011" =>
         score3_data <= to_unsigned(27*8, 12);  -- 3
-      when "0000" =>
+      when "0100" =>
         score3_data <= to_unsigned(28*8, 12);  -- 4
-      when "0000" =>
+      when "0101" =>
         score3_data <= to_unsigned(29*8, 12);  -- 5
-      when "0000" =>
+      when "0110" =>
         score3_data <= to_unsigned(30*8, 12);  -- 6
-      when "0000" =>
+      when "0111" =>
         score3_data <= to_unsigned(31*8, 12);  -- 7
-      when "0000" =>
+      when "1000" =>
         score3_data <= to_unsigned(32*8, 12);  -- 8
-      when "0000" =>
+      when "1001" =>
         score3_data <= to_unsigned(33*8, 12);  -- 9
       when others =>
         score3_data <= (others => '0');
@@ -222,28 +224,28 @@ begin
 
 
 
-  p_score4_data : process (score4)
+  p_score4_data : process (score4_v)
   begin  -- process score4 output data
-    case score4 is
+    case score4_v is
       when "0000" =>
         score4_data <= to_unsigned(24*8, 12);  -- 0
-      when "0000" =>
+      when "0001" =>
         score4_data <= to_unsigned(25*8, 12);  -- 1
-      when "0000" =>
+      when "0010" =>
         score4_data <= to_unsigned(26*8, 12);  -- 2
-      when "0000" =>
+      when "0011" =>
         score4_data <= to_unsigned(27*8, 12);  -- 3
-      when "0000" =>
+      when "0100" =>
         score4_data <= to_unsigned(28*8, 12);  -- 4
-      when "0000" =>
+      when "0101" =>
         score4_data <= to_unsigned(29*8, 12);  -- 5
-      when "0000" =>
+      when "0110" =>
         score4_data <= to_unsigned(30*8, 12);  -- 6
-      when "0000" =>
+      when "0111" =>
         score4_data <= to_unsigned(31*8, 12);  -- 7
-      when "0000" =>
+      when "1000" =>
         score4_data <= to_unsigned(32*8, 12);  -- 8
-      when "0000" =>
+      when "1001" =>
         score4_data <= to_unsigned(33*8, 12);  -- 9
       when others =>
         score4_data <= (others => '0');
@@ -254,28 +256,28 @@ begin
 
 -- purpose: updates the score display variables
 -- type   : sequential
--- inputs : clk_25, ext_reset
+-- inputs : clk25, ext_reset
 -- outputs: 
-  p_score1 : process (clk_25, ext_reset)
+  p_score1 : process (clk25, ext_reset)
   begin  -- process p_score1
-    if ext_reset = '1' then             -- asynchronous reset (active high)
+    if ext_reset = '1' then                 -- asynchronous reset (active high)
       score1_done <= '0';
       score1_max  <= '0';
-      score1      <= (others => '0');
+      score1_v    <= (others => '0');
       score2_done <= '0';
       score2_max  <= '0';
-      score2      <= (others => '0');
+      score2_v    <= (others => '0');
       score3_done <= '0';
       score3_max  <= '0';
-      score3      <= (others => '0');
+      score3_v    <= (others => '0');
       score4_done <= '0';
       score4_max  <= '0';
-      score4      <= (others => '0');
-    elsif clk_25'event and clk_25 = '1' then  -- rising clock edge
+      score4_v    <= (others => '0');
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge
       if (score_state = SCORE1) then
-        score1 <= score1 + 1;
-        if (score1 = "1010") then
-          score1     <= (others => '0');
+        score1_v <= score1_v + 1;
+        if (score1_v = "1010") then
+          score1_v   <= (others => '0');
           score1_max <= '1';
         else
           score1_done <= '1';
@@ -285,9 +287,9 @@ begin
         score1_max  <= '0';
       end if;
       if (score_state = SCORE2) then
-        score2 <= score2 + 1;
-        if (score2 = "1010") then
-          score2     <= (others => '0');
+        score2_v <= score2_v + 1;
+        if (score2_v = "1010") then
+          score2_v   <= (others => '0');
           score2_max <= '1';
         else
           score2_done <= '1';
@@ -297,9 +299,9 @@ begin
         score2_max  <= '0';
       end if;
       if (score_state = SCORE3) then
-        score3 <= score3 + 1;
-        if (score3 = "1010") then
-          score3     <= (others => '0');
+        score3_v <= score3_v + 1;
+        if (score3_v = "1010") then
+          score3_v   <= (others => '0');
           score3_max <= '1';
         else
           score3_done <= '1';
@@ -309,11 +311,17 @@ begin
         score3_max  <= '0';
       end if;
       if (score_state = SCORE4) then
-        score4      <= score4 + 1;
-        score4_done <= '1';
+        score4_v <= score4_v + 1;
+        if (score4_v = "1010") then
+          score4_v   <= (others => '0');
+          score4_max <= '1';
+        else
+          score4_done <= '1';
+        end if;
+      else
+        score4_done <= '0';
+        score4_max  <= '0';
       end if;
-    else
-      score4_done <= '0';
     end if;
   end process p_score1;
 
@@ -332,8 +340,7 @@ begin
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
       case score_state is
         when IDLE =>
-          score_write <= '0';
-          if scoretick = '1' then
+          if score_tick = '1' then
             score_state <= SCORE1;
           elsif tick_done = '1' then
             score_state <= SCORE_WRITE;
