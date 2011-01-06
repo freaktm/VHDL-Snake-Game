@@ -35,6 +35,14 @@ architecture Behavioral of score_logic is
   signal score_done_int    : std_logic                    := '0';
   signal score_address_int : unsigned(12 downto 0)        := (others => '0');
   signal score_data_int    : unsigned(11 downto 0)        := (others => '0');
+  signal score1_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal score2_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal score3_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal score4_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal score1_address    : unsigned(12 downto 0)        := to_unsigned(4568, 13);  -- 0;
+  signal score2_address    : unsigned(12 downto 0)        := to_unsigned(4569, 13);  -- 0;
+  signal score3_address    : unsigned(12 downto 0)        := to_unsigned(4570, 13);  -- 0;
+  signal score4_address    : unsigned(12 downto 0)        := to_unsigned(4571, 13);  -- 0;
   signal score_tick        : std_logic                    := '0';
   signal score1_done       : std_logic                    := '0';
   signal score2_done       : std_logic                    := '0';
@@ -47,7 +55,7 @@ architecture Behavioral of score_logic is
   signal score3            : std_logic_vector(3 downto 0) := (others => '0');
   signal score4            : std_logic_vector(3 downto 0) := (others => '0');
   signal tick_done         : std_logic                    := '0';
-  signal write_state       : std_logic_vector(3 downto 0) := (others => '0');
+  signal write_state       : std_logic_vector(1 downto 0) := (others => '0');
 
   type   score_state_t is (IDLE, SCORE1, SCORE2, SCORE3, SCORE4, SCORE_WRITE);
   signal score_state : score_state_t := IDLE;
@@ -99,20 +107,150 @@ begin
           write_state       <= (others => '0');
         elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
           if (score_state = SCORE_WRITE) then
-
-if (write_state = "00") then
-
-
-
-  
-end if;
-
-
-            
+            if (write_state = "00") then
+              write_state       <= "01";
+              score_address_int <= score1_address;
+              score_data_int    <= score1_data;
+            elsif (write_state = "01") then
+              write_state       <= "10";
+              score_address_int <= score2_address;
+              score_data_int    <= score2_data;
+            elsif (write_state = "10") then
+              write_state       <= "11";
+              score_address_int <= score3_address;
+              score_data_int    <= score3_data;
+            elsif (write_state = "11") then
+              write_state       <= "00";
+              score_address_int <= score4_address;
+              score_data_int    <= score4_data;
+              score_done_int    <= '1';
+            end if;
+          else
+            score_done_int    <= '0';
+            score_address_int <= score1_address;
+            score_data_int    <= score1_data;
+            write_state       <= (others => '0');
           end if;
         end if;
       end process p_write_score_data;
 
+
+
+      p_score1_data : process (score1)
+      begin  -- process score1 output data
+        case score1 is
+          when "0000" =>
+            score1_data <= to_unsigned(24*8, 12);  -- 0
+          when "0000" =>
+            score1_data <= to_unsigned(25*8, 12);  -- 1
+          when "0000" =>
+            score1_data <= to_unsigned(26*8, 12);  -- 2
+          when "0000" =>
+            score1_data <= to_unsigned(27*8, 12);  -- 3
+          when "0000" =>
+            score1_data <= to_unsigned(28*8, 12);  -- 4
+          when "0000" =>
+            score1_data <= to_unsigned(29*8, 12);  -- 5
+          when "0000" =>
+            score1_data <= to_unsigned(30*8, 12);  -- 6
+          when "0000" =>
+            score1_data <= to_unsigned(31*8, 12);  -- 7
+          when "0000" =>
+            score1_data <= to_unsigned(32*8, 12);  -- 8
+          when "0000" =>
+            score1_data <= to_unsigned(33*8, 12);  -- 9
+          when others =>
+            score1_data <= (others => '0');
+        end case;
+      end process p_score1_data;
+
+
+      p_score2_data : process (score2)
+      begin  -- process score2 output data
+        case score2 is
+          when "0000" =>
+            score2_data <= to_unsigned(24*8, 12);  -- 0
+          when "0000" =>
+            score2_data <= to_unsigned(25*8, 12);  -- 1
+          when "0000" =>
+            score2_data <= to_unsigned(26*8, 12);  -- 2
+          when "0000" =>
+            score2_data <= to_unsigned(27*8, 12);  -- 3
+          when "0000" =>
+            score2_data <= to_unsigned(28*8, 12);  -- 4
+          when "0000" =>
+            score2_data <= to_unsigned(29*8, 12);  -- 5
+          when "0000" =>
+            score2_data <= to_unsigned(30*8, 12);  -- 6
+          when "0000" =>
+            score2_data <= to_unsigned(31*8, 12);  -- 7
+          when "0000" =>
+            score2_data <= to_unsigned(32*8, 12);  -- 8
+          when "0000" =>
+            score2_data <= to_unsigned(33*8, 12);  -- 9
+          when others =>
+            score2_data <= (others => '0');
+        end case;
+      end process p_score2_data;
+
+
+      p_score3_data : process (score3)
+      begin  -- process score3 output data
+        case score3 is
+          when "0000" =>
+            score3_data <= to_unsigned(24*8, 12);  -- 0
+          when "0000" =>
+            score3_data <= to_unsigned(25*8, 12);  -- 1
+          when "0000" =>
+            score3_data <= to_unsigned(26*8, 12);  -- 2
+          when "0000" =>
+            score3_data <= to_unsigned(27*8, 12);  -- 3
+          when "0000" =>
+            score3_data <= to_unsigned(28*8, 12);  -- 4
+          when "0000" =>
+            score3_data <= to_unsigned(29*8, 12);  -- 5
+          when "0000" =>
+            score3_data <= to_unsigned(30*8, 12);  -- 6
+          when "0000" =>
+            score3_data <= to_unsigned(31*8, 12);  -- 7
+          when "0000" =>
+            score3_data <= to_unsigned(32*8, 12);  -- 8
+          when "0000" =>
+            score3_data <= to_unsigned(33*8, 12);  -- 9
+          when others =>
+            score3_data <= (others => '0');
+        end case;
+      end process p_score3_data;
+
+
+
+      p_score4_data : process (score4)
+      begin  -- process score4 output data
+        case score4 is
+          when "0000" =>
+            score4_data <= to_unsigned(24*8, 12);  -- 0
+          when "0000" =>
+            score4_data <= to_unsigned(25*8, 12);  -- 1
+          when "0000" =>
+            score4_data <= to_unsigned(26*8, 12);  -- 2
+          when "0000" =>
+            score4_data <= to_unsigned(27*8, 12);  -- 3
+          when "0000" =>
+            score4_data <= to_unsigned(28*8, 12);  -- 4
+          when "0000" =>
+            score4_data <= to_unsigned(29*8, 12);  -- 5
+          when "0000" =>
+            score4_data <= to_unsigned(30*8, 12);  -- 6
+          when "0000" =>
+            score4_data <= to_unsigned(31*8, 12);  -- 7
+          when "0000" =>
+            score4_data <= to_unsigned(32*8, 12);  -- 8
+          when "0000" =>
+            score4_data <= to_unsigned(33*8, 12);  -- 9
+          when others =>
+            score4_data <= (others => '0');
+        end case;
+      end process p_score4_data;
 
 
 
