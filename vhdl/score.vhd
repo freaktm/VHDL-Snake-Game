@@ -67,15 +67,15 @@ begin
 
 -- purpose: update the score
 -- type   : sequential
--- inputs : clk_slow, ext_reset
-  p_update_score : process (clk_slow, ext_reset)
+-- inputs : clk25, ext_reset
+  p_update_score : process (clk25, ext_reset)
     variable cnt : integer := 0;
   begin  -- process p_update_score
-    if ext_reset = '1' then             -- asynchronous reset (active high)
+    if ext_reset = '1' then                 -- asynchronous reset (active high)
       cnt        := 0;
       score_tick <= '0';
       tick_done  <= '0';
-    elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge
       if (gamelogic_state = SCORE) then
         if (score_state = IDLE) then
           if (cnt = 15) then
@@ -254,76 +254,122 @@ begin
 
 
 
+  score1_update : process (score_state)
+  begin  -- process score1_update
+    if (score_state = SCORE1) then
+      score1_v <= score1_v + 1;
+      if (score1_v = "1010") then
+        score1_v   <= (others => '0');
+        score1_max <= '1';
+      else
+        score1_done <= '1';
+      end if;
+    elsif (score_state = SCORE2) then
+      score2_v <= score2_v + 1;
+      if (score2_v = "1010") then
+        score2_v   <= (others => '0');
+        score2_max <= '1';
+      else
+        score2_done <= '1';
+      end if;
+    elsif (score_state = SCORE3) then
+      score3_v <= score3_v + 1;
+      if (score3_v = "1010") then
+        score3_v   <= (others => '0');
+        score3_max <= '1';
+      else
+        score3_done <= '1';
+      end if;
+    elsif (score_state = SCORE4) then
+      score4_v <= score4_v + 1;
+      if (score4_v = "1010") then
+        score4_v   <= (others => '0');
+        score4_max <= '1';
+      else
+        score4_done <= '1';
+      end if;
+    else
+      score1_done <= '0';
+      score1_max  <= '0';
+      score2_max  <= '0';
+      score2_done <= '0';
+      score3_done <= '0';
+      score3_max  <= '0';
+      score4_done <= '0';
+      score4_max  <= '0';
+    end if;
+  end process score1_update;
+
 -- purpose: updates the score display variables
 -- type   : sequential
 -- inputs : clk25, ext_reset
 -- outputs: 
-  p_score1 : process (clk25, ext_reset)
-  begin  -- process p_score1
-    if ext_reset = '1' then                 -- asynchronous reset (active high)
-      score1_done <= '0';
-      score1_max  <= '0';
-      score1_v    <= (others => '0');
-      score2_done <= '0';
-      score2_max  <= '0';
-      score2_v    <= (others => '0');
-      score3_done <= '0';
-      score3_max  <= '0';
-      score3_v    <= (others => '0');
-      score4_done <= '0';
-      score4_max  <= '0';
-      score4_v    <= (others => '0');
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge
-      if (score_state = SCORE1) then
-        score1_v <= score1_v + 1;
-        if (score1_v = "1010") then
-          score1_v   <= (others => '0');
-          score1_max <= '1';
-        else
-          score1_done <= '1';
-        end if;
-      else
-        score1_done <= '0';
-        score1_max  <= '0';
-      end if;
-      if (score_state = SCORE2) then
-        score2_v <= score2_v + 1;
-        if (score2_v = "1010") then
-          score2_v   <= (others => '0');
-          score2_max <= '1';
-        else
-          score2_done <= '1';
-        end if;
-      else
-        score2_done <= '0';
-        score2_max  <= '0';
-      end if;
-      if (score_state = SCORE3) then
-        score3_v <= score3_v + 1;
-        if (score3_v = "1010") then
-          score3_v   <= (others => '0');
-          score3_max <= '1';
-        else
-          score3_done <= '1';
-        end if;
-      else
-        score3_done <= '0';
-        score3_max  <= '0';
-      end if;
-      if (score_state = SCORE4) then
-        score4_v <= score4_v + 1;
-        if (score4_v = "1010") then
-          score4_v   <= (others => '0');
-          score4_max <= '1';
-        else
-          score4_done <= '1';
-        end if;
-      else
-        score4_done <= '0';
-        score4_max  <= '0';
-      end if;
-    end if;
-  end process p_score1;
+--  p_score1 : process (clk25, ext_reset)
+--  begin   process p_score1
+--    if ext_reset = '1' then              asynchronous reset (active high)
+--      score1_done <= '0';
+--      score1_max  <= '0';
+--      score1_v    <= (others => '0');
+--      score2_done <= '0';
+--      score2_max  <= '0';
+--      score2_v    <= (others => '0');
+--      score3_done <= '0';
+--      score3_max  <= '0';
+--      score3_v    <= (others => '0');
+--      score4_done <= '0';
+--      score4_max  <= '0';
+--      score4_v    <= (others => '0');
+--    else
+--      if (score_state = SCORE1) then
+--        score1_v <= score1_v + 1;
+--        if (score1_v = "1010") then
+--          score1_v   <= (others => '0');
+--          score1_max <= '1';
+--        else
+--          score1_done <= '1';
+--        end if;
+--      else
+--        score1_done <= '0';
+--        score1_max  <= '0';
+--      end if;
+--      if (score_state = SCORE2) then
+--        score2_v <= score2_v + 1;
+--        if (score2_v = "1010") then
+--          score2_v   <= (others => '0');
+--          score2_max <= '1';
+--        else
+--          score2_done <= '1';
+--        end if;
+--      else
+--        score2_done <= '0';
+--        score2_max  <= '0';
+--      end if;
+--      if (score_state = SCORE3) then
+--        score3_v <= score3_v + 1;
+--        if (score3_v = "1010") then
+--          score3_v   <= (others => '0');
+--          score3_max <= '1';
+--        else
+--          score3_done <= '1';
+--        end if;
+--      else
+--        score3_done <= '0';
+--        score3_max  <= '0';
+--      end if;
+--      if (score_state = SCORE4) then
+--        score4_v <= score4_v + 1;
+--        if (score4_v = "1010") then
+--          score4_v   <= (others => '0');
+--          score4_max <= '1';
+--        else
+--          score4_done <= '1';
+--        end if;
+--      else
+--        score4_done <= '0';
+--        score4_max  <= '0';
+--      end if;
+--    end if;
+--  end process p_score1;
 
 
 
