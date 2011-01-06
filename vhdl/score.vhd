@@ -67,17 +67,19 @@ begin
 
 -- purpose: update the score
 -- type   : sequential
--- inputs : clk25, ext_reset
-  p_update_score : process (clk25, ext_reset)
+-- inputs : clk_slow, ext_reset
+  p_update_score : process (clk_slow, ext_reset)
     variable cnt : integer := 0;
   begin  -- process p_update_score
-    if ext_reset = '1' then                 -- asynchronous reset (active high)
+    if ext_reset = '1' then             -- asynchronous reset (active high)
       cnt        := 0;
       score_tick <= '0';
       tick_done  <= '0';
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge
+    elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
       if (gamelogic_state = SCORE) then
         if (score_state = IDLE) then
+          score_tick <= '0';
+          tick_done  <= '0';
           if (cnt = 15) then
             score_tick <= '1';
             cnt        := 0;
@@ -87,10 +89,10 @@ begin
             score_tick <= '0';
             tick_done  <= '1';
           end if;
-        else
-          score_tick <= '0';
-          tick_done  <= '0';
         end if;
+      else
+        score_tick <= '0';
+        tick_done  <= '0';
       end if;
     end if;
   end process p_update_score;
@@ -254,7 +256,7 @@ begin
 
 
 
-  score1_update : process (score_state)
+  score_updates : process (score_state)
   begin  -- process score1_update
     if (score_state = SCORE1) then
       score1_v <= score1_v + 1;
@@ -298,7 +300,7 @@ begin
       score4_done <= '0';
       score4_max  <= '0';
     end if;
-  end process score1_update;
+  end process score_updates;
 
 -- purpose: updates the score display variables
 -- type   : sequential
