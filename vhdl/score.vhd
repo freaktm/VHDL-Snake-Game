@@ -29,32 +29,32 @@ end score_logic;
 architecture Behavioral of score_logic is
 
 
-  signal score_done_int    : std_logic                    := '0';
-  signal score_address_int : unsigned(12 downto 0)        := (others => '0');
-  signal score_data_int    : unsigned(11 downto 0)        := (others => '0');
-  signal score1_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
-  signal score2_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
-  signal score3_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
-  signal score4_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
-  signal score1_address    : unsigned(12 downto 0)        := to_unsigned(4568, 13);  -- 0;
-  signal score2_address    : unsigned(12 downto 0)        := to_unsigned(4569, 13);  -- 0;
-  signal score3_address    : unsigned(12 downto 0)        := to_unsigned(4570, 13);  -- 0;
-  signal score4_address    : unsigned(12 downto 0)        := to_unsigned(4571, 13);  -- 0;
-  signal score_tick        : std_logic                    := '0';
-  signal score1_done       : std_logic                    := '0';
-  signal score2_done       : std_logic                    := '0';
-  signal score3_done       : std_logic                    := '0';
-  signal score4_done       : std_logic                    := '0';
-  signal score1_max        : std_logic                    := '0';
-  signal score2_max        : std_logic                    := '0';
-  signal score3_max        : std_logic                    := '0';
-  signal score4_max        : std_logic                    := '0';
-  signal score1_v          : unsigned(3 downto 0)         := (others => '0');
-  signal score2_v          : unsigned(3 downto 0)         := (others => '0');
-  signal score3_v          : unsigned(3 downto 0)         := (others => '0');
-  signal score4_v          : unsigned(3 downto 0)         := (others => '0');
-  signal tick_done         : std_logic                    := '0';
-  signal write_state       : std_logic_vector(1 downto 0) := (others => '0');
+  signal   score_done_int    : std_logic                    := '0';
+  signal   score_address_int : unsigned(12 downto 0)        := (others => '0');
+  signal   score_data_int    : unsigned(11 downto 0)        := (others => '0');
+  signal   score1_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal   score2_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal   score3_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  signal   score4_data       : unsigned(11 downto 0)        := to_unsigned(24*8, 12);  -- 0;
+  constant score1_address    : unsigned(12 downto 0)        := to_unsigned(4571, 13);  -- 0;
+  constant score2_address    : unsigned(12 downto 0)        := to_unsigned(4570, 13);  -- 0;
+  constant score3_address    : unsigned(12 downto 0)        := to_unsigned(4569, 13);  -- 0;
+  constant score4_address    : unsigned(12 downto 0)        := to_unsigned(4568, 13);  -- 0;
+  signal   score_tick        : std_logic                    := '0';
+  signal   score1_done       : std_logic                    := '0';
+  signal   score2_done       : std_logic                    := '0';
+  signal   score3_done       : std_logic                    := '0';
+  signal   score4_done       : std_logic                    := '0';
+  signal   score1_max        : std_logic                    := '0';
+  signal   score2_max        : std_logic                    := '0';
+  signal   score3_max        : std_logic                    := '0';
+  signal   score4_max        : std_logic                    := '0';
+  signal   score1_v          : unsigned(3 downto 0)         := (others => '0');
+  signal   score2_v          : unsigned(3 downto 0)         := (others => '0');
+  signal   score3_v          : unsigned(3 downto 0)         := (others => '0');
+  signal   score4_v          : unsigned(3 downto 0)         := (others => '0');
+  signal   tick_done         : std_logic                    := '0';
+  signal   write_state       : std_logic_vector(1 downto 0) := (others => '0');
 
   type   score_state_t is (IDLE, SCORE1, SCORE2, SCORE3, SCORE4, SCORE_WRITE);
   signal score_state : score_state_t := IDLE;
@@ -302,85 +302,10 @@ begin
     end if;
   end process score_updates;
 
--- purpose: updates the score display variables
--- type   : sequential
--- inputs : clk25, ext_reset
--- outputs: 
---  p_score1 : process (clk25, ext_reset)
---  begin   process p_score1
---    if ext_reset = '1' then              asynchronous reset (active high)
---      score1_done <= '0';
---      score1_max  <= '0';
---      score1_v    <= (others => '0');
---      score2_done <= '0';
---      score2_max  <= '0';
---      score2_v    <= (others => '0');
---      score3_done <= '0';
---      score3_max  <= '0';
---      score3_v    <= (others => '0');
---      score4_done <= '0';
---      score4_max  <= '0';
---      score4_v    <= (others => '0');
---    else
---      if (score_state = SCORE1) then
---        score1_v <= score1_v + 1;
---        if (score1_v = "1010") then
---          score1_v   <= (others => '0');
---          score1_max <= '1';
---        else
---          score1_done <= '1';
---        end if;
---      else
---        score1_done <= '0';
---        score1_max  <= '0';
---      end if;
---      if (score_state = SCORE2) then
---        score2_v <= score2_v + 1;
---        if (score2_v = "1010") then
---          score2_v   <= (others => '0');
---          score2_max <= '1';
---        else
---          score2_done <= '1';
---        end if;
---      else
---        score2_done <= '0';
---        score2_max  <= '0';
---      end if;
---      if (score_state = SCORE3) then
---        score3_v <= score3_v + 1;
---        if (score3_v = "1010") then
---          score3_v   <= (others => '0');
---          score3_max <= '1';
---        else
---          score3_done <= '1';
---        end if;
---      else
---        score3_done <= '0';
---        score3_max  <= '0';
---      end if;
---      if (score_state = SCORE4) then
---        score4_v <= score4_v + 1;
---        if (score4_v = "1010") then
---          score4_v   <= (others => '0');
---          score4_max <= '1';
---        else
---          score4_done <= '1';
---        end if;
---      else
---        score4_done <= '0';
---        score4_max  <= '0';
---      end if;
---    end if;
---  end process p_score1;
 
 
+-- purpose: controls which state the score logic is in
 
-
-
--- purpose: controls which state the game logic is in
--- type   : sequential
--- inputs : clk25, ext_reset, tick, head_done, corner_done, corner, score, tail_done, crashed, reset_done
--- outputs: state
   p_state_machine : process (clk25, ext_reset)
   begin  -- process p_state_machine
     if ext_reset = '1' then                 -- asynchronous reset (active high)

@@ -52,37 +52,45 @@ begin
   p_process_corner : process (clk_slow, ext_reset)
   begin  -- process p_process_corner
     if ext_reset = '1' then             -- asynchronous reset (active high)
-      snake_character       <= to_unsigned(5*8, snake_character'length);
+      snake_character       <= (others => '0');
       corner_done_int       <= '0';
       state                 <= "00";
       corner_write_data_int <= (others => '0');
-    elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-      
+    elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge      
       if (gamelogic_state = CORNER) then
-
         if (state = "00") then
           state <= "01";
-          if ((current_direction_in = "001") and (old_direction_in = "010")) or ((current_direction_in = "100") and (old_direction_in = "011")) then
+          if (current_direction_in = "001") and (old_direction_in = "010") then
             snake_character <= to_unsigned(5*8, snake_character'length);
-          elsif ((current_direction_in = "010") and (old_direction_in = "011")) or ((current_direction_in = "001") and (old_direction_in = "100")) then
+          elsif (current_direction_in = "100") and (old_direction_in = "011") then
+            snake_character <= to_unsigned(5*8, snake_character'length);
+          elsif (current_direction_in = "010") and (old_direction_in = "011") then
             snake_character <= to_unsigned(4*8, snake_character'length);
-          elsif ((current_direction_in = "010") and (old_direction_in = "001")) or ((current_direction_in = "011") and (old_direction_in = "100")) then
+          elsif (current_direction_in = "001") and (old_direction_in = "100") then
+            snake_character <= to_unsigned(4*8, snake_character'length);
+          elsif (current_direction_in = "010") and (old_direction_in = "001") then
             snake_character <= to_unsigned(6*8, snake_character'length);
-          elsif ((current_direction_in = "011") and (old_direction_in = "010")) or ((current_direction_in = "100") and (old_direction_in = "001")) then
+          elsif (current_direction_in = "011") and (old_direction_in = "100") then
+            snake_character <= to_unsigned(6*8, snake_character'length);
+          elsif (current_direction_in = "011") and (old_direction_in = "010") then
+            snake_character <= to_unsigned(7*8, snake_character'length);
+          elsif (current_direction_in = "100") and (old_direction_in = "001") then
             snake_character <= to_unsigned(7*8, snake_character'length);
           else
-            snake_character <= to_unsigned(7*8, snake_character'length);
+            snake_character <= (others => '0');
           end if;
         elsif (state = "01") then
           state                 <= "10";
           corner_write_data_int <= current_direction_in & snake_character;
         elsif (state = "10") then
-          state           <= (others => '0');
+          state <= "11";
+        elsif (state = "11") then
           corner_done_int <= '1';
+          state           <= "00";
+        else
+          corner_done_int <= '0';
+          state           <= (others => '0');
         end if;
-      else
-        corner_done_int <= '0';
-        state           <= (others => '0');
       end if;
     end if;
   end process p_process_corner;

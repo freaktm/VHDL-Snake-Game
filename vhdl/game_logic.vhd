@@ -88,7 +88,8 @@ architecture Behavioral of game_logic is
       tail_read_data  : in  unsigned(11 downto 0);
       tail_write_data : out unsigned(11 downto 0);
       tailread_done   : out std_logic;
-      tailwrite_done  : out std_logic
+      tailwrite_done  : out std_logic;
+      tail_done       : out std_logic
       );
   end component;
 
@@ -156,6 +157,7 @@ architecture Behavioral of game_logic is
   signal head_done_int         : std_logic             := '0';
   signal tailread_done_int     : std_logic             := '0';
   signal tailwrite_done_int    : std_logic             := '0';
+  signal tail_done_int         : std_logic             := '0';
   signal score_done_int        : std_logic             := '0';
   signal crashed_int           : std_logic             := '0';
   signal corner_done_int       : std_logic             := '0';
@@ -216,7 +218,8 @@ begin
       tail_read_data  => tail_read_data_int,
       tail_write_data => tail_write_data_int,
       tailread_done   => tailread_done_int,
-      tailwrite_done  => tailwrite_done_int
+      tailwrite_done  => tailwrite_done_int,
+      tail_done       => tail_done_int
       );
 
   SCORE_CNTRL : score_logic
@@ -300,7 +303,6 @@ begin
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
       if (cnt = 5000000) then
-        --             if (cnt = 50) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
@@ -346,6 +348,8 @@ begin
         when TAIL_READ =>
           if (tailread_done_int = '1') then
             gamelogic_state <= TAIL_WRITE;
+          elsif (tail_done_int = '1') then
+            gamelogic_state <= IDLE;
           end if;
         when TAIL_WRITE =>
           if (tailwrite_done_int = '1') then
