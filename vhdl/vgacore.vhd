@@ -84,7 +84,7 @@ begin
       else
         hcounter <= (others => '0');
         if (to_integer(vcounter) < 523) then
-          if (to_integer(vcounter) > 43) then
+          if (to_integer(vcounter) > 40) then
             row_count <= row_count + 1;
           end if;
           vcounter <= vcounter + 1;
@@ -97,7 +97,7 @@ begin
 
 
     -- displays pixel data, in blue colour
-    if (to_integer(hcounter) > 158)     -- 138
+    if (to_integer(hcounter) > 162)     -- 138
       and (to_integer(hcounter) < 799)  -- 784
       and (to_integer(vcounter) > 43)   -- 39
       and (to_integer(vcounter) < 523)  -- 519
@@ -150,23 +150,21 @@ begin
       ram_address_b_signal <= (others => '0');
       rom_address_signal   <= (others => '0');
       row_data_signal      <= (others => '0');
-                                        --     cell                 <= (others => '0');
     elsif clk25'event and clk25 = '1' then
-      if (to_integer(hcounter) = 130) and (to_integer(vcounter) = 39) then
+      
+      if (to_integer(hcounter) = 154) and (to_integer(vcounter) = 43) then
         strobe_signal        <= '0';
         ram_address_b_signal <= (others => '0');
-      elsif (to_integer(hcounter) = 131) and (to_integer(vcounter) = 39) then
+      elsif (to_integer(hcounter) = 155) and (to_integer(vcounter) = 43) then
         strobe_signal      <= '0';
         rom_address_signal <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
-      elsif (to_integer(hcounter) = 132) and (to_integer(vcounter) = 39) then
+      elsif (to_integer(hcounter) = 156) and (to_integer(vcounter) = 43) then
         strobe_signal   <= '0';
         row_data_signal <= rom_data;
-      elsif (to_integer(hcounter) = 133) and (to_integer(vcounter) = 39) then
+      elsif (to_integer(hcounter) = 162) and (to_integer(vcounter) = 43) then
         strobe_signal <= '1';
       end if;
-
-
-
+      
       if pixelcount_w = "111" then
         strobe_signal <= '1';
       elsif pixelcount_w < "100" then
@@ -189,7 +187,7 @@ begin
       pixelcount_w <= (others => '0');
 
     elsif clk25'event and clk25 = '1' then
-      if (to_integer(hcounter) < 158)
+      if (to_integer(hcounter) < 163)
         or (to_integer(vcounter) < 44) then
         pixelcount_w <= (others => '0');
       else
