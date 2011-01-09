@@ -9,13 +9,7 @@
 -- 
 -- Dependencies: VRAM, SHFTREG and CHROM modules.
 -- 
--- 
--- Reference Material:
--- VGATEST vhdl authored by :
--- Company: Department of Computer Science, University of Texas at San Antonio
--- Engineer: Chia-Tien Dan Lo (danlo@cs.utsa.edu)
--- 
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
@@ -34,161 +28,159 @@ entity vga_core is
     ram_data_b    : in  unsigned(11 downto 0);
     rom_address   : out unsigned(8 downto 0);
     rom_data      : in  unsigned(7 downto 0);
-    strobe        : out std_logic;
-    row_data      : out unsigned(7 downto 0);
-    pixel         : in  std_logic
+    strobe        : out std_logic;      -- activate serializer
+    row_data      : out unsigned(7 downto 0);  -- data to send to serializer
+    pixel         : in  std_logic       -- bit data coming back from serializer
     );
 end vga_core;
 
 architecture behavioral of vga_core is
 
   
-  signal hcounter     : unsigned(9 downto 0)  := (others => '0');  --1100100000 is 800
-  signal vcounter     : unsigned(9 downto 0)  := (others => '0');  --1000001001 is 521
-  signal pixelcount_w : unsigned(2 downto 0)  := (others => '0');  -- 8 pixels wide for each cell.
-  signal row_count    : unsigned(2 downto 0)  := "000";  -- 8 pixels deep for each cell.
-  signal cell         : unsigned(12 downto 0) := "0000000000000";
-  signal x            : unsigned(9 downto 0)  := (others => '0');
-  signal y            : unsigned(9 downto 0)  := (others => '0');
-  signal x_temp       : unsigned(9 downto 0)  := (others => '0');
-  signal y_temp       : unsigned(9 downto 0)  := (others => '0');
+  signal hcounter             : unsigned(9 downto 0)  := (others => '0');
+  signal vcounter             : unsigned(9 downto 0)  := (others => '0');
+  signal pixelcount_w         : unsigned(2 downto 0)  := (others => '0');
+  signal row_count            : unsigned(2 downto 0)  := (others => '0');
+  signal cell                 : unsigned(12 downto 0) := (others => '0');
+  signal x                    : unsigned(9 downto 0)  := (others => '0');
+  signal y                    : unsigned(8 downto 0)  := (others => '0');
+  signal x_temp               : unsigned(6 downto 0)  := (others => '0');
+  signal y_temp               : unsigned(5 downto 0)  := (others => '0');
+  signal hs_out_signal        : std_logic             := '0';
+  signal vs_out_signal        : std_logic             := '0';
+  signal ram_address_b_signal : unsigned(12 downto 0) := (others => '0');
+  signal rom_address_signal   : unsigned(8 downto 0)  := (others => '0');
+  signal strobe_signal        : std_logic             := '0';
+  signal row_data_signal      : unsigned(7 downto 0)  := (others => '0');
+  signal red, green           : std_logic             := '0';
+  signal blue                 : std_logic             := '0';
 
-
-
-
-  signal hs_out_int, vs_out_int : std_logic;
 
 begin
 
+  red_out       <= red;
+  green_out     <= green;
+  blue_out      <= blue;
+  hs_out        <= hs_out_signal;
+  vs_out        <= vs_out_signal;
+  ram_address_b <= ram_address_b_signal;
+  rom_address   <= rom_address_signal;
+  strobe        <= strobe_signal;
+  row_data      <= row_data_signal;
 
-  p2 : process (clk25)
 
+  p_vga_signals : process (clk25, ext_reset)
   begin
-    -- hcounter counts from 0 to 799
-    -- vcounter counts from 0 to 520
-    -- x coordinate: 0 - 639 (x = hcounter - 144, i.e., hcounter -Tpw-Tbp)
-    -- y coordinate: 0 - 479 (y = vcounter - 31, i.e., vcounter-Tpw-Tbp)
-
-    if clk25'event and clk25 = '1' then
-      -- To draw a pixel in (x0, y0), simply test if the ray trace to it
-      -- and set its color to any value between 1 to 7. The following example simply sets
-      -- the whole display area to a single-color wash, which is changed every one
-      -- second.
-      
-      
-      x      <= to_unsigned((to_integer(hcounter) - 144), x'length);
-      y      <= to_unsigned((to_integer(vcounter) - 39), y'length);
-      x_temp <= "000" & x(9 downto 3);
-      y_temp <= "000" & y(9 downto 3);
-
-      if (to_integer(hcounter) < 144) and (to_integer(vcounter) < 39) then
-        cell <= (others => '0');
+    if ext_reset = '1' then                 -- asynchronous reset (active high)
+      hcounter      <= (others => '0');
+      vcounter      <= (others => '0');
+      hs_out_signal <= '0';
+      vs_out_signal <= '0';
+      row_count     <= (others => '0');
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge
+      -- increment counters
+      if (to_integer(hcounter) < 799) then
+        hcounter <= hcounter + 1;
       else
-        cell <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
-      end if;
-
-      if (to_integer(hcounter) >= 144)    -- 144
-        and (to_integer(hcounter) < 808)  -- 784
-        and (to_integer(vcounter) >= 39)  -- 39
-        and (to_integer(vcounter) < 519)  -- 519
-      then
-        
-        red_out   <= '0';
-        green_out <= '0';
-        blue_out  <= pixel;
-
-      else
-        red_out   <= '0';
-        green_out <= '0';
-        blue_out  <= '0';
-      end if;
-      -- Here is the timing for horizontal synchronization.
-      -- (Refer to p. 24, Xilinx, Spartan-3 Starter Kit Board User Guide)
-      -- Pulse width: Tpw = 96 cycles @ 25 MHz
-      -- Back porch: Tbp = 48 cycles
-      -- Display time: Tdisp = 640 cycles
-      -- Front porch: Tfp = 16 cycles
-      -- Sync pulse time (total cycles) Ts = 800 cycles
-
-      if (to_integer(hcounter) > 0)
-        and (to_integer(hcounter) < 117)  -- 96+1
-      then
-        hs_out_int <= '0';
-      else
-        hs_out_int <= '1';
-      end if;
-      -- Here is the timing for vertical synchronization.
-      -- (Refer to p. 24, Xilinx, Spartan-3 Starter Kit Board User Guide)
-      -- Pulse width: Tpw = 1600 cycles (2 lines) @ 25 MHz
-      -- Back porch: Tbp = 23200 cycles (29 lines)
-      -- Display time: Tdisp = 38400 cycles (480 lines)
-      -- Front porch: Tfp = 8000 cycles (10 lines)
-      -- Sync pulse time (total cycles) Ts = 416800 cycles (521 lines)
-      if (to_integer(vcounter) > 0)
-        and (to_integer(vcounter) < 3)    -- 2+1
-      then
-        vs_out_int <= '0';
-      else
-        vs_out_int <= '1';
-      end if;
-      -- horizontal counts from 0 to 799 , checks if it has counted to 800
-      hcounter <= hcounter+1;
-      if (to_integer(hcounter) = 800) then
-        vcounter <= vcounter+1;
         hcounter <= (others => '0');
-        if (vcounter > 39) then
-          row_count <= row_count + 1;
-        end if;
-        if (to_integer(row_count) = 8) then
+        if (to_integer(vcounter) < 523) then
+          if (to_integer(vcounter) > 43) then
+            row_count <= row_count + 1;
+          end if;
+          vcounter <= vcounter + 1;
+        else
+          vcounter  <= (others => '0');
           row_count <= (others => '0');
         end if;
       end if;
-      if (to_integer(vcounter) = 521) then
-        vcounter  <= (others => '0');
-        row_count <= (others => '0');
-      end if;
-
-
-
     end if;
 
-  end process;
 
-  p_strobe : process(clk25)
+    -- displays pixel data, in blue colour
+    if (to_integer(hcounter) > 158)     -- 138
+      and (to_integer(hcounter) < 799)  -- 784
+      and (to_integer(vcounter) > 43)   -- 39
+      and (to_integer(vcounter) < 523)  -- 519
+    then
+      red   <= '0';
+      green <= '0';
+      blue  <= pixel;
+    else
+      red   <= '0';
+      green <= '0';
+      blue  <= '0';
+    end if;
+
+
+    -- define synch pulse's
+    if (to_integer(hcounter) > 15) and
+      (to_integer(hcounter) < 111) then
+      hs_out_signal <= '0';
+    else
+      hs_out_signal <= '1';
+    end if;
+
+
+    if (to_integer(vcounter) > 10) and
+      (to_integer(vcounter) < 12) then
+      vs_out_signal <= '0';
+    else
+      vs_out_signal <= '1';
+    end if;
+
+
+    x      <= to_unsigned((to_integer(hcounter) - 154), x'length);
+    y      <= to_unsigned((to_integer(vcounter) - 40), y'length);
+    x_temp <= x(9 downto 3);
+    y_temp <= y(8 downto 3);
+
+    if (to_integer(hcounter) < 158) and (to_integer(vcounter) < 44) then
+      cell <= (others => '0');
+    else
+      cell <= to_unsigned(((to_integer(x_temp)) + (to_integer(y_temp) * 80)), cell'length);
+    end if;
+    
+  end process p_vga_signals;
+
+
+  p_strobe : process(clk25, ext_reset)
   begin
-    if clk25'event and clk25 = '1' then
+    if ext_reset = '1' then             -- asynchronous reset (active high)
+      strobe_signal        <= '0';
+      ram_address_b_signal <= (others => '0');
+      rom_address_signal   <= (others => '0');
+      row_data_signal      <= (others => '0');
+                                        --     cell                 <= (others => '0');
+    elsif clk25'event and clk25 = '1' then
       if (to_integer(hcounter) = 130) and (to_integer(vcounter) = 39) then
-        strobe        <= '0';
-        ram_address_b <= to_unsigned((to_integer(cell)), ram_address_b'length);
+        strobe_signal        <= '0';
+        ram_address_b_signal <= (others => '0');
       elsif (to_integer(hcounter) = 131) and (to_integer(vcounter) = 39) then
-        strobe      <= '0';
-        rom_address <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
+        strobe_signal      <= '0';
+        rom_address_signal <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
       elsif (to_integer(hcounter) = 132) and (to_integer(vcounter) = 39) then
-        strobe   <= '0';
-        row_data <= rom_data;
+        strobe_signal   <= '0';
+        row_data_signal <= rom_data;
       elsif (to_integer(hcounter) = 133) and (to_integer(vcounter) = 39) then
-        strobe <= '1';
+        strobe_signal <= '1';
       end if;
+
+
 
       if pixelcount_w = "111" then
-        strobe <= '1';
+        strobe_signal <= '1';
       elsif pixelcount_w < "100" then
-        strobe        <= '0';
-        ram_address_b <= to_unsigned((to_integer(cell)), ram_address_b'length);
+        strobe_signal        <= '0';
+        ram_address_b_signal <= to_unsigned((to_integer(cell)), ram_address_b'length);
       elsif pixelcount_w = "100" then
-        strobe      <= '0';
-        rom_address <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
+        strobe_signal      <= '0';
+        rom_address_signal <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
       elsif pixelcount_w = "101" then
-        strobe   <= '0';
-        row_data <= rom_data;
+        strobe_signal   <= '0';
+        row_data_signal <= rom_data;
       end if;
     end if;
   end process;
-
-  vs_out <= vs_out_int;
-  hs_out <= hs_out_int;
-
-
 
 
   p_pixelcount : process (clk25, ext_reset)
@@ -197,14 +189,15 @@ begin
       pixelcount_w <= (others => '0');
 
     elsif clk25'event and clk25 = '1' then
-      if hs_out_int = '0' or vs_out_int = '0' then
+      if (to_integer(hcounter) < 158)
+        or (to_integer(vcounter) < 44) then
         pixelcount_w <= (others => '0');
       else
         pixelcount_w <= pixelcount_w + 1;
       end if;
     end if;
-
   end process;
+
 
 
 
