@@ -35,7 +35,7 @@ architecture Behavioral of corner_logic is
 
 
   signal snake_character       : unsigned(8 downto 0)         := (others => '0');
-  signal state                 : std_logic_vector(1 downto 0) := "00";
+  signal state                 : std_logic_vector(1 downto 0) := (others => '0');
   signal corner_done_int       : std_logic                    := '0';
   signal corner_write_data_int : unsigned(11 downto 0)        := (others => '0');
   
@@ -54,7 +54,7 @@ begin
     if ext_reset = '1' then             -- asynchronous reset (active high)
       snake_character       <= (others => '0');
       corner_done_int       <= '0';
-      state                 <= "00";
+      state                 <= (others => '0');
       corner_write_data_int <= (others => '0');
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge      
       if (gamelogic_state = CORNER) then
@@ -80,13 +80,11 @@ begin
             snake_character <= (others => '0');
           end if;
         elsif (state = "01") then
-          state                 <= "10";
           corner_write_data_int <= current_direction_in & snake_character;
+          state                 <= "10";
         elsif (state = "10") then
-          state <= "11";
-        elsif (state = "11") then
           corner_done_int <= '1';
-          state           <= "00";
+          state           <= (others => '0');
         else
           corner_done_int <= '0';
           state           <= (others => '0');

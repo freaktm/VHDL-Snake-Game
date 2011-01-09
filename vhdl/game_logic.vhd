@@ -14,16 +14,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 use work.gamelogic_pkg.all;
 
 entity game_logic is
@@ -161,7 +151,6 @@ architecture Behavioral of game_logic is
   signal score_done_int        : std_logic             := '0';
   signal crashed_int           : std_logic             := '0';
   signal corner_done_int       : std_logic             := '0';
-  signal corner_data_int       : unsigned(11 downto 0) := (others => '0');
   signal gamelogic_state       : gamelogic_state_t;
   signal head_write_data_int   : unsigned(11 downto 0) := (others => '0');
   signal head_cell_int         : unsigned(12 downto 0) := (others => '0');
@@ -256,7 +245,7 @@ begin
       clk_slow             => clk_slow,
       gamelogic_state      => gamelogic_state,
       address_a_corner     => corner_cell_int,
-      corner_write_data    => corner_data_int,
+      corner_write_data    => corner_write_data_int,
       corner_done          => corner_done_int,
       next_cell            => next_cell_int,
       old_direction_in     => old_direction_int,
@@ -302,7 +291,7 @@ begin
       cnt  := 0;
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
-      if (cnt = 5000000) then
+      if (cnt = 25) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
