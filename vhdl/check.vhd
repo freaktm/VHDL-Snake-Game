@@ -33,7 +33,8 @@ entity check_logic is
     nochange              : out std_logic;
     current_direction_out : out unsigned(2 downto 0);
     old_direction_out     : out unsigned(2 downto 0);
-    next_cell             : out unsigned(12 downto 0)
+    next_cell             : out unsigned(12 downto 0);
+    corner_cell           : out unsigned(12 downto 0)
     );
 end check_logic;
 
@@ -43,6 +44,7 @@ architecture Behavioral of check_logic is
   signal next_direction        : unsigned(2 downto 0)  := "001";
   signal current_cell          : unsigned(12 downto 0) := to_unsigned(2440, 13);
   signal next_cell_int         : unsigned(12 downto 0) := to_unsigned(2360, 13);
+  signal corner_cell_int       : unsigned(12 downto 0) := (others => '0');
   signal checking              : unsigned(2 downto 0)  := (others => '0');
   signal old_direction_out_int : unsigned(2 downto 0)  := "001";
   signal address_a_check_int   : unsigned(12 downto 0) := to_unsigned(2360, 13);
@@ -57,6 +59,7 @@ begin
   address_a_check       <= address_a_check_int;
   nochange              <= nochange_int;
   crashed               <= crashed_int;
+  corner_cell           <= corner_cell_int;
 
   next_direction <= keyboard;
   next_cell      <= next_cell_int;
@@ -77,6 +80,7 @@ begin
       current_direction_int <= "001";   -- reset to moving up
       next_cell_int         <= to_unsigned(2360, next_cell_int'length);
       old_direction_out_int <= "001";
+      corner_cell_int       <= (others => '0');
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
         if (checking = "000") then
@@ -93,17 +97,18 @@ begin
             if (current_direction_int /= next_direction) then
               nochange_int          <= '0';
               old_direction_out_int <= current_direction_int;
+              corner_cell_int       <= current_cell;
             else
               nochange_int <= '1';
-              if (next_direction = "001") then
-                next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
-              elsif (next_direction = "010") then
-                next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
-              elsif (next_direction = "011") then
-                next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
-              elsif (next_direction = "100") then
-                next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
-              end if;
+            end if;
+            if (next_direction = "001") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+            elsif (next_direction = "010") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+            elsif (next_direction = "011") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+            elsif (next_direction = "100") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
             end if;
           end if;
           

@@ -122,7 +122,8 @@ architecture Behavioral of game_logic is
       nochange              : out std_logic;
       old_direction_out     : out unsigned(2 downto 0);
       current_direction_out : out unsigned(2 downto 0);
-      next_cell             : out unsigned(12 downto 0)
+      next_cell             : out unsigned(12 downto 0);
+      corner_cell           : out unsigned(12 downto 0)
       );
   end component;
 
@@ -156,6 +157,7 @@ architecture Behavioral of game_logic is
   signal head_cell_int         : unsigned(12 downto 0) := (others => '0');
   signal corner_write_data_int : unsigned(11 downto 0) := (others => '0');
   signal corner_cell_int       : unsigned(12 downto 0) := (others => '0');
+  signal corner_cell_signal    : unsigned(12 downto 0) := (others => '0');
   signal tail_write_data_int   : unsigned(11 downto 0) := (others => '0');
   signal tail_read_data_int    : unsigned(11 downto 0) := (others => '0');
   signal tail_cell_int         : unsigned(12 downto 0) := (others => '0');
@@ -236,7 +238,8 @@ begin
       keyboard              => next_direction,
       crashed               => crashed_int,
       current_direction_out => current_direction_int,
-      next_cell             => next_cell_int
+      next_cell             => next_cell_int,
+      corner_cell           => corner_cell_signal
       );
 
   CORNER_CNTRL : corner_logic
@@ -247,7 +250,7 @@ begin
       address_a_corner     => corner_cell_int,
       corner_write_data    => corner_write_data_int,
       corner_done          => corner_done_int,
-      next_cell            => next_cell_int,
+      next_cell            => corner_cell_signal,
       old_direction_in     => old_direction_int,
       current_direction_in => current_direction_int
       );
