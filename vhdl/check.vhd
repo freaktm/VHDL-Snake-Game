@@ -3,16 +3,13 @@
 --
 -- Author: Aaron Storey
 -- 
--- Description: This module controls the game logic for the snake physics etc.
+-- Description: This module controls the check logic for the snake physics.
 --              
 -- 
 -- 
 -- Dependencies: VRAM
 -- 
 -- 
--- Assisted by:
---
--- Anthonix
 -- 
 -----------------------------------------------------------------------------------
 library IEEE;
@@ -45,22 +42,21 @@ architecture Behavioral of check_logic is
   signal current_cell          : unsigned(12 downto 0) := to_unsigned(2440, 13);
   signal next_cell_int         : unsigned(12 downto 0) := to_unsigned(2360, 13);
   signal corner_cell_int       : unsigned(12 downto 0) := (others => '0');
-  signal checking              : unsigned(2 downto 0)  := (others => '0');
+  signal checking              : std_logic             := '0';
   signal old_direction_out_int : unsigned(2 downto 0)  := "001";
-  signal address_a_check_int   : unsigned(12 downto 0) := to_unsigned(2360, 13);
   signal nochange_int          : std_logic             := '1';
   signal crashed_int           : std_logic             := '0';
-  signal corner                : std_logic             := '0';
 
   
 begin
   
   old_direction_out     <= old_direction_out_int;
   current_direction_out <= current_direction_int;
-  address_a_check       <= address_a_check_int;
+  address_a_check       <= next_cell_int;
   nochange              <= nochange_int;
   crashed               <= crashed_int;
   corner_cell           <= corner_cell_int;
+
 
   next_direction <= keyboard;
   next_cell      <= next_cell_int;
@@ -76,83 +72,55 @@ begin
       crashed_int           <= '0';
       check_done            <= '0';
       nochange_int          <= '1';
-      checking              <= "000";
+      checking              <= '0';
       current_cell          <= to_unsigned(2440, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up
       next_cell_int         <= to_unsigned(2360, next_cell_int'length);
       old_direction_out_int <= "001";
       corner_cell_int       <= (others => '0');
-      corner                <= '0';
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
-
-
-        
-        if (checking = "000") then
+        if (checking = '0') then
           check_done <= '0';
-          checking   <= "001";    
+          checking   <= '1';
           -- checks to see if the snake has changed direction
           if (current_direction_int /= next_direction) then
-            corner                <= '1';
+            nochange_int          <= '0';
             old_direction_out_int <= current_direction_int;
             corner_cell_int       <= current_cell;
           else
-            corner       <= '0';
-            nochange_int <= '0';
-          end if;
-
-          -- updates next cell for head
-          if (next_direction = "001") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
-          elsif (next_direction = "010") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
-          elsif (next_direction = "011") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
-          elsif (next_direction = "100") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
-          end if;
-          
-          
-
-        elsif (checking = "001") then
-          current_direction_int <= next_direction;
-          checking              <= "010";
-          address_a_check_int   <= next_cell_int;
-          current_cell          <= next_cell_int;
-        elsif (checking = "010") then
-          checking <= "011";
-          if (corner = '0') then
-            if (to_integer(check_read_data) = 0) then
-              crashed_int <= '0';
-            else
-              crashed_int <= '1';
+            if (next_direction = "001") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+            elsif (next_direction = "010") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+            elsif (next_direction = "011") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+            elsif (next_direction = "100") then
+              next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
             end if;
-          end if;
-        elsif (checking = "011") then
-          checking <= (others => '0');
-          if (corner = '1') then
-            nochange_int <= '0';
-            check_done   <= '0';
-          else
             nochange_int <= '1';
-            check_done   <= '1';
           end if;
-
-
+        elsif (checking = '1') then
+          checking              <= '0';
+          current_direction_int <= next_direction;
+          current_cell          <= next_cell_int;
+          if (to_integer(check_read_data) = 0) then
+            crashed_int <= '0';
+            check_done  <= '1';
+          else
+            crashed_int <= '1';
+            check_done  <= '0';
+          end if;
         end if;
-
-
-
-          
-        else
-          check_done   <= '0';
-          nochange_int <= '1';
-          checking     <= (others => '0');
-          corner       <= '0';
-        end if;        
       end if;
-    end process p_collision_checker;
+    else
+      check_done   <= '0';
+      nochange_int <= '1';
+      checking     <= '0';
+    end if;
+  end if;
+end process p_collision_checker;
 
 
 
-    end Behavioral;
+end Behavioral;
