@@ -28,6 +28,7 @@ entity head_logic is
     address_a_head       : out unsigned(12 downto 0);
     head_write_data      : out unsigned(11 downto 0);
     head_done            : out std_logic;
+    head_addr_done       : out std_logic;
     next_cell            : in  unsigned(12 downto 0);
     current_direction_in : in  unsigned(2 downto 0)
     );
@@ -41,6 +42,7 @@ architecture Behavioral of head_logic is
   signal address_a_head_int  : unsigned(12 downto 0)        := (others => '0');
   signal head_write_data_int : unsigned(11 downto 0)        := (others => '0');
   signal head_done_int       : std_logic                    := '0';
+  signal head_addr_done_int  : std_logic                    := '0';
 
   
   
@@ -51,6 +53,7 @@ begin
   address_a_head  <= address_a_head_int;
   head_write_data <= head_write_data_int;
   head_done       <= head_done_int;
+  head_addr_done  <= head_addr_done_int;
 
 
   -- purpose: update head movement
