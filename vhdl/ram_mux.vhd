@@ -78,6 +78,7 @@ begin
 
   with gamelogic_state select
     input_a_int <=
+    head_write_data   when HEAD_ADDR,
     head_write_data   when HEAD,
     corner_write_data when CORNER,
     tail_write_data   when TAIL_WRITE,
@@ -86,6 +87,7 @@ begin
 
   with gamelogic_state select
     address_a_int <=
+    head_cell   when HEAD_ADDR,
     head_cell   when HEAD,
     corner_cell when CORNER,
     tail_cell   when TAIL_READ,

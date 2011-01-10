@@ -136,6 +136,7 @@ architecture Behavioral of game_logic is
       address_a_head       : out unsigned(12 downto 0);
       head_write_data      : out unsigned(11 downto 0);
       head_done            : out std_logic;
+      head_addr_done       : out std_logic;
       next_cell            : in  unsigned(12 downto 0);
       current_direction_in : in  unsigned(2 downto 0)
       );
@@ -172,6 +173,7 @@ architecture Behavioral of game_logic is
   signal current_direction_int : unsigned(2 downto 0)  := (others => '0');
   signal old_direction_int     : unsigned(2 downto 0)  := (others => '0');
   signal next_cell_int         : unsigned(12 downto 0) := (others => '0');
+  signal head_addr_done_int    : std_logic             := '0';
 
 
   
@@ -274,6 +276,7 @@ begin
       address_a_head       => head_cell_int,
       head_write_data      => head_write_data_int,
       head_done            => head_done_int,
+      head_addr_done       => head_addr_done_int,
       current_direction_in => current_direction_int,
       next_cell            => next_cell_int);
 
@@ -321,7 +324,7 @@ begin
           end if;
         when CHECK =>
           if (check_done_int = '1') then
-            gamelogic_state <= HEAD;
+            gamelogic_state <= HEAD_ADDR;
           elsif (nochange_int = '0') then
             gamelogic_state <= CORNER;
           elsif (crashed_int = '1') then
@@ -329,19 +332,23 @@ begin
           else
             gamelogic_state <= CHECK;
           end if;
+        when HEAD_ADDR =>
+          if (head_addr_done_int = '1') then
+            gamelogic_state <= HEAD;
+          end if;
         when HEAD =>
           if (head_done_int = '1') then
             gamelogic_state <= TAIL_READ;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-            gamelogic_state <= HEAD;
+            gamelogic_state <= TAIL_READ;
           end if;
         when TAIL_READ =>
           if (tailread_done_int = '1') then
             gamelogic_state <= TAIL_WRITE;
           elsif (tail_done_int = '1') then
-            gamelogic_state <= IDLE;
+            gamelogic_state <= SCORE;
           end if;
         when TAIL_WRITE =>
           if (tailwrite_done_int = '1') then
