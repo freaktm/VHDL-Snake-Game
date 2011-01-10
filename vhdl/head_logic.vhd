@@ -79,10 +79,9 @@ begin
           elsif (current_direction_in = "010") or (current_direction_in = "100") then
             snake_character <= to_unsigned(2*8, snake_character'length);
           end if;
-
+          address_a_head_int <= next_cell;
         elsif (checking = "01") then
           checking            <= "10";
-          address_a_head_int  <= next_cell;
           head_write_data_int <= current_direction_in & snake_character;
         elsif (checking = "10") then
           checking      <= (others => '0');

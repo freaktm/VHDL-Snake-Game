@@ -320,9 +320,9 @@ begin
             gamelogic_state <= CHECK;
           end if;
         when CHECK =>
-          if (check_done_int = '1') and (nochange_int = '1') then
+          if (check_done_int = '1') then
             gamelogic_state <= HEAD;
-          elsif (check_done_int = '1') and (nochange_int = '0') then
+          elsif (nochange_int = '0') then
             gamelogic_state <= CORNER;
           elsif (crashed_int = '1') then
             gamelogic_state <= RESET;
@@ -335,7 +335,7 @@ begin
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-            gamelogic_state <= TAIL_READ;
+            gamelogic_state <= HEAD;
           end if;
         when TAIL_READ =>
           if (tailread_done_int = '1') then

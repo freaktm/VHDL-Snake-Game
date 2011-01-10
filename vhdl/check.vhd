@@ -50,6 +50,7 @@ architecture Behavioral of check_logic is
   signal address_a_check_int   : unsigned(12 downto 0) := to_unsigned(2360, 13);
   signal nochange_int          : std_logic             := '1';
   signal crashed_int           : std_logic             := '0';
+  signal corner                : std_logic             := '0';
 
   
 begin
@@ -81,36 +82,36 @@ begin
       next_cell_int         <= to_unsigned(2360, next_cell_int'length);
       old_direction_out_int <= "001";
       corner_cell_int       <= (others => '0');
+      corner                <= '0';
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
+
+
+        
         if (checking = "000") then
           check_done <= '0';
-          checking   <= "001";
-
-          if (crashed_int = '1') then
-            crashed_int           <= '0';
-            current_cell          <= to_unsigned(2440, current_cell'length);
-            current_direction_int <= "001";  -- reset to moving up
-            next_cell_int         <= to_unsigned(2360, next_cell_int'length);
-            old_direction_out_int <= "001";
+          checking   <= "001";    
+          -- checks to see if the snake has changed direction
+          if (current_direction_int /= next_direction) then
+            corner                <= '1';
+            old_direction_out_int <= current_direction_int;
+            corner_cell_int       <= current_cell;
           else
-            if (current_direction_int /= next_direction) then
-              nochange_int          <= '0';
-              old_direction_out_int <= current_direction_int;
-              corner_cell_int       <= current_cell;
-            else
-              nochange_int <= '1';
-            end if;
-            if (next_direction = "001") then
-              next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
-            elsif (next_direction = "010") then
-              next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
-            elsif (next_direction = "011") then
-              next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
-            elsif (next_direction = "100") then
-              next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
-            end if;
+            corner       <= '0';
+            nochange_int <= '0';
           end if;
+
+          -- updates next cell for head
+          if (next_direction = "001") then
+            next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+          elsif (next_direction = "010") then
+            next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+          elsif (next_direction = "011") then
+            next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+          elsif (next_direction = "100") then
+            next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
+          end if;
+          
           
 
         elsif (checking = "001") then
@@ -120,7 +121,7 @@ begin
           current_cell          <= next_cell_int;
         elsif (checking = "010") then
           checking <= "011";
-          if (nochange_int = '1') then
+          if (corner = '0') then
             if (to_integer(check_read_data) = 0) then
               crashed_int <= '0';
             else
@@ -128,16 +129,30 @@ begin
             end if;
           end if;
         elsif (checking = "011") then
-          checking   <= "000";
-          check_done <= '1';
+          checking <= (others => '0');
+          if (corner = '1') then
+            nochange_int <= '0';
+            check_done   <= '0';
+          else
+            nochange_int <= '1';
+            check_done   <= '1';
+          end if;
+
+
         end if;
-      else
-        check_done <= '0';
-        checking   <= "000";
+
+
+
+          
+        else
+          check_done   <= '0';
+          nochange_int <= '1';
+          checking     <= (others => '0');
+          corner       <= '0';
+        end if;        
       end if;
-    end if;
-  end process p_collision_checker;
+    end process p_collision_checker;
 
 
 
-end Behavioral;
+    end Behavioral;
