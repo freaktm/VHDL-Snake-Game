@@ -324,7 +324,7 @@ begin
           end if;
         when CHECK =>
           if (check_done_int = '1') then
-            gamelogic_state <= HEAD_ADDR;
+            gamelogic_state <= HEAD_DATA;
           elsif (nochange_int = '0') then
             gamelogic_state <= CORNER;
           elsif (crashed_int = '1') then
@@ -332,11 +332,11 @@ begin
           else
             gamelogic_state <= CHECK;
           end if;
-        when HEAD_ADDR =>
+        when HEAD_DATA =>
           if (head_addr_done_int = '1') then
-            gamelogic_state <= HEAD;
+            gamelogic_state <= HEAD_WRITE;
           end if;
-        when HEAD =>
+        when HEAD_WRITE =>
           if (head_done_int = '1') then
             gamelogic_state <= TAIL_READ;
           end if;

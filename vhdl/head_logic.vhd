@@ -67,7 +67,7 @@ begin
       snake_character     <= to_unsigned(3*8, snake_character'length);
       head_write_data_int <= (others => '0');
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-      if (gamelogic_state = HEAD_ADDR) then
+      if (gamelogic_state = HEAD_DATA) then
         if (current_direction_in = "001") or (current_direction_in = "011") then
           snake_character <= to_unsigned(3*8, snake_character'length);
         elsif (current_direction_in = "010") or (current_direction_in = "100") then
@@ -89,7 +89,7 @@ begin
     if ext_reset = '1' then             -- asynchronous reset (active high)
       head_done_int <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-      if (gamelogic_state = HEAD) then
+      if (gamelogic_state = HEAD_WRITE) then
         head_done_int <= '1';
       else
         head_done_int <= '0';
