@@ -38,7 +38,6 @@ architecture Behavioral of head_logic is
 
 
   signal snake_character     : unsigned(8 downto 0)         := (others => '0');
-  signal checking            : std_logic_vector(1 downto 0) := (others => '0');
   signal address_a_head_int  : unsigned(12 downto 0)        := (others => '0');
   signal head_write_data_int : unsigned(11 downto 0)        := (others => '0');
   signal head_done_int       : std_logic                    := '0';
@@ -55,6 +54,31 @@ begin
   head_done       <= head_done_int;
   head_addr_done  <= head_addr_done_int;
 
+  address_a_head_int <= next_cell;
+
+  -- purpose: sets the address for the HEAD state to write.
+  -- type   : sequential
+  -- inputs : clk_slow, ext_reset
+  -- outputs: 
+  p_set_head_address : process (clk_slow, ext_reset)
+  begin  -- process p_set_head_address
+    if ext_reset = '1' then             -- asynchronous reset (active high)
+      head_addr_done_int  <= '0';
+      snake_character     <= to_unsigned(3*8, snake_character'length);
+      head_write_data_int <= (others => '0');
+    elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
+      if (gamelogic_state = HEAD_ADDR) then
+        if (current_direction_in = "001") or (current_direction_in = "011") then
+          snake_character <= to_unsigned(3*8, snake_character'length);
+        elsif (current_direction_in = "010") or (current_direction_in = "100") then
+          snake_character <= to_unsigned(2*8, snake_character'length);
+        end if;
+        head_write_data_int <= current_direction_in & snake_character;
+      end if;
+    end if;
+  end process p_set_head_address;
+
+
 
   -- purpose: update head movement
   -- type   : sequential
@@ -63,40 +87,17 @@ begin
   p_process_head : process (clk_slow, ext_reset)
   begin  -- process
     if ext_reset = '1' then             -- asynchronous reset (active high)
-      checking            <= (others => '0');
-      head_done_int       <= '0';
-      snake_character     <= to_unsigned(3*8, snake_character'length);
-      address_a_head_int  <= next_cell;
-      head_write_data_int <= (others => '0');
-      
+      head_done_int <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-
-
       if (gamelogic_state = HEAD) then
-
-        if (checking = "00") then
-          
-          checking <= "01";
-          if (current_direction_in = "001") or (current_direction_in = "011") then
-            snake_character <= to_unsigned(3*8, snake_character'length);
-          elsif (current_direction_in = "010") or (current_direction_in = "100") then
-            snake_character <= to_unsigned(2*8, snake_character'length);
-          end if;
-          address_a_head_int <= next_cell;
-        elsif (checking = "01") then
-          checking            <= "10";
-          head_write_data_int <= current_direction_in & snake_character;
-        elsif (checking = "10") then
-          checking      <= (others => '0');
-          head_done_int <= '1';
-        end if;
-
+        head_done_int <= '1';
       else
-        checking      <= (others => '0');
         head_done_int <= '0';
       end if;
-      
     end if;
   end process;
-  
+
+
+
+
 end Behavioral;
