@@ -85,9 +85,10 @@ begin
           checking   <= '1';
           -- checks to see if the snake has changed direction
           if (current_direction_int /= next_direction) then
-            nochange_int          <= '0';
             old_direction_out_int <= current_direction_int;
+            current_direction_int <= next_direction;
             corner_cell_int       <= current_cell;
+            nochange_int          <= '0';
           else
             if (next_direction = "001") then
               next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
@@ -100,10 +101,9 @@ begin
             end if;
             nochange_int <= '1';
           end if;
-        elsif (checking = '1') then
-          checking              <= '0';
-          current_direction_int <= next_direction;
-          current_cell          <= next_cell_int;
+        else
+          checking     <= '0';
+          current_cell <= next_cell_int;
           if (to_integer(check_read_data) = 0) then
             crashed_int <= '0';
             check_done  <= '1';
@@ -112,13 +112,13 @@ begin
             check_done  <= '0';
           end if;
         end if;
+      else
+        check_done   <= '0';
+        nochange_int <= '1';
+        checking     <= '0';
       end if;
-    else
-      check_done   <= '0';
-      nochange_int <= '1';
-      checking     <= '0';
     end if;
-end process p_collision_checker;
+  end process p_collision_checker;
 
 
 
