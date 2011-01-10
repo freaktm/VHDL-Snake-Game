@@ -105,16 +105,16 @@ begin
           checking     <= '0';
           current_cell <= next_cell_int;
           if (to_integer(check_read_data) = 0) then
-            check_done  <= '1';
+            check_done_int <= '1';
           else
             crashed_int <= '1';
           end if;
         end if;
       else
-        crashed_int  <= '0';
-        check_done   <= '0';
-        nochange_int <= '1';
-        checking     <= '0';
+        crashed_int    <= '0';
+        check_done_int <= '0';
+        nochange_int   <= '1';
+        checking       <= '0';
       end if;
     end if;
   end process p_collision_checker;
