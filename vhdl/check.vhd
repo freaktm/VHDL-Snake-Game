@@ -118,7 +118,6 @@ begin
       nochange_int <= '1';
       checking     <= '0';
     end if;
-  end if;
 end process p_collision_checker;
 
 
