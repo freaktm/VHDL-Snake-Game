@@ -46,6 +46,7 @@ architecture Behavioral of check_logic is
   signal old_direction_out_int : unsigned(2 downto 0)  := "001";
   signal nochange_int          : std_logic             := '1';
   signal crashed_int           : std_logic             := '0';
+  signal check_done_int        : std_logic             := '0';
 
   
 begin
@@ -56,6 +57,7 @@ begin
   nochange              <= nochange_int;
   crashed               <= crashed_int;
   corner_cell           <= corner_cell_int;
+  check_done            <= check_done_int;
 
 
   next_direction <= keyboard;
@@ -70,7 +72,7 @@ begin
   begin  -- process p_collision_checker
     if (ext_reset = '1') then           --  asynchronous reset (active high)
       crashed_int           <= '0';
-      check_done            <= '0';
+      check_done_int        <= '0';
       nochange_int          <= '1';
       checking              <= '0';
       current_cell          <= to_unsigned(2440, current_cell'length);
@@ -81,8 +83,7 @@ begin
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
         if (checking = '0') then
-          check_done <= '0';
-          checking   <= '1';
+          checking <= '1';
           -- checks to see if the snake has changed direction
           if (current_direction_int /= next_direction) then
             old_direction_out_int <= current_direction_int;
@@ -99,20 +100,18 @@ begin
             elsif (next_direction = "100") then
               next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
             end if;
-            nochange_int <= '1';
           end if;
         else
           checking     <= '0';
           current_cell <= next_cell_int;
           if (to_integer(check_read_data) = 0) then
-            crashed_int <= '0';
             check_done  <= '1';
           else
             crashed_int <= '1';
-            check_done  <= '0';
           end if;
         end if;
       else
+        crashed_int  <= '0';
         check_done   <= '0';
         nochange_int <= '1';
         checking     <= '0';
