@@ -74,6 +74,7 @@ begin
           snake_character <= to_unsigned(2*8, snake_character'length);
         end if;
         head_write_data_int <= current_direction_in & snake_character;
+        head_addr_done_int <= '1';
       end if;
     end if;
   end process p_set_head_address;
