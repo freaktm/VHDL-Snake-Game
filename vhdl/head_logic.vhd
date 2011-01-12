@@ -37,11 +37,12 @@ end head_logic;
 architecture Behavioral of head_logic is
 
 
-  signal snake_character     : unsigned(8 downto 0)         := (others => '0');
-  signal address_a_head_int  : unsigned(12 downto 0)        := (others => '0');
-  signal head_write_data_int : unsigned(11 downto 0)        := (others => '0');
-  signal head_done_int       : std_logic                    := '0';
-  signal head_addr_done_int  : std_logic                    := '0';
+  signal snake_character     : unsigned(8 downto 0)  := (others => '0');
+  signal address_a_head_int  : unsigned(12 downto 0) := (others => '0');
+  signal head_write_data_int : unsigned(11 downto 0) := (others => '0');
+  signal head_done_int       : std_logic             := '0';
+  signal head_addr_done_int  : std_logic             := '0';
+  signal gen_char            : std_logic             := '0';
 
   
   
@@ -66,15 +67,20 @@ begin
       head_addr_done_int  <= '0';
       snake_character     <= to_unsigned(3*8, snake_character'length);
       head_write_data_int <= (others => '0');
+      gen_char            <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
       if (gamelogic_state = HEAD_DATA) then
-        if (current_direction_in = "001") or (current_direction_in = "011") then
-          snake_character <= to_unsigned(3*8, snake_character'length);
-        elsif (current_direction_in = "010") or (current_direction_in = "100") then
-          snake_character <= to_unsigned(2*8, snake_character'length);
+        if (gen_char = '0') then
+          gen_char <= '1';
+        else
+          if (current_direction_in = "001") or (current_direction_in = "011") then
+            snake_character <= to_unsigned(3*8, snake_character'length);
+          elsif (current_direction_in = "010") or (current_direction_in = "100") then
+            snake_character <= to_unsigned(2*8, snake_character'length);
+          end if;
+          head_write_data_int <= current_direction_in & snake_character;
+          head_addr_done_int  <= '1';
         end if;
-        head_write_data_int <= current_direction_in & snake_character;
-        head_addr_done_int <= '1';
       end if;
     end if;
   end process p_set_head_address;
