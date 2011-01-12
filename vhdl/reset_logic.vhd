@@ -72,7 +72,7 @@ begin
           ramcnt_j := ramcnt_j + 1;
           ramcnt_i := 0;
           if (ramcnt_j = 55) then
-            reset_done_int <= '1';
+            reset_done_int <= '0';
             ramcnt_i       := 0;
             ramcnt_j       := 0;
           end if;
