@@ -79,6 +79,21 @@ begin
   row_data      <= row_data_signal;
 
 
+
+  p_row_counter : process (clk25, ext_reset)
+  begin  -- process p_row_counter
+    if ext_reset = '1' then                 -- asynchronous reset (active high)
+      row_count <= (others => '0');
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge
+      --increment row_count
+      if (to_integer(hcounter) = (H_WIDTH-8))
+        and (to_integer(vcounter) > (VS+VB-2)) then
+        row_count <= row_count + 1;
+      end if;
+    end if;
+  end process p_row_counter;
+
+
   p_vga_signals : process (clk25, ext_reset)
   begin
     if ext_reset = '1' then                 -- asynchronous reset (active high)
@@ -86,24 +101,17 @@ begin
       vcounter      <= (others => '0');
       hs_out_signal <= '0';
       vs_out_signal <= '0';
-      row_count     <= (others => '0');
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
       -- increment counters
       if (to_integer(hcounter) < H_WIDTH) then
         hcounter <= hcounter + 1;
       else
-        hcounter <= (others => '0');
         if (to_integer(vcounter) < V_WIDTH) then
-          if (to_integer(vcounter) > (VB + VS - 2))
-            and (to_integer(hcounter) = (H_WIDTH - 8))
-          then
-            row_count <= row_count + 1;
-          end if;
           vcounter <= vcounter + 1;
         else
-          vcounter  <= (others => '0');
-          row_count <= (others => '0');
+          vcounter <= (others => '0');
         end if;
+        hcounter <= (others => '0');
       end if;
 
 
@@ -115,7 +123,7 @@ begin
       then
         red   <= '0';
         green <= '0';
-        blue  <= '1';
+        blue  <= pixel;
       else
         red   <= '0';
         green <= '0';
@@ -173,7 +181,7 @@ begin
       rom_address_signal   <= (others => '0');
       row_data_signal      <= (others => '0');
     elsif clk25'event and clk25 = '1' then
-      if pixelcount_w = "111" then
+      if pixelcount_w = "110" then
         strobe_signal <= '1';
       elsif pixelcount_w < "100" then
         strobe_signal        <= '0';
@@ -184,6 +192,8 @@ begin
       elsif pixelcount_w = "101" then
         strobe_signal   <= '0';
         row_data_signal <= rom_data;
+      else
+        strobe_signal <= '0';
       end if;
     end if;
   end process;
