@@ -79,8 +79,6 @@ begin
   row_data      <= row_data_signal;
 
 
-
-
   p_vga_signals : process (clk25, ext_reset)
   begin
     if ext_reset = '1' then                 -- asynchronous reset (active high)
@@ -109,8 +107,8 @@ begin
         and (to_integer(vcounter) > (VB + VS - 1))
         and (to_integer(vcounter) < (VB + VS + VD))
       then
-        red   <= pixel;
-        green <= pixel;
+        red   <= '0';
+        green <= '1';
         blue  <= pixel;
       else
         red   <= '0';
@@ -120,9 +118,12 @@ begin
 
 
       --increment row_count
-      if (to_integer(hcounter) = (H_WIDTH-8))
-        and (to_integer(vcounter) > (VS+VB-2)) then
-        row_count <= row_count + 1;
+      if (to_integer(hcounter) = (H_WIDTH-8)) then
+        if (to_integer(vcounter) > (VS+VB-1)) then
+          row_count <= row_count + 1;
+        else
+          row_count <= (others => '0');
+        end if;
       end if;
 
       -- define horizontal sync pulse
@@ -143,27 +144,43 @@ begin
 
 
 
-  p_cell_counter : process (hcounter, vcounter, pixelcount_w)
+  p_cell_counter : process (clk25, ext_reset)
   begin  -- process p_cell_counter
     if ext_reset = '1' then
       cell <= (others => '0');
-    else
-      if (to_integer(hcounter) > (HB+HS-2))
-        and (to_integer(hcounter) < (HB+HS+HD))
+    elsif clk25'event and clk25 = '1' then
+      if (to_integer(hcounter) > (HB+HS-40))
         and (to_integer(vcounter) < (VB+VS+VD))
-        and (to_integer(vcounter) > (VS+VB-2)) then
-        if pixelcount_w = "000" then
-          if (to_integer(cell) < 4799) then
+        and (to_integer(vcounter) > (VS+VB-1)) then
+
+        if (to_integer(hcounter) < (HB+HS+HD-28)) then
+          if pixelcount_w = "111" then
+            if (to_integer(cell) < 4799) then
+              cell <= cell + 1;
+            else
+              cell <= (others => '0');
+            end if;
+          end if;
+        end if;
+
+        if (to_integer(hcounter) = 755) then
+          if (row_count = "111") then
             cell <= cell + 1;
           else
-            cell <= (others => '0');
+            cell <= cell - 79;
           end if;
         end if;
       end if;
+      
+
+      
     end if;
+
+
+
+
+    
   end process p_cell_counter;
-
-
 
   p_strobe : process(clk25, ext_reset)
   begin
@@ -173,15 +190,15 @@ begin
       rom_address_signal   <= (others => '0');
       row_data_signal      <= (others => '0');
     elsif clk25'event and clk25 = '1' then
-      if pixelcount_w = "110" then
+      if pixelcount_w = "101" then
         strobe_signal <= '1';
-      elsif pixelcount_w < "100" then
+      elsif pixelcount_w < "010" then
         strobe_signal        <= '0';
         ram_address_b_signal <= to_unsigned((to_integer(cell)), ram_address_b'length);
-      elsif pixelcount_w = "100" then
+      elsif pixelcount_w = "011" then
         strobe_signal      <= '0';
         rom_address_signal <= to_unsigned(to_integer(ram_data_b(8 downto 0)) + to_integer(row_count), rom_address'length);
-      elsif pixelcount_w = "101" then
+      elsif pixelcount_w = "100" then
         strobe_signal   <= '0';
         row_data_signal <= rom_data;
       else
@@ -191,13 +208,13 @@ begin
   end process;
 
 
+
   p_pixelcount : process (clk25, ext_reset)
   begin
     if ext_reset = '1' then
       pixelcount_w <= (others => '0');
-
     elsif clk25'event and clk25 = '1' then
-      if (to_integer(hcounter) < (HB + HS - 24))
+      if (to_integer(hcounter) < (HB + HS - 23))
         or (to_integer(vcounter) < (VB + VS - 2)) then
         pixelcount_w <= (others => '0');
       else
