@@ -22,15 +22,16 @@ use work.gamelogic_pkg.all;             -- game state package
 
 entity head_logic is
   port(
-    clk_slow        : in  std_logic;
-    ext_reset       : in  std_logic;
-    gamelogic_state : in  gamelogic_state_t;
-    address_a_head  : out unsigned(12 downto 0);
-    head_write_data : out unsigned(11 downto 0);
-    head_done       : out std_logic;
-    head_addr_done  : out std_logic;
-    next_cell       : in  unsigned(12 downto 0);
-    changed_dir     : in  std_logic
+    clk_slow             : in  std_logic;
+    ext_reset            : in  std_logic;
+    gamelogic_state      : in  gamelogic_state_t;
+    address_a_head       : out unsigned(12 downto 0);
+    head_write_data      : out unsigned(11 downto 0);
+    head_done            : out std_logic;
+    head_addr_done       : out std_logic;
+    next_cell            : in  unsigned(12 downto 0);
+    changed_dir          : in  std_logic;
+    current_direction_in : in  unsigned(2 downto 0)
     );
 end head_logic;
 

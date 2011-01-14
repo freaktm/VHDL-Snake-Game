@@ -80,7 +80,6 @@ begin
       crashed_int     <= '0';
       check_done_int  <= '0';
       nochange_int    <= '1';
-      changed_dir_int <= '0';
 
       current_cell          <= to_unsigned(2440, current_cell'length);
       current_direction_int <= "001";   -- reset to moving up

@@ -130,15 +130,16 @@ architecture Behavioral of game_logic is
 
   component head_logic is
     port(
-      clk_slow        : in  std_logic;
-      ext_reset       : in  std_logic;
-      gamelogic_state : in  gamelogic_state_t;
-      address_a_head  : out unsigned(12 downto 0);
-      head_write_data : out unsigned(11 downto 0);
-      head_done       : out std_logic;
-      head_addr_done  : out std_logic;
-      next_cell       : in  unsigned(12 downto 0);
-      changed_dir     : in  std_logic
+      clk_slow             : in  std_logic;
+      ext_reset            : in  std_logic;
+      gamelogic_state      : in  gamelogic_state_t;
+      address_a_head       : out unsigned(12 downto 0);
+      head_write_data      : out unsigned(11 downto 0);
+      head_done            : out std_logic;
+      head_addr_done       : out std_logic;
+      next_cell            : in  unsigned(12 downto 0);
+      changed_dir          : in  std_logic;
+      current_direction_in : in  unsigned(2 downto 0)
       );
   end component;
 
@@ -271,15 +272,16 @@ begin
 
   HEAD_CNTRL : head_logic
     port map (
-      clk_slow        => clk_slow,
-      ext_reset       => ext_reset,
-      gamelogic_state => gamelogic_state,
-      address_a_head  => head_cell_int,
-      head_write_data => head_write_data_int,
-      head_done       => head_done_int,
-      head_addr_done  => head_addr_done_int,
-      changed_dir     => nochange_int,
-      next_cell       => next_cell_int);
+      clk_slow             => clk_slow,
+      ext_reset            => ext_reset,
+      gamelogic_state      => gamelogic_state,
+      address_a_head       => head_cell_int,
+      head_write_data      => head_write_data_int,
+      head_done            => head_done_int,
+      head_addr_done       => head_addr_done_int,
+      changed_dir          => nochange_int,
+      next_cell            => next_cell_int,
+      current_direction_in => current_direction_int);
 
 
 
