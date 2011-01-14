@@ -43,7 +43,7 @@ architecture behavioral of fontrom is
     "00000000",
 
     --filled character (1)
-    "11111111",
+    "01111111",
     "11111111",
     "11111111",
     "11111111",
