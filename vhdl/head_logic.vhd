@@ -22,15 +22,15 @@ use work.gamelogic_pkg.all;             -- game state package
 
 entity head_logic is
   port(
-    clk_slow             : in  std_logic;
-    ext_reset            : in  std_logic;
-    gamelogic_state      : in  gamelogic_state_t;
-    address_a_head       : out unsigned(12 downto 0);
-    head_write_data      : out unsigned(11 downto 0);
-    head_done            : out std_logic;
-    head_addr_done       : out std_logic;
-    next_cell            : in  unsigned(12 downto 0);
-    current_direction_in : in  unsigned(2 downto 0)
+    clk_slow        : in  std_logic;
+    ext_reset       : in  std_logic;
+    gamelogic_state : in  gamelogic_state_t;
+    address_a_head  : out unsigned(12 downto 0);
+    head_write_data : out unsigned(11 downto 0);
+    head_done       : out std_logic;
+    head_addr_done  : out std_logic;
+    next_cell       : in  unsigned(12 downto 0);
+    changed_dir     : in  std_logic
     );
 end head_logic;
 
@@ -72,14 +72,17 @@ begin
       if (gamelogic_state = HEAD_DATA) then
         if (gen_char = '0') then
           gen_char <= '1';
-        else
-          if (current_direction_in = "001") or (current_direction_in = "011") then
-            snake_character <= to_unsigned(3*8, snake_character'length);
-          elsif (current_direction_in = "010") or (current_direction_in = "100") then
-            snake_character <= to_unsigned(2*8, snake_character'length);
+          if changed_dir = '1' then
+            if (to_integer(snake_character) = 16) then
+              snake_character <= to_unsigned(3*8, snake_character'length);
+            else
+              snake_character <= to_unsigned(2*8, snake_character'length);
+            end if;
+          else
+            head_write_data_int <= current_direction_in & snake_character;
+            head_addr_done_int  <= '1';
+            gen_char            <= '0';
           end if;
-          head_write_data_int <= current_direction_in & snake_character;
-          head_addr_done_int  <= '1';
         end if;
       end if;
     end if;
