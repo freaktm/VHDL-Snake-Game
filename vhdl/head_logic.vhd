@@ -72,7 +72,7 @@ begin
       if (gamelogic_state = HEAD_DATA) then
         if (gen_char = '0') then
           gen_char <= '1';
-          if changed_dir = '1' then
+          if changed_dir = '0' then     -- (active low)
             if (to_integer(snake_character) = 16) then
               snake_character <= to_unsigned(3*8, snake_character'length);
             else
