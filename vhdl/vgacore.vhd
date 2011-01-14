@@ -54,12 +54,12 @@ architecture behavioral of vga_core is
   signal   row_data_signal      : unsigned(7 downto 0)  := (others => '0');
   signal   red, green           : std_logic             := '0';
   signal   blue                 : std_logic             := '0';
-  constant HB                   : integer               := 38;
-  constant HF                   : integer               := 26;
+  constant HB                   : integer               := 18;
+  constant HF                   : integer               := 46;
   constant HS                   : integer               := 96;
   constant HD                   : integer               := 640;
-  constant VB                   : integer               := 33;
-  constant VF                   : integer               := 10;
+  constant VB                   : integer               := 10;
+  constant VF                   : integer               := 33;
   constant VS                   : integer               := 2;
   constant VD                   : integer               := 480;
   constant H_WIDTH              : integer               := HB+HF+HS+HD-1;  -- screen counter horizontal
@@ -80,19 +80,6 @@ begin
 
 
 
-  p_row_counter : process (clk25, ext_reset)
-  begin  -- process p_row_counter
-    if ext_reset = '1' then                 -- asynchronous reset (active high)
-      row_count <= (others => '0');
-    elsif clk25'event and clk25 = '1' then  -- rising clock edge
-      --increment row_count
-      if (to_integer(hcounter) = (H_WIDTH-8))
-        and (to_integer(vcounter) > (VS+VB-2)) then
-        row_count <= row_count + 1;
-      end if;
-    end if;
-  end process p_row_counter;
-
 
   p_vga_signals : process (clk25, ext_reset)
   begin
@@ -101,6 +88,7 @@ begin
       vcounter      <= (others => '0');
       hs_out_signal <= '0';
       vs_out_signal <= '0';
+      row_count     <= (others => '0');
     elsif clk25'event and clk25 = '1' then  -- rising clock edge
       -- increment counters
       if (to_integer(hcounter) < H_WIDTH) then
@@ -123,7 +111,7 @@ begin
       then
         red   <= '0';
         green <= '0';
-        blue  <= pixel;
+        blue  <= '1';
       else
         red   <= '0';
         green <= '0';
@@ -131,17 +119,21 @@ begin
       end if;
 
 
-      -- define synch pulse's
-      if (to_integer(hcounter) > HB - 1) and
-        (to_integer(hcounter) < (HB + HS - 1)) then
+      --increment row_count
+      if (to_integer(hcounter) = (H_WIDTH-8))
+        and (to_integer(vcounter) > (VS+VB-2)) then
+        row_count <= row_count + 1;
+      end if;
+
+      -- define horizontal sync pulse
+      if (to_integer(hcounter) < HS) then
         hs_out_signal <= '0';
       else
         hs_out_signal <= '1';
       end if;
 
-
-      if (to_integer(vcounter) > VB - 1) and
-        (to_integer(vcounter) < (VB + VS - 1)) then
+      -- define vertical sync pulse
+      if (to_integer(vcounter) < VS) then
         vs_out_signal <= '0';
       else
         vs_out_signal <= '1';
