@@ -109,9 +109,9 @@ begin
         and (to_integer(vcounter) > (VB + VS - 1))
         and (to_integer(vcounter) < (VB + VS + VD))
       then
-        red   <= '0';
-        green <= '0';
-        blue  <= '1';
+        red   <= pixel;
+        green <= pixel;
+        blue  <= pixel;
       else
         red   <= '0';
         green <= '0';
