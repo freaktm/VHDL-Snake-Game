@@ -43,7 +43,6 @@ architecture Behavioral of head_logic is
   signal head_write_data_int : unsigned(11 downto 0) := (others => '0');
   signal head_done_int       : std_logic             := '0';
   signal head_addr_done_int  : std_logic             := '0';
-  signal gen_char            : std_logic             := '0';
 
   
   
@@ -68,33 +67,29 @@ begin
       head_addr_done_int  <= '0';
       snake_character     <= to_unsigned(3*8, snake_character'length);
       head_write_data_int <= (others => '0');
-      gen_char            <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-      if (gamelogic_state = HEAD_DATA) then
-        if (gen_char = '0') then
-          gen_char <= '1';
-          if changed_dir = '0' then     -- (active low)
-            if (to_integer(snake_character) = 16) then
-              snake_character <= to_unsigned(3*8, snake_character'length);
-            else
-              snake_character <= to_unsigned(2*8, snake_character'length);
-            end if;
-          else
-            head_write_data_int <= current_direction_in & snake_character;
-            head_addr_done_int  <= '1';
-            gen_char            <= '0';
-          end if;
+      
+      if changed_dir = '0' then         -- (active low)
+        if (to_integer(snake_character) = 16) then
+          snake_character <= to_unsigned(3*8, snake_character'length);
+        else
+          snake_character <= to_unsigned(2*8, snake_character'length);
         end if;
+      end if;
+
+      if (gamelogic_state = HEAD_DATA) then
+        head_write_data_int <= current_direction_in & snake_character;
+        head_addr_done_int  <= '1';
       end if;
     end if;
   end process p_set_head_address;
 
 
 
-  -- purpose: update head movement
-  -- type   : sequential
-  -- inputs : clk_slow, ext_reset
-  -- outputs: 
+-- purpose: update head movement
+-- type   : sequential
+-- inputs : clk_slow, ext_reset
+-- outputs: 
   p_process_head : process (clk_slow, ext_reset)
   begin  -- process
     if ext_reset = '1' then             -- asynchronous reset (active high)
