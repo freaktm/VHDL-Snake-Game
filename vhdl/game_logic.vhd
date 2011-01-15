@@ -177,11 +177,48 @@ architecture Behavioral of game_logic is
   signal head_addr_done_int    : std_logic             := '0';
   signal changed_dir_int       : std_logic             := '0';
 
+------------------------------------------------------------------------------
 
+component chipscope_icon
+  PORT (
+    CONTROL0 : INOUT STD_LOGIC_VECTOR(35 DOWNTO 0));
+
+end component;
+
+-- Synplicity black box declaration
+attribute syn_black_box : boolean;
+attribute syn_black_box of chipscope_icon: component is true;
+component chipscope_ila
+  PORT (
+    CONTROL : INOUT STD_LOGIC_VECTOR(35 DOWNTO 0);
+    CLK : IN STD_LOGIC;
+    TRIG0 : IN STD_LOGIC_VECTOR(7 DOWNTO 0));
+
+end component;
+
+
+-- Synplicity black box declaration
+attribute syn_black_box of chipscope_ila: component is true;
   
+signal chipscope_control : std_logic_vector(35 downto 0);
+signal chipscope_trigger : std_logic_vector(7 downto 0);
+
 begin
 
+ila_inst : chipscope_ila
+  port map (
+    CONTROL => chipscope_control,
+    CLK => clk25,
+    TRIG0 => chipscope_trigger);
 
+icon_inst : chipscope_icon
+  port map (
+    CONTROL0 => chipscope_control);
+
+chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_direction) & tick & check_done_int; 
+
+
+---------------------------------------------------------------
 
   RAM_CNTRL : ram_mux
     port map (
