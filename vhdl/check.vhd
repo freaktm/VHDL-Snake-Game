@@ -115,45 +115,44 @@ begin
               check_state           <= CHECK_DIRECTION;
             end if;
           else
-            check_state  <= MOVE_DIRECTION;
+            check_state  <= CHECK_DIRECTION;
             nochange_int <= '1';
           end if;
-        end if;
-      elsif (check_state = CHECK_DIRECTION) then
-        current_direction_int <= next_direction;
-        check_state           <= MOVE_DIRECTION;
-      elsif (check_state = MOVE_DIRECTION) then
-        check_state <= CHECK_HIT;
-        if (next_direction = "001") then
-          current_axis  <= VERTICAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
-        elsif (next_direction = "010") then
-          current_axis  <= HORIZONTAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
-        elsif (next_direction = "011") then
-          current_axis  <= VERTICAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
-        elsif (next_direction = KEYBOARD_LEFT) then
-          current_axis  <= HORIZONTAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
-        end if;
-      elsif (check_state = CHECK_HIT) then
-        check_state <= IDLE;
-        if (to_integer(check_read_data) = 0) then
-          check_done_int <= '1';
+        elsif (check_state = CHECK_DIRECTION) then
+          current_direction_int <= next_direction;
+          check_state           <= MOVE_DIRECTION;
+        elsif (check_state = MOVE_DIRECTION) then
+          check_state <= CHECK_HIT;
+          if (next_direction = KEYBOARD_UP) then
+            current_axis  <= VERTICAL;
+            next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+          elsif (next_direction = KEYBOARD_RIGHT) then
+            current_axis  <= HORIZONTAL;
+            next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+          elsif (next_direction = KEYBOARD_DOWN) then
+            current_axis  <= VERTICAL;
+            next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+          elsif (next_direction = KEYBOARD_LEFT) then
+            current_axis  <= HORIZONTAL;
+            next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
+          end if;
+        elsif (check_state = CHECK_HIT) then
+          check_state <= IDLE;
+          if (to_integer(check_read_data) = 0) then
+            check_done_int <= '1';
+          else
+            crashed_int <= '1';
+          end if;
         else
-          crashed_int <= '1';
+          check_state    <= IDLE;
+          current_cell   <= next_cell_int;
+          crashed_int    <= '0';
+          check_done_int <= '0';
+          nochange_int   <= '1';
         end if;
       end if;
-    else
-      check_state    <= IDLE;
-      current_cell   <= next_cell_int;
-      crashed_int    <= '0';
-      check_done_int <= '0';
-      nochange_int   <= '1';
     end if;
-  end if;
-end process p_collision_checker;
+  end process p_collision_checker;
 
 
 
