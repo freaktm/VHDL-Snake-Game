@@ -34,10 +34,12 @@ end corner_logic;
 architecture Behavioral of corner_logic is
 
 
-  signal snake_character       : unsigned(8 downto 0)         := (others => '0');
-  signal state                 : std_logic_vector(1 downto 0) := (others => '0');
-  signal corner_done_int       : std_logic                    := '0';
-  signal corner_write_data_int : unsigned(11 downto 0)        := (others => '0');
+  signal snake_character       : unsigned(8 downto 0)  := (others => '0');
+  signal corner_done_int       : std_logic             := '0';
+  signal corner_write_data_int : unsigned(11 downto 0) := (others => '0');
+
+  type   corner_state_t is (IDLE, CHAR_GEN, CHAR_WRITE);
+  signal corner_state : corner_state_t := IDLE;
   
 begin
   
@@ -54,12 +56,13 @@ begin
     if ext_reset = '1' then             -- asynchronous reset (active high)
       snake_character       <= (others => '0');
       corner_done_int       <= '0';
-      state                 <= (others => '0');
       corner_write_data_int <= (others => '0');
+      corner_state          <= IDLE;
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge      
       if (gamelogic_state = CORNER) then
-        if (state = "00") then
-          state <= "01";
+        
+        if (corner_state = IDLE) then
+          corner_state <= CHAR_GEN;
           if (current_direction_in = "001") and (old_direction_in = "010") then
             snake_character <= to_unsigned(5*8, snake_character'length);
           elsif (current_direction_in = "100") and (old_direction_in = "011") then
@@ -77,18 +80,20 @@ begin
           elsif (current_direction_in = "100") and (old_direction_in = "001") then
             snake_character <= to_unsigned(7*8, snake_character'length);
           else
-            snake_character <= (others => '0');
+            snake_character <= to_unsigned(39*8, snake_character'length);
           end if;
-        elsif (state = "01") then
+          
+        elsif (corner_state = CHAR_GEN) then
+          corner_state          <= CHAR_WRITE;
           corner_write_data_int <= current_direction_in & snake_character;
-          state                 <= "10";
-        elsif (state = "10") then
+          
+        elsif (corner_state = CHAR_WRITE) then
           corner_done_int <= '1';
-          state           <= (others => '0');
-        else
-          corner_done_int <= '0';
-          state           <= (others => '0');
+          corner_state    <= IDLE;
         end if;
+      else
+        corner_state    <= IDLE;
+        corner_done_int <= '0';
       end if;
     end if;
   end process p_process_corner;
