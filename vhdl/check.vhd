@@ -37,18 +37,25 @@ end check_logic;
 
 architecture Behavioral of check_logic is
 
-  signal current_direction_int : unsigned(2 downto 0)  := "001";
-  signal next_direction        : unsigned(2 downto 0)  := "001";
-  signal current_cell          : unsigned(12 downto 0) := to_unsigned(2520, 13);
-  signal next_cell_int         : unsigned(12 downto 0) := to_unsigned(2360, 13);
-  signal corner_cell_int       : unsigned(12 downto 0) := (others => '0');
-  signal old_direction_out_int : unsigned(2 downto 0)  := "001";
-  signal nochange_int          : std_logic             := '1';
-  signal crashed_int           : std_logic             := '0';
-  signal check_done_int        : std_logic             := '0';
+  signal   current_direction_int : unsigned(2 downto 0)  := "001";
+  signal   next_direction        : unsigned(2 downto 0)  := "001";
+  signal   current_cell          : unsigned(12 downto 0) := to_unsigned(2520, 13);
+  signal   next_cell_int         : unsigned(12 downto 0) := to_unsigned(2360, 13);
+  signal   corner_cell_int       : unsigned(12 downto 0) := (others => '0');
+  signal   old_direction_out_int : unsigned(2 downto 0)  := "001";
+  signal   nochange_int          : std_logic             := '1';
+  signal   crashed_int           : std_logic             := '0';
+  signal   check_done_int        : std_logic             := '0';
+  constant KEYBOARD_LEFT         : unsigned(2 downto 0)  := "100";
+  constant KEYBOARD_RIGHT        : unsigned(2 downto 0)  := "010";
+  constant KEYBOARD_UP           : unsigned(2 downto 0)  := "001";
+  constant KEYBOARD_DOWN         : unsigned(2 downto 0)  := "011";
 
-  type   check_state_t is (IDLE, CHECK_DIRECTION, CHECK_HIT);
-  signal check_state : check_state_t := IDLE;
+
+  type   current_axis_t is (HORIZONTAL, VERTICAL);
+  type   check_state_t is (IDLE, CHECK_DIRECTION, MOVE_DIRECTION, CHECK_HIT);
+  signal check_state  : check_state_t  := IDLE;
+  signal current_axis : current_axis_t := VERTICAL;
   
 begin
 
@@ -77,57 +84,76 @@ begin
   begin  -- process p_collision_checker
     if (ext_reset = '1') then           --  asynchronous reset (active high)
       
-      crashed_int     <= '0';
-      check_done_int  <= '0';
-      nochange_int    <= '1';
+      crashed_int    <= '0';
+      check_done_int <= '0';
+      nochange_int   <= '1';
+      current_axis   <= VERTICAL;
 
       current_cell          <= to_unsigned(2440, current_cell'length);
-      current_direction_int <= "001";   -- reset to moving up
+      current_direction_int <= KEYBOARD_UP;  -- reset to moving up
       next_cell_int         <= to_unsigned(2360, next_cell_int'length);
 
-      old_direction_out_int <= "001";
+      old_direction_out_int <= KEYBOARD_UP;
       corner_cell_int       <= (others => '0');
       check_state           <= IDLE;
       
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
         if (check_state = IDLE) then
-          check_state <= CHECK_DIRECTION;
-          -- checks to see if the snake has changed direction
           if (current_direction_int /= next_direction) then
-            old_direction_out_int <= current_direction_int;
-            current_direction_int <= next_direction;
-            corner_cell_int       <= current_cell;
-            nochange_int          <= '0';
-          end if;
-        elsif (check_state = CHECK_DIRECTION) then
-          check_state <= CHECK_HIT;
-          if (next_direction = "001") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
-          elsif (next_direction = "010") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
-          elsif (next_direction = "011") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
-          elsif (next_direction = "100") then
-            next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
-          end if;
-        elsif (check_state = CHECK_HIT) then
-          check_state <= IDLE;
-          if (to_integer(check_read_data) = 0) then
-            check_done_int <= '1';
+            if (current_axis = VERTICAL) then
+              if (next_direction = KEYBOARD_RIGHT) or (next_direction = KEYBOARD_LEFT) then
+                old_direction_out_int <= current_direction_int;
+                corner_cell_int       <= current_cell;
+                nochange_int          <= '0';
+                check_state           <= CHECK_DIRECTION;
+              end if;
+            elsif (next_direction = KEYBOARD_UP) or (next_direction = KEYBOARD_DOWN) then
+              old_direction_out_int <= current_direction_int;
+              corner_cell_int       <= current_cell;
+              nochange_int          <= '0';
+              check_state           <= CHECK_DIRECTION;
+            end if;
           else
-            crashed_int <= '1';
+            check_state  <= MOVE_DIRECTION;
+            nochange_int <= '1';
           end if;
         end if;
-      else
-        check_state    <= IDLE;
-        current_cell   <= next_cell_int;
-        crashed_int    <= '0';
-        check_done_int <= '0';
-        nochange_int   <= '1';
+      elsif (check_state = CHECK_DIRECTION) then
+        current_direction_int <= next_direction;
+        check_state           <= MOVE_DIRECTION;
+      elsif (check_state = MOVE_DIRECTION) then
+        check_state <= CHECK_HIT;
+        if (next_direction = "001") then
+          current_axis  <= VERTICAL;
+          next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+        elsif (next_direction = "010") then
+          current_axis  <= HORIZONTAL;
+          next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+        elsif (next_direction = "011") then
+          current_axis  <= VERTICAL;
+          next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+        elsif (next_direction = KEYBOARD_LEFT) then
+          current_axis  <= HORIZONTAL;
+          next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
+        end if;
+      elsif (check_state = CHECK_HIT) then
+        check_state <= IDLE;
+        if (to_integer(check_read_data) = 0) then
+          check_done_int <= '1';
+        else
+          crashed_int <= '1';
+        end if;
       end if;
+    else
+      check_state    <= IDLE;
+      current_cell   <= next_cell_int;
+      crashed_int    <= '0';
+      check_done_int <= '0';
+      nochange_int   <= '1';
     end if;
-  end process p_collision_checker;
+  end if;
+end process p_collision_checker;
 
 
 
