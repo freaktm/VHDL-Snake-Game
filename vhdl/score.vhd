@@ -256,41 +256,9 @@ begin
 
 
 
-  score_updates : process (score_state)
-  begin  -- process score1_update
-    if (score_state = SCORE1) then
-      score1_v <= score1_v + 1;
-      if (score1_v = "1010") then
-        score1_v   <= (others => '0');
-        score1_max <= '1';
-      else
-        score1_done <= '1';
-      end if;
-    elsif (score_state = SCORE2) then
-      score2_v <= score2_v + 1;
-      if (score2_v = "1010") then
-        score2_v   <= (others => '0');
-        score2_max <= '1';
-      else
-        score2_done <= '1';
-      end if;
-    elsif (score_state = SCORE3) then
-      score3_v <= score3_v + 1;
-      if (score3_v = "1010") then
-        score3_v   <= (others => '0');
-        score3_max <= '1';
-      else
-        score3_done <= '1';
-      end if;
-    elsif (score_state = SCORE4) then
-      score4_v <= score4_v + 1;
-      if (score4_v = "1010") then
-        score4_v   <= (others => '0');
-        score4_max <= '1';
-      else
-        score4_done <= '1';
-      end if;
-    else
+  p_score_updater : process (clk25, ext_reset)
+  begin  -- process p_score_updater
+    if ext_reset = '1' then                 -- asynchronous reset (active high)
       score1_done <= '0';
       score1_max  <= '0';
       score2_max  <= '0';
@@ -299,8 +267,43 @@ begin
       score3_max  <= '0';
       score4_done <= '0';
       score4_max  <= '0';
+    elsif clk25'event and clk25 = '1' then  -- rising clock edge
+      if (score_state = SCORE1) then
+        score1_v <= score1_v + 1;
+        if (score1_v = "1010") then
+          score1_v   <= (others => '0');
+          score1_max <= '1';
+        else
+          score1_done <= '1';
+        end if;
+      elsif (score_state = SCORE2) then
+        score2_v <= score2_v + 1;
+        if (score2_v = "1010") then
+          score2_v   <= (others => '0');
+          score2_max <= '1';
+        else
+          score2_done <= '1';
+        end if;
+      elsif (score_state = SCORE3) then
+        score3_v <= score3_v + 1;
+        if (score3_v = "1010") then
+          score3_v   <= (others => '0');
+          score3_max <= '1';
+        else
+          score3_done <= '1';
+        end if;
+      elsif (score_state = SCORE4) then
+        score4_v <= score4_v + 1;
+        if (score4_v = "1010") then
+          score4_v   <= (others => '0');
+          score4_max <= '1';
+        else
+          score4_done <= '1';
+        end if;
+      end if;
     end if;
-  end process score_updates;
+  end process p_score_updater;
+
 
 
 
@@ -337,7 +340,9 @@ begin
             score_state <= SCORE_WRITE;
           end if;
         when SCORE4 =>
-          if (score4_done = '1') then
+          if (score4_max = '1') then
+            score_state <= SCORE1;
+          elsif (score4_done = '1') then
             score_state <= SCORE_WRITE;
           end if;
         when SCORE_WRITE =>
@@ -349,6 +354,7 @@ begin
 
   end process p_state_machine;
 
+  
 
 
 
