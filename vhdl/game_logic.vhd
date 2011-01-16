@@ -378,11 +378,11 @@ chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_directi
           end if;
         when HEAD_WRITE =>
           if (head_done_int = '1') then
-            gamelogic_state <= IDLE;
+            gamelogic_state <= TAIL_READ;
           end if;
         when CORNER =>
           if (corner_done_int = '1') then
-            gamelogic_state <= IDLE;
+            gamelogic_state <= TAIL_READ;
           end if;
         when TAIL_READ =>
           if (tailread_done_int = '1') then
@@ -410,7 +410,7 @@ chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_directi
 
 
 -- purpose: updates the user input from keyboard
--- type   : combinational
+-- type   : sequential
 -- inputs : clk25, ext_reset, Direction, crashed
 -- outputs: next_direction, reset_game
   p_keyboard_input : process (clk25, ext_reset)
