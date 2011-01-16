@@ -99,7 +99,7 @@ begin
 
       -- displays pixel data, in blue colour
       if (to_integer(hcounter) > (HB + HS - 1))
-        and (to_integer(hcounter) < (HB + HS + HD))
+        and (to_integer(hcounter) < (HB + HS + HD + 16))
         and (to_integer(vcounter) > (VB + VS - 1))
         and (to_integer(vcounter) < (VB + VS + VD))
       then
