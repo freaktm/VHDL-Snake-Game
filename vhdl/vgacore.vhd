@@ -42,10 +42,6 @@ architecture behavioral of vga_core is
   signal   pixelcount_w         : unsigned(2 downto 0)  := (others => '0');
   signal   row_count            : unsigned(2 downto 0)  := (others => '0');
   signal   cell                 : unsigned(12 downto 0) := (others => '0');
-  signal   x                    : unsigned(9 downto 0)  := (others => '0');
-  signal   y                    : unsigned(8 downto 0)  := (others => '0');
-  signal   x_temp               : unsigned(6 downto 0)  := (others => '0');
-  signal   y_temp               : unsigned(5 downto 0)  := (others => '0');
   signal   hs_out_signal        : std_logic             := '0';
   signal   vs_out_signal        : std_logic             := '0';
   signal   ram_address_b_signal : unsigned(12 downto 0) := (others => '0');
