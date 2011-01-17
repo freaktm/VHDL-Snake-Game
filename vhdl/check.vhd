@@ -39,7 +39,7 @@ architecture Behavioral of check_logic is
 
   signal   current_direction_int : unsigned(2 downto 0)  := "001";
   signal   next_direction        : unsigned(2 downto 0)  := "001";
-  signal   current_cell          : unsigned(12 downto 0) := to_unsigned(2520, 13);
+  signal   current_cell          : unsigned(12 downto 0) := to_unsigned(2440, 13);
   signal   next_cell_int         : unsigned(12 downto 0) := to_unsigned(2360, 13);
   signal   corner_cell_int       : unsigned(12 downto 0) := (others => '0');
   signal   old_direction_out_int : unsigned(2 downto 0)  := "001";
@@ -53,7 +53,7 @@ architecture Behavioral of check_logic is
 
 
   type   current_axis_t is (HORIZONTAL, VERTICAL);
-  type   check_state_t is (IDLE, CHECK_DIRECTION, MOVE_DIRECTION, CHECK_HIT);
+  type   check_state_t is (IDLE, CHECK_DIRECTION, CHANGE_DIRECTION, CALC_NEXT_CELL, CHECK_HIT);
   signal check_state  : check_state_t  := IDLE;
   signal current_axis : current_axis_t := VERTICAL;
   
@@ -99,6 +99,8 @@ begin
       
     elsif (clk_slow'event and clk_slow = '1') then
       if (gamelogic_state = CHECK) then
+
+        -- CHECK DIRECTION STATE---
         if (check_state = IDLE) then
           if (current_direction_int /= next_direction) then
             if (current_axis = VERTICAL) then
@@ -106,33 +108,35 @@ begin
                 old_direction_out_int <= current_direction_int;
                 corner_cell_int       <= current_cell;
                 nochange_int          <= '0';
-                check_state           <= CHECK_DIRECTION;
+                check_state           <= CHANGE_DIRECTION;
               end if;
             elsif (next_direction = KEYBOARD_UP) or (next_direction = KEYBOARD_DOWN) then
               old_direction_out_int <= current_direction_int;
               corner_cell_int       <= current_cell;
               nochange_int          <= '0';
-              check_state           <= CHECK_DIRECTION;
+              check_state           <= CHANGE_DIRECTION;
             end if;
           else
-            check_state  <= CHECK_DIRECTION;
             nochange_int <= '1';
+            check_state  <= CALC_NEXT_CELL;
           end if;
-        elsif (check_state = CHECK_DIRECTION) then
+          -- CHANGE_DIRECTION STATE
+        elsif (check_state = CHANGE_DIRECTION) then
           current_direction_int <= next_direction;
-          check_state           <= MOVE_DIRECTION;
-        elsif (check_state = MOVE_DIRECTION) then
+          check_state           <= CALC_NEXT_CELL;
+          -- CALCULATE NEXT HEAD CELL
+        elsif (check_state = CALC_NEXT_CELL) then
           check_state <= CHECK_HIT;
-          if (next_direction = KEYBOARD_UP) then
+          if (current_direction_int = KEYBOARD_UP) then
             current_axis  <= VERTICAL;
             next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
-          elsif (next_direction = KEYBOARD_RIGHT) then
+          elsif (current_direction_int = KEYBOARD_RIGHT) then
             current_axis  <= HORIZONTAL;
             next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
-          elsif (next_direction = KEYBOARD_DOWN) then
+          elsif (current_direction_int = KEYBOARD_DOWN) then
             current_axis  <= VERTICAL;
             next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
-          elsif (next_direction = KEYBOARD_LEFT) then
+          elsif (current_direction_int = KEYBOARD_LEFT) then
             current_axis  <= HORIZONTAL;
             next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
           end if;
@@ -143,14 +147,18 @@ begin
           else
             crashed_int <= '1';
           end if;
-        else
-          check_state    <= IDLE;
-          current_cell   <= next_cell_int;
-          crashed_int    <= '0';
-          check_done_int <= '0';
-          nochange_int   <= '1';
         end if;
+      else
+        check_state    <= IDLE;
+        crashed_int    <= '0';
+        check_done_int <= '0';
+        nochange_int   <= '1';
       end if;
+
+
+
+
+      
     end if;
   end process p_collision_checker;
 
