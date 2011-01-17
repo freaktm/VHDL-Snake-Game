@@ -6,7 +6,7 @@
 -- Author     : Aaron Storey  <freaktm@freaktm>
 -- Company    : 
 -- Created    : 2010-12-26
--- Last update: 2011-01-03
+-- Last update: 2011-01-17
 -- Platform   : 
 -- Standard   : VHDL'87
 -------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ begin  -- tb
     wait for 500 ns;
     ext_reset <= '0';
 
-    wait for 10000 ns;
+    wait for 100000 ns;
 
     --simulate left keyboard press
     wait until clk'event and clk = '1';
@@ -139,7 +139,7 @@ begin  -- tb
 
 
 
-    wait for 10000 ns;
+    wait for 100000 ns;
 
     --simulate down keyboard press
     wait until clk'event and clk = '1';
@@ -149,7 +149,7 @@ begin  -- tb
     keyboard_wr_en   <= '0';
 
     wait until keyboard_ready = '1';
-    wait for 1000 ns;
+    wait for 100000 ns;
 
     --simulate keyboard break (release key)
     wait until clk'event and clk = '1';
