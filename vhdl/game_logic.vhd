@@ -179,43 +179,43 @@ architecture Behavioral of game_logic is
 
 ------------------------------------------------------------------------------
 
-component chipscope_icon
-  PORT (
-    CONTROL0 : INOUT STD_LOGIC_VECTOR(35 DOWNTO 0));
+  component chipscope_icon
+    port (
+      CONTROL0 : inout std_logic_vector(35 downto 0));
 
-end component;
-
--- Synplicity black box declaration
-attribute syn_black_box : boolean;
-attribute syn_black_box of chipscope_icon: component is true;
-component chipscope_ila
-  PORT (
-    CONTROL : INOUT STD_LOGIC_VECTOR(35 DOWNTO 0);
-    CLK : IN STD_LOGIC;
-    TRIG0 : IN STD_LOGIC_VECTOR(7 DOWNTO 0));
-
-end component;
-
+  end component;
 
 -- Synplicity black box declaration
-attribute syn_black_box of chipscope_ila: component is true;
-  
-signal chipscope_control : std_logic_vector(35 downto 0);
-signal chipscope_trigger : std_logic_vector(7 downto 0);
+  attribute syn_black_box                   : boolean;
+  attribute syn_black_box of chipscope_icon : component is true;
+  component chipscope_ila
+    port (
+      CONTROL : inout std_logic_vector(35 downto 0);
+      CLK     : in    std_logic;
+      TRIG0   : in    std_logic_vector(7 downto 0));
+
+  end component;
+
+
+-- Synplicity black box declaration
+  attribute syn_black_box of chipscope_ila : component is true;
+
+  signal chipscope_control : std_logic_vector(35 downto 0);
+  signal chipscope_trigger : std_logic_vector(7 downto 0);
 
 begin
 
-ila_inst : chipscope_ila
-  port map (
-    CONTROL => chipscope_control,
-    CLK => clk25,
-    TRIG0 => chipscope_trigger);
+  ila_inst : chipscope_ila
+    port map (
+      CONTROL => chipscope_control,
+      CLK     => clk25,
+      TRIG0   => chipscope_trigger);
 
-icon_inst : chipscope_icon
-  port map (
-    CONTROL0 => chipscope_control);
+  icon_inst : chipscope_icon
+    port map (
+      CONTROL0 => chipscope_control);
 
-chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_direction) & tick & check_done_int; 
+  chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_direction) & tick & check_done_int;
 
 
 ---------------------------------------------------------------
@@ -337,7 +337,7 @@ chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_directi
       cnt  := 0;
     elsif clk25'event and clk25 = '1' then  --    rising clock edge   
       cnt := cnt + 1;
-      if (cnt = 25) then
+      if (cnt = 10000) then
         tick <= '1';  --  move snake head every time the  timer reaches max.
         cnt  := 0;
       else
@@ -363,9 +363,9 @@ chipscope_trigger <= std_logic_vector(Direction) & std_logic_vector(next_directi
             gamelogic_state <= CHECK;
           end if;
         when CHECK =>
-          if (check_done_int = '1') then
+          if (check_done_int = '1') and (nochange_int = '1') then
             gamelogic_state <= HEAD_DATA;
-          elsif (nochange_int = '0') then
+          elsif (check_done_int = '1') and (nochange_int = '0') then
             gamelogic_state <= CORNER;
           elsif (crashed_int = '1') then
             gamelogic_state <= RESET;
