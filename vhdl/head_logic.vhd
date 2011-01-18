@@ -30,7 +30,7 @@ entity head_logic is
     head_done            : out std_logic;
     head_addr_done       : out std_logic;
     next_cell            : in  unsigned(12 downto 0);
-    changed_dir          : in  std_logic;
+    snake_char           : in  std_logic;
     current_direction_in : in  unsigned(2 downto 0)
     );
 end head_logic;
@@ -68,13 +68,10 @@ begin
       snake_character     <= to_unsigned(3*8, snake_character'length);
       head_write_data_int <= (others => '0');
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-      
-      if changed_dir = '0' then         -- (active low)
-        if (to_integer(snake_character) = 16) then
-          snake_character <= to_unsigned(3*8, snake_character'length);
-        else
-          snake_character <= to_unsigned(2*8, snake_character'length);
-        end if;
+      if (to_integer(snake_character) = 16) then
+        snake_character <= to_unsigned(3*8, snake_character'length);
+      else
+        snake_character <= to_unsigned(2*8, snake_character'length);
       end if;
 
       if (gamelogic_state = HEAD_DATA) then
