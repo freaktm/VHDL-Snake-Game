@@ -123,7 +123,8 @@ architecture Behavioral of game_logic is
       old_direction_out     : out unsigned(2 downto 0);
       current_direction_out : out unsigned(2 downto 0);
       next_cell             : out unsigned(12 downto 0);
-      corner_cell           : out unsigned(12 downto 0)
+      corner_cell           : out unsigned(12 downto 0);
+      snake_char            : out std_logic
       );
   end component;
 
@@ -138,7 +139,7 @@ architecture Behavioral of game_logic is
       head_done            : out std_logic;
       head_addr_done       : out std_logic;
       next_cell            : in  unsigned(12 downto 0);
-      changed_dir          : in  std_logic;
+      snake_char           : in  std_logic;
       current_direction_in : in  unsigned(2 downto 0)
       );
   end component;
@@ -175,7 +176,7 @@ architecture Behavioral of game_logic is
   signal old_direction_int     : unsigned(2 downto 0)  := (others => '0');
   signal next_cell_int         : unsigned(12 downto 0) := (others => '0');
   signal head_addr_done_int    : std_logic             := '0';
-  signal changed_dir_int       : std_logic             := '0';
+  signal snake_char_int        : std_logic             := '0';
 
 ------------------------------------------------------------------------------
 
@@ -280,7 +281,8 @@ begin
       crashed               => crashed_int,
       current_direction_out => current_direction_int,
       next_cell             => next_cell_int,
-      corner_cell           => corner_cell_signal
+      corner_cell           => corner_cell_signal,
+      snake_char            => snake_char_int
       );
 
   CORNER_CNTRL : corner_logic
