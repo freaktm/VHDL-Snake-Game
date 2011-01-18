@@ -318,7 +318,7 @@ begin
       head_write_data      => head_write_data_int,
       head_done            => head_done_int,
       head_addr_done       => head_addr_done_int,
-      changed_dir          => nochange_int,
+      snake_char           => snake_char_int,
       next_cell            => next_cell_int,
       current_direction_in => current_direction_int);
 
