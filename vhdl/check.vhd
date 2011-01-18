@@ -165,7 +165,6 @@ begin
   begin  -- process p_CALC_CELL
     if ext_reset = '1' then             -- asynchronous reset (active high)
       current_axis        <= VERTICAL;
-      current_cell        <= to_unsigned(2440, current_cell'length);
       next_cell_int       <= to_unsigned(2360, next_cell_int'length);
       calc_next_cell_done <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
@@ -196,9 +195,10 @@ begin
     if (ext_reset = '1') then  --  asynchronous reset (active high)              
       check_done_int <= '0';
       crashed_int    <= '0';
+      current_cell   <= to_unsigned(2440, current_cell'length);
     elsif (clk_slow'event and clk_slow = '1') then
       if (check_state = CHECK_HIT) then
-        check_done_int <= '1';
+        current_cell   <= next_cell_int;
         if (to_integer(check_read_data) = 0) then
           check_done_int <= '1';
         else
