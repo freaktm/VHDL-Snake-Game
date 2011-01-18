@@ -31,7 +31,8 @@ entity check_logic is
     current_direction_out : out unsigned(2 downto 0);
     old_direction_out     : out unsigned(2 downto 0);
     next_cell             : out unsigned(12 downto 0);
-    corner_cell           : out unsigned(12 downto 0)
+    corner_cell           : out unsigned(12 downto 0);
+    snake_char            : out std_logic
     );
 end check_logic;
 
@@ -53,6 +54,7 @@ architecture Behavioral of check_logic is
   signal   check_direction_done  : std_logic             := '0';
   signal   change_direction_done : std_logic             := '0';
   signal   calc_next_cell_done   : std_logic             := '0';
+  signal   snake_char_int        : std_logic             := '0';
 
 
 
@@ -71,6 +73,7 @@ begin
   crashed               <= crashed_int;
   corner_cell           <= corner_cell_int;
   check_done            <= check_done_int;
+  snake_char            <= snake_char_int;
 
 
   next_direction <= keyboard;
@@ -166,21 +169,26 @@ begin
       current_axis        <= VERTICAL;
       next_cell_int       <= to_unsigned(2360, next_cell_int'length);
       calc_next_cell_done <= '0';
+      snake_char_int      <= '0';
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
       if (check_state = CALC_NEXT_CELL) then
         calc_next_cell_done <= '1';
         if (current_direction_int = KEYBOARD_UP) then
-          current_axis  <= VERTICAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
+          current_axis   <= VERTICAL;
+          snake_char_int <= '0';
+          next_cell_int  <= to_unsigned(to_integer(current_cell) - 80, next_cell_int'length);
         elsif (current_direction_int = KEYBOARD_RIGHT) then
-          current_axis  <= HORIZONTAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
+          current_axis   <= HORIZONTAL;
+          snake_char_int <= '1';
+          next_cell_int  <= to_unsigned(to_integer(current_cell) + 1, next_cell_int'length);
         elsif (current_direction_int = KEYBOARD_DOWN) then
-          current_axis  <= VERTICAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
+          current_axis   <= VERTICAL;
+          snake_char_int <= '0';
+          next_cell_int  <= to_unsigned(to_integer(current_cell) + 80, next_cell_int'length);
         elsif (current_direction_int = KEYBOARD_LEFT) then
-          current_axis  <= HORIZONTAL;
-          next_cell_int <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
+          current_axis   <= HORIZONTAL;
+          snake_char_int <= '1';
+          next_cell_int  <= to_unsigned(to_integer(current_cell) - 1, next_cell_int'length);
         end if;
       else
         calc_next_cell_done <= '0';
@@ -201,7 +209,7 @@ begin
         if (to_integer(check_read_data) = 0) then
           check_done_int <= '1';
         else
-          crashed_int    <= '1';
+          crashed_int <= '1';
         end if;
       else
         crashed_int    <= '0';
