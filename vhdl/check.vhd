@@ -138,7 +138,6 @@ begin
           nochange_int <= '1';
         end if;
       else
-        nochange_int         <= '1';
         check_direction_done <= '0';
       end if;
     end if;
@@ -198,11 +197,11 @@ begin
       current_cell   <= to_unsigned(2440, current_cell'length);
     elsif (clk_slow'event and clk_slow = '1') then
       if (check_state = CHECK_HIT) then
-        current_cell   <= next_cell_int;
+        current_cell <= next_cell_int;
         if (to_integer(check_read_data) = 0) then
           check_done_int <= '1';
         else
-          crashed_int <= '1';
+          crashed_int    <= '1';
         end if;
       else
         crashed_int    <= '0';
