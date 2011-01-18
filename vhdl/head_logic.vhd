@@ -44,7 +44,8 @@ architecture Behavioral of head_logic is
   signal head_done_int       : std_logic             := '0';
   signal head_addr_done_int  : std_logic             := '0';
 
-  
+  type   snake_head_t is (IDLE, GEN_CHAR, SET_DATA);
+  signal snake_head : snake_head_t := IDLE;
   
   
 begin
@@ -67,16 +68,22 @@ begin
       head_addr_done_int  <= '0';
       snake_character     <= to_unsigned(3*8, snake_character'length);
       head_write_data_int <= (others => '0');
+      snake_head          <= IDLE;
     elsif clk_slow'event and clk_slow = '1' then  -- rising clock edge
-      if (to_integer(snake_character) = 16) then
-        snake_character <= to_unsigned(3*8, snake_character'length);
-      else
-        snake_character <= to_unsigned(2*8, snake_character'length);
-      end if;
-
       if (gamelogic_state = HEAD_DATA) then
-        head_write_data_int <= current_direction_in & snake_character;
-        head_addr_done_int  <= '1';
+        if (snake_head = IDLE) then
+          snake_head <= GEN_CHAR;
+          if (snake_char = '0') then
+            snake_character <= to_unsigned(3*8, snake_character'length);
+          else
+            snake_character <= to_unsigned(2*8, snake_character'length);
+          end if;
+        elsif (snake_head = GEN_CHAR) then
+          head_write_data_int <= current_direction_in & snake_character;
+          head_addr_done_int  <= '1';
+        end if;
+      else
+        snake_head <= IDLE;
       end if;
     end if;
   end process p_set_head_address;
